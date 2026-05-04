@@ -18,6 +18,8 @@ import 'package:obs_websocket/obs_websocket.dart';
 /// export OBS_WEBSOCKET_URL=ws://localhost:4455
 /// export OBS_WEBSOCKET_PASSWORD=your_password
 /// ```
+///
+/// Note: The .env file is parsed at runtime (no build step required).
 void main(List<String> args) async {
   // Connect using .env file or environment variables
   final obs = await ObsWebSocket.connectFromEnv(

@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.7.0+1
+
+* Removed `envied` dependency for compile-time `.env` loading
+* Implemented runtime `.env` file parsing from current working directory
+* Added `ObsUtil.parseDotenvFile()` utility method for reusable dotenv parsing
+* Improved cross-platform compatibility with safe `.env` file loading (try-catch for web/mobile)
+* Updated documentation to clarify runtime `.env` loading behavior
+
 ## 5.7.0
 
 * Canvases (New in OBS WebSocket v5.7.0)

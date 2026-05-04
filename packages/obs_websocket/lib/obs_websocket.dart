@@ -9,8 +9,6 @@ export 'src/enum/obs_media_input_action.dart';
 export 'src/enum/obs_media_state.dart';
 export 'src/enum/obs_monitoring_type.dart';
 
-export 'src/obs_env.dart';
-
 export 'src/model/comm/authentication.dart';
 export 'src/model/comm/event.dart';
 export 'src/model/comm/hello.dart';

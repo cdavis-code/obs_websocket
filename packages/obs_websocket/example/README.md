@@ -24,6 +24,8 @@ export OBS_WEBSOCKET_URL=ws://localhost:4455
 export OBS_WEBSOCKET_PASSWORD=your_password
 ```
 
+**Note:** The `.env` file is parsed at runtime (no build step required). System environment variables take precedence over `.env` file values. This approach works for Dart VM/command-line examples only. For Flutter web/mobile apps, use `ObsWebSocket.connect()` directly with credentials from your app's configuration.
+
 ### Running Examples
 
 ```bash

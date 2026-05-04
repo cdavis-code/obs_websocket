@@ -74,7 +74,7 @@ Before a websocket connection can be made to a running instance of [OBS](https:/
 The easiest way to connect is to use `connectFromEnv()`, which automatically reads credentials from environment variables or a `.env` file:
 
 ```dart
-// Create a .env file with:
+// Create a .env file in your current working directory with:
 // OBS_WEBSOCKET_URL=ws://localhost:4455
 // OBS_WEBSOCKET_PASSWORD=your_password
 
@@ -86,12 +86,17 @@ final obsWebSocket = await ObsWebSocket.connectFromEnv();
 - `OBS_WEBSOCKET_PASSWORD` (optional) - OBS WebSocket password
 - `OBS_WEBSOCKET_TIMEOUT` (optional) - Connection timeout in seconds (default: 120)
 
-**`.env` file search paths** (first match wins):
-- `.env` in current working directory
-- `bin/.env` relative to CWD
-- `.env` in the same directory as the running script
+**`.env` file support:**
+- Place a `.env` file in your current working directory
+- The file is parsed at runtime (no build step required)
+- System environment variables take precedence over `.env` file values
 
-See [example/connect_from_env.dart](example/connect_from_env.dart) for a complete example.
+**Platform support:**
+- **Dart VM (CLI/Server):** Full `.env` file support
+- **Flutter Web:** Use `--dart-define` at build time or provide credentials programmatically
+- **Flutter Mobile:** Use app-specific storage and call `ObsWebSocket.connect()` directly
+
+See [example/example.dart](example/example.dart) for a complete example.
 
 #### Option 2: Manual connection with explicit parameters
 

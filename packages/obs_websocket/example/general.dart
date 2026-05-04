@@ -5,10 +5,11 @@ import 'package:loggy/loggy.dart';
 import 'package:obs_websocket/event.dart';
 import 'package:obs_websocket/obs_websocket.dart';
 
-/// Example demonstrating general OBS operations using .env file for credentials.
+/// Example demonstrating general OBS operations using environment variables
+/// or .env file for credentials.
 ///
-/// This example shows the new simplified approach using connectFromEnv().
-/// For the old manual approach, see event.dart.
+/// This example shows the simplified approach using connectFromEnv().
+/// The .env file is parsed at runtime (no build step required).
 
 void main(List<String> args) async {
   // Connect using .env file or environment variables
