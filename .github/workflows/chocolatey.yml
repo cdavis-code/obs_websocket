@@ -1,0 +1,140 @@
+name: Publish Chocolatey Package
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 5.7.0)'
+        required: true
+        default: '5.7.0'
+
+jobs:
+  build-and-publish:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      
+      - name: Get version
+        id: get_version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+          else
+            VERSION=${{ github.event.inputs.version }}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+      
+      - name: Install dependencies
+        working-directory: packages/obs_cli
+        run: dart pub get
+      
+      - name: Build Windows executable
+        working-directory: packages/obs_cli
+        run: |
+          dart compile exe bin/obs.dart -o obs.exe
+          echo "Build completed successfully"
+      
+      - name: Create ZIP archive
+        working-directory: packages/obs_cli
+        run: |
+          Compress-Archive -Path obs.exe -DestinationPath ../../obs-cli-windows.zip
+          echo "ZIP archive created"
+      
+      - name: Calculate SHA256 checksum
+        id: checksum
+        shell: pwsh
+        run: |
+          $hash = Get-FileHash -Path "obs-cli-windows.zip" -Algorithm SHA256
+          echo "checksum=$($hash.Hash)" >> $env:GITHUB_OUTPUT
+          echo "SHA256: $($hash.Hash)"
+      
+      - name: Upload Windows binary to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: obs-cli-windows.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Chocolatey tools
+        run: |
+          choco install chocolatey -y
+          choco install chocolateygui -y
+      
+      - name: Prepare Chocolatey package
+        shell: pwsh
+        run: |
+          # Create chocolatey package structure
+          mkdir chocolatey-package
+          mkdir chocolatey-package/tools
+          
+          # Copy nuspec and update version
+          $nuspec = Get-Content chocolatey/obs-cli.nuspec -Raw
+          $nuspec = $nuspec -replace '<version>.*?</version>', "<version>${{ steps.get_version.outputs.version }}</version>"
+          $nuspec | Out-File -FilePath chocolatey-package/obs-cli.nuspec -Encoding UTF8
+          
+          # Copy install script and update checksum
+          $installScript = Get-Content chocolatey/tools/chocolateyinstall.ps1 -Raw
+          $installScript = $installScript -replace "\$version = '.*?'", "`$version = '${{ steps.get_version.outputs.version }}'"
+          $installScript = $installScript -replace "checksum\s*=\s*''", "checksum = '${{ steps.checksum.outputs.checksum }}'"
+          $installScript | Out-File -FilePath chocolatey-package/tools/chocolateyinstall.ps1 -Encoding UTF8
+          
+          # Copy uninstall script
+          Copy-Item chocolatey/tools/chocolateyuninstall.ps1 chocolatey-package/tools/chocolateyuninstall.ps1
+          
+          echo "Chocolatey package prepared"
+      
+      - name: Pack Chocolatey package
+        working-directory: chocolatey-package
+        run: |
+          choco pack obs-cli.nuspec
+          echo "Chocolatey package packed"
+      
+      - name: Test Chocolatey package locally
+        working-directory: chocolatey-package
+        run: |
+          # Dry run to validate package
+          choco info obs-cli -s .
+          echo "Package validation completed"
+      
+      - name: Publish to Chocolatey Community Repository
+        if: github.event_name == 'release'
+        working-directory: chocolatey-package
+        run: |
+          choco apikey --key "${{ secrets.CHOCO_API_KEY }}" --source https://push.chocolatey.org/
+          choco push obs-cli.*.nupkg --source https://push.chocolatey.org/ --timeout 1800
+          echo "Published to Chocolatey Community Repository"
+        env:
+          CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
+      
+      - name: Upload Chocolatey package as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chocolatey-package
+          path: chocolatey-package/*.nupkg
+          retention-days: 30
+      
+      - name: Create release notes
+        if: github.event_name == 'release'
+        shell: bash
+        run: |
+          echo "## Chocolatey Installation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Install obs-cli via Chocolatey:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`powershell" >> $GITHUB_STEP_SUMMARY
+          echo "choco install obs-cli" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Package will be available after moderation review (typically 3-5 days)." >> $GITHUB_STEP_SUMMARY

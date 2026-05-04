@@ -131,8 +131,16 @@ Install using `brew`:
 For more information about the `brew` package manager and how to install it, check out [brew.sh](https://brew.sh/) 
 
 ```sh
-brew tap faithoflifedev/obs_websocket
-brew install obs
+brew tap cdavis-code/obs-cli
+brew install obs-cli
+```
+
+Install using `choco` (Windows):
+
+For more information about the `choco` package manager and how to install it, check out [chocolatey.org](https://chocolatey.org/) 
+
+```powershell
+choco install obs-cli
 ```
 
 Then check the install with,

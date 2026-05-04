@@ -1502,7 +1502,767 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
       );
     }
   }
-  static const _codeModeToolSpecs = <Map<String, dynamic>>[<String, dynamic>{'name': 'obs_connect', 'description': 'Connect to an OBS WebSocket server (ws:// or wss://) and authenticate. Required before any other tool can be invoked.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'url', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'password', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'timeoutSeconds', 'type': 'number', 'required': false}]}, <String, dynamic>{'name': 'obs_disconnect', 'description': 'Close the active OBS WebSocket connection.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_is_connected', 'description': 'Return whether a live OBS WebSocket connection is held.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_send_raw', 'description': 'Send a raw OBS WebSocket request (requestType + optional data map) and return the response payload. Use this for requests that are not exposed directly as tools.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'requestType', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'requestData', 'type': 'object', 'required': false}]}, <String, dynamic>{'name': 'obs_general_version', 'description': 'Return OBS Studio + obs-websocket version information.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_general_stats', 'description': 'Return OBS runtime statistics (cpu, memory, frame rate).', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_general_hotkeys', 'description': 'Return the names of every registered hotkey in OBS.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_general_trigger_hotkey', 'description': 'Trigger a hotkey by its registered name.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'hotkeyName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_general_sleep', 'description': 'Sleep for a duration in milliseconds or frames (executed server-side).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sleepMillis', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'sleepFrames', 'type': 'number', 'required': false}]}, <String, dynamic>{'name': 'obs_general_broadcast_custom_event', 'description': 'Broadcast a custom JSON event to all connected clients.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'eventData', 'type': 'object', 'required': true}]}, <String, dynamic>{'name': 'obs_scenes_list', 'description': 'Return all scenes plus the current program and preview scene.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_scenes_group_list', 'description': 'Return the names of all groups in OBS.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_scenes_get_current_program', 'description': 'Return the name of the scene currently on the program bus.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_scenes_set_current_program', 'description': 'Set the program scene to the given sceneName.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scenes_get_current_preview', 'description': 'Return the name of the preview scene (studio mode only). Throws if studio mode is disabled.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_scenes_set_current_preview', 'description': 'Set the preview scene (studio mode only).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scenes_create', 'description': 'Create a new scene with the given name.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_list', 'description': 'List the scene items (sources) contained in a scene.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_group_list', 'description': 'List the scene items contained in a group.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_id', 'description': 'Return the numeric sceneItemId for a source placed in a given scene.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_enabled', 'description': 'Return whether a scene item is currently enabled (visible).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_set_enabled', 'description': 'Show or hide a scene item by id.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'sceneItemEnabled', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_locked', 'description': 'Return whether a scene item is locked (uneditable).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_set_locked', 'description': 'Lock or unlock a scene item by id.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'sceneItemLocked', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_set_transform', 'description': 'Set the transform properties (position, scale, rotation, crop) for a scene item. Only provide the fields you want to change.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'positionX', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'positionY', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'scaleX', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'scaleY', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'rotation', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'cropLeft', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'cropTop', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'cropRight', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'cropBottom', 'type': 'number', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_list', 'description': 'List all inputs in OBS. Provide inputKind to filter to a single kind.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputKind', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_kind_list', 'description': 'Return the list of available input kinds on this OBS.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'unversioned', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_special', 'description': 'Return the names of OBS special inputs (mic/aux/etc.).', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_inputs_get_mute', 'description': 'Return whether an input is currently muted.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_set_mute', 'description': 'Mute or unmute an input (by name or uuid).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputMuted', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_toggle_mute', 'description': 'Toggle mute on an input and return the new muted state.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_get_volume', 'description': 'Return the volume of an input as both multiplier and dB.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_get_settings', 'description': 'Return the current settings payload for an input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_settings', 'description': 'Overwrite or merge an input settings payload.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputSettings', 'type': 'object', 'required': true}, <String, dynamic>{'name': 'overlay', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_name', 'description': 'Rename an input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'newInputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_create', 'description': 'Create a new input as a scene item inside a scene.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'inputKind', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'inputSettings', 'type': 'object', 'required': false}, <String, dynamic>{'name': 'sceneItemEnabled', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_remove', 'description': 'Delete an input by name or uuid.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_stream_status', 'description': 'Return the current streaming status.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_stream_start', 'description': 'Start the active streaming output.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_stream_stop', 'description': 'Stop the active streaming output.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_stream_toggle', 'description': 'Toggle streaming. Returns the resulting active state.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_stream_send_caption', 'description': 'Send a caption line to the active stream.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'captionText', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_record_status', 'description': 'Return the current recording status.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_start', 'description': 'Start a new recording.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_stop', 'description': 'Stop the current recording and return the resulting file path.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_toggle', 'description': 'Toggle recording on/off.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_pause', 'description': 'Pause the active recording.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_resume', 'description': 'Resume a paused recording.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_toggle_pause', 'description': 'Toggle pause state of the active recording.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_virtual_cam_status', 'description': 'Return whether the virtual camera output is active.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_virtual_cam_toggle', 'description': 'Toggle the virtual camera output. Returns new state.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_virtual_cam_start', 'description': 'Start the virtual camera output.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_virtual_cam_stop', 'description': 'Stop the virtual camera output.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_status', 'description': 'Return whether the replay buffer is currently active.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_toggle', 'description': 'Toggle the replay buffer. Returns the new active state.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_start', 'description': 'Start the replay buffer.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_stop', 'description': 'Stop the replay buffer.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_save', 'description': 'Flush the replay buffer contents to a replay file.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_outputs_toggle', 'description': 'Toggle a named OBS output. Returns the new active state.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_outputs_start', 'description': 'Start a named OBS output.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_outputs_stop', 'description': 'Stop a named OBS output.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_config_record_directory', 'description': 'Return the current recording directory.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_config_stream_service_settings', 'description': 'Return the active streaming service name + settings.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_ui_studio_mode_enabled', 'description': 'Return whether OBS studio mode is currently enabled.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_ui_set_studio_mode', 'description': 'Enable or disable OBS studio mode.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'enabled', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_ui_open_input_properties', 'description': 'Open the properties dialog window in the OBS UI for the given input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_ui_open_input_filters', 'description': 'Open the filters dialog in the OBS UI for the given input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_ui_open_input_interact', 'description': 'Open the interact dialog in the OBS UI for the given input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_ui_monitor_list', 'description': 'Return the list of connected monitors.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_trigger_studio', 'description': 'Trigger the studio-mode transition from the preview scene to program.', 'parameters': <Map<String, dynamic>>[]}];
+  FutureOr<CallToolResult> _obs_transitions_kind_list(CallToolRequest request) async {
+    try {
+
+
+      final result = await obs_mcp_server.ObsMcpServer().transitionsKindList();
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_transitions_kind_list: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_transitions_scene_list(CallToolRequest request) async {
+    try {
+
+
+      final result = await obs_mcp_server.ObsMcpServer().transitionsSceneList();
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_transitions_scene_list: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_transitions_get_current(CallToolRequest request) async {
+    try {
+
+
+      final result = await obs_mcp_server.ObsMcpServer().transitionsGetCurrent();
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_transitions_get_current: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_transitions_set_current(CallToolRequest request) async {
+    try {
+    final transitionName = request.arguments!['transitionName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().transitionsSetCurrent(transitionName);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_transitions_set_current: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_transitions_set_duration(CallToolRequest request) async {
+    try {
+    final duration = request.arguments!['duration'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().transitionsSetDuration(duration);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_transitions_set_duration: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_transitions_set_settings(CallToolRequest request) async {
+    try {
+    final transitionSettings = request.arguments!['transitionSettings'] as dynamic;
+    final overlay = request.arguments?['overlay'] as bool?;
+
+      final result = await obs_mcp_server.ObsMcpServer().transitionsSetSettings(transitionSettings: transitionSettings, overlay: overlay);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_transitions_set_settings: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_transitions_get_cursor(CallToolRequest request) async {
+    try {
+
+
+      final result = await obs_mcp_server.ObsMcpServer().transitionsGetCursor();
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_transitions_get_cursor: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_transitions_set_tbar(CallToolRequest request) async {
+    try {
+    final position = request.arguments!['position'] as double;
+    final release = request.arguments?['release'] as bool?;
+
+      final result = await obs_mcp_server.ObsMcpServer().transitionsSetTBar(position: position, release: release);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_transitions_set_tbar: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_canvases_list(CallToolRequest request) async {
+    try {
+
+
+      final result = await obs_mcp_server.ObsMcpServer().canvasesList();
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_canvases_list: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_filters_kind_list(CallToolRequest request) async {
+    try {
+
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersKindList();
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_filters_kind_list: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_filters_list(CallToolRequest request) async {
+    try {
+    final sourceName = request.arguments!['sourceName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersList(sourceName);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_filters_list: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_filters_default_settings(CallToolRequest request) async {
+    try {
+    final filterKind = request.arguments!['filterKind'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersDefaultSettings(filterKind);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_filters_default_settings: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_filters_create(CallToolRequest request) async {
+    try {
+    final sourceName = request.arguments!['sourceName'] as String;
+    final filterName = request.arguments!['filterName'] as String;
+    final filterKind = request.arguments!['filterKind'] as String;
+    final filterSettings = request.arguments?['filterSettings'] as dynamic?;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersCreate(sourceName: sourceName, filterName: filterName, filterKind: filterKind, filterSettings: filterSettings);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_filters_create: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_filters_remove(CallToolRequest request) async {
+    try {
+    final sourceName = request.arguments!['sourceName'] as String;
+    final filterName = request.arguments!['filterName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersRemove(sourceName: sourceName, filterName: filterName);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_filters_remove: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_filters_rename(CallToolRequest request) async {
+    try {
+    final sourceName = request.arguments!['sourceName'] as String;
+    final filterName = request.arguments!['filterName'] as String;
+    final newFilterName = request.arguments!['newFilterName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersRename(sourceName: sourceName, filterName: filterName, newFilterName: newFilterName);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_filters_rename: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_filters_get(CallToolRequest request) async {
+    try {
+    final sourceName = request.arguments!['sourceName'] as String;
+    final filterName = request.arguments!['filterName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersGet(sourceName: sourceName, filterName: filterName);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_filters_get: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_filters_set_index(CallToolRequest request) async {
+    try {
+    final sourceName = request.arguments!['sourceName'] as String;
+    final filterName = request.arguments!['filterName'] as String;
+    final filterIndex = request.arguments!['filterIndex'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersSetIndex(sourceName: sourceName, filterName: filterName, filterIndex: filterIndex);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_filters_set_index: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_filters_set_settings(CallToolRequest request) async {
+    try {
+    final sourceName = request.arguments!['sourceName'] as String;
+    final filterName = request.arguments!['filterName'] as String;
+    final filterSettings = request.arguments!['filterSettings'] as dynamic;
+    final overlay = request.arguments?['overlay'] as bool?;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersSetSettings(sourceName: sourceName, filterName: filterName, filterSettings: filterSettings, overlay: overlay);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_filters_set_settings: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_filters_set_enabled(CallToolRequest request) async {
+    try {
+    final sourceName = request.arguments!['sourceName'] as String;
+    final filterName = request.arguments!['filterName'] as String;
+    final filterEnabled = request.arguments!['filterEnabled'] as bool;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersSetEnabled(sourceName: sourceName, filterName: filterName, filterEnabled: filterEnabled);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_filters_set_enabled: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_outputs_list(CallToolRequest request) async {
+    try {
+
+
+      final result = await obs_mcp_server.ObsMcpServer().outputsList();
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_outputs_list: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_outputs_get_status(CallToolRequest request) async {
+    try {
+    final outputName = request.arguments!['outputName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().outputsGetStatus(outputName);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_outputs_get_status: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_outputs_get_settings(CallToolRequest request) async {
+    try {
+    final outputName = request.arguments!['outputName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().outputsGetSettings(outputName);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_outputs_get_settings: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_outputs_set_settings(CallToolRequest request) async {
+    try {
+    final outputName = request.arguments!['outputName'] as String;
+    final outputSettings = request.arguments!['outputSettings'] as dynamic;
+
+      final result = await obs_mcp_server.ObsMcpServer().outputsSetSettings(outputName: outputName, outputSettings: outputSettings);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_outputs_set_settings: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_inputs_get_audio_balance(CallToolRequest request) async {
+    try {
+    final inputName = request.arguments?['inputName'] as String?;
+    final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsGetAudioBalance(inputName: inputName, inputUuid: inputUuid);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_inputs_get_audio_balance: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_inputs_set_audio_balance(CallToolRequest request) async {
+    try {
+    final inputName = request.arguments?['inputName'] as String?;
+    final inputUuid = request.arguments?['inputUuid'] as String?;
+    final inputAudioBalance = request.arguments!['inputAudioBalance'] as double;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsSetAudioBalance(inputName: inputName, inputUuid: inputUuid, inputAudioBalance: inputAudioBalance);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_inputs_set_audio_balance: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_inputs_get_audio_sync_offset(CallToolRequest request) async {
+    try {
+    final inputName = request.arguments?['inputName'] as String?;
+    final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsGetAudioSyncOffset(inputName: inputName, inputUuid: inputUuid);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_inputs_get_audio_sync_offset: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_inputs_set_audio_sync_offset(CallToolRequest request) async {
+    try {
+    final inputName = request.arguments?['inputName'] as String?;
+    final inputUuid = request.arguments?['inputUuid'] as String?;
+    final inputAudioSyncOffset = request.arguments!['inputAudioSyncOffset'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsSetAudioSyncOffset(inputName: inputName, inputUuid: inputUuid, inputAudioSyncOffset: inputAudioSyncOffset);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_inputs_set_audio_sync_offset: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_inputs_get_audio_monitor_type(CallToolRequest request) async {
+    try {
+    final inputName = request.arguments?['inputName'] as String?;
+    final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsGetAudioMonitorType(inputName: inputName, inputUuid: inputUuid);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_inputs_get_audio_monitor_type: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_inputs_set_audio_monitor_type(CallToolRequest request) async {
+    try {
+    final inputName = request.arguments?['inputName'] as String?;
+    final inputUuid = request.arguments?['inputUuid'] as String?;
+    final monitorType = request.arguments!['monitorType'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsSetAudioMonitorType(inputName: inputName, inputUuid: inputUuid, monitorType: monitorType);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_inputs_set_audio_monitor_type: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_inputs_get_audio_tracks(CallToolRequest request) async {
+    try {
+    final inputName = request.arguments?['inputName'] as String?;
+    final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsGetAudioTracks(inputName: inputName, inputUuid: inputUuid);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_inputs_get_audio_tracks: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_inputs_set_audio_tracks(CallToolRequest request) async {
+    try {
+    final inputName = request.arguments?['inputName'] as String?;
+    final inputUuid = request.arguments?['inputUuid'] as String?;
+    final inputAudioTracks = request.arguments!['inputAudioTracks'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsSetAudioTracks(inputName: inputName, inputUuid: inputUuid, inputAudioTracks: inputAudioTracks);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_inputs_set_audio_tracks: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_inputs_get_properties_list_items(CallToolRequest request) async {
+    try {
+    final inputName = request.arguments?['inputName'] as String?;
+    final inputUuid = request.arguments?['inputUuid'] as String?;
+    final propertyName = request.arguments!['propertyName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsGetPropertiesListItems(inputName: inputName, inputUuid: inputUuid, propertyName: propertyName);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_inputs_get_properties_list_items: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_inputs_press_properties_button(CallToolRequest request) async {
+    try {
+    final inputName = request.arguments?['inputName'] as String?;
+    final inputUuid = request.arguments?['inputUuid'] as String?;
+    final propertyName = request.arguments!['propertyName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsPressPropertiesButton(inputName: inputName, inputUuid: inputUuid, propertyName: propertyName);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_inputs_press_properties_button: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_scene_items_get_source(CallToolRequest request) async {
+    try {
+    final sceneName = request.arguments?['sceneName'] as String?;
+    final sceneUuid = request.arguments?['sceneUuid'] as String?;
+    final sceneItemId = request.arguments!['sceneItemId'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetSource(sceneName: sceneName, sceneUuid: sceneUuid, sceneItemId: sceneItemId);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_scene_items_get_source: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_scene_items_get_private_settings(CallToolRequest request) async {
+    try {
+    final sceneName = request.arguments?['sceneName'] as String?;
+    final sceneUuid = request.arguments?['sceneUuid'] as String?;
+    final sceneItemId = request.arguments!['sceneItemId'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetPrivateSettings(sceneName: sceneName, sceneUuid: sceneUuid, sceneItemId: sceneItemId);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_scene_items_get_private_settings: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  FutureOr<CallToolResult> _obs_scene_items_set_private_settings(CallToolRequest request) async {
+    try {
+    final sceneName = request.arguments?['sceneName'] as String?;
+    final sceneUuid = request.arguments?['sceneUuid'] as String?;
+    final sceneItemId = request.arguments!['sceneItemId'] as int;
+    final sceneItemSettings = request.arguments!['sceneItemSettings'] as dynamic;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsSetPrivateSettings(sceneName: sceneName, sceneUuid: sceneUuid, sceneItemId: sceneItemId, sceneItemSettings: sceneItemSettings);
+      return CallToolResult(
+        content: [TextContent(text: _serializeResult(result))],
+      );
+    } catch (e, st) {
+      if (_logErrors) {
+        io.stderr.writeln('[easy_api] obs_scene_items_set_private_settings: $e');
+        io.stderr.writeln(st);
+        await io.stderr.flush();
+      }
+      return CallToolResult(
+        content: [TextContent(text: 'An error occurred while processing the request.')],
+        isError: true,
+      );
+    }
+  }
+  static const _codeModeToolSpecs = <Map<String, dynamic>>[<String, dynamic>{'name': 'obs_connect', 'description': 'Connect to an OBS WebSocket server (ws:// or wss://) and authenticate. Required before any other tool can be invoked.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'url', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'password', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'timeoutSeconds', 'type': 'number', 'required': false}]}, <String, dynamic>{'name': 'obs_disconnect', 'description': 'Close the active OBS WebSocket connection.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_is_connected', 'description': 'Return whether a live OBS WebSocket connection is held.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_send_raw', 'description': 'Send a raw OBS WebSocket request (requestType + optional data map) and return the response payload. Use this for requests that are not exposed directly as tools.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'requestType', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'requestData', 'type': 'object', 'required': false}]}, <String, dynamic>{'name': 'obs_general_version', 'description': 'Return OBS Studio + obs-websocket version information.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_general_stats', 'description': 'Return OBS runtime statistics (cpu, memory, frame rate).', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_general_hotkeys', 'description': 'Return the names of every registered hotkey in OBS.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_general_trigger_hotkey', 'description': 'Trigger a hotkey by its registered name.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'hotkeyName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_general_sleep', 'description': 'Sleep for a duration in milliseconds or frames (executed server-side).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sleepMillis', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'sleepFrames', 'type': 'number', 'required': false}]}, <String, dynamic>{'name': 'obs_general_broadcast_custom_event', 'description': 'Broadcast a custom JSON event to all connected clients.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'eventData', 'type': 'object', 'required': true}]}, <String, dynamic>{'name': 'obs_scenes_list', 'description': 'Return all scenes plus the current program and preview scene.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_scenes_group_list', 'description': 'Return the names of all groups in OBS.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_scenes_get_current_program', 'description': 'Return the name of the scene currently on the program bus.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_scenes_set_current_program', 'description': 'Set the program scene to the given sceneName.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scenes_get_current_preview', 'description': 'Return the name of the preview scene (studio mode only). Throws if studio mode is disabled.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_scenes_set_current_preview', 'description': 'Set the preview scene (studio mode only).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scenes_create', 'description': 'Create a new scene with the given name.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_list', 'description': 'List the scene items (sources) contained in a scene.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_group_list', 'description': 'List the scene items contained in a group.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_id', 'description': 'Return the numeric sceneItemId for a source placed in a given scene.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_enabled', 'description': 'Return whether a scene item is currently enabled (visible).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_set_enabled', 'description': 'Show or hide a scene item by id.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'sceneItemEnabled', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_locked', 'description': 'Return whether a scene item is locked (uneditable).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_set_locked', 'description': 'Lock or unlock a scene item by id.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'sceneItemLocked', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_set_transform', 'description': 'Set the transform properties (position, scale, rotation, crop) for a scene item. Only provide the fields you want to change.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'positionX', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'positionY', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'scaleX', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'scaleY', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'rotation', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'cropLeft', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'cropTop', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'cropRight', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'cropBottom', 'type': 'number', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_list', 'description': 'List all inputs in OBS. Provide inputKind to filter to a single kind.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputKind', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_kind_list', 'description': 'Return the list of available input kinds on this OBS.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'unversioned', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_special', 'description': 'Return the names of OBS special inputs (mic/aux/etc.).', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_inputs_get_mute', 'description': 'Return whether an input is currently muted.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_set_mute', 'description': 'Mute or unmute an input (by name or uuid).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputMuted', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_toggle_mute', 'description': 'Toggle mute on an input and return the new muted state.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_get_volume', 'description': 'Return the volume of an input as both multiplier and dB.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_get_settings', 'description': 'Return the current settings payload for an input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_settings', 'description': 'Overwrite or merge an input settings payload.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputSettings', 'type': 'object', 'required': true}, <String, dynamic>{'name': 'overlay', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_name', 'description': 'Rename an input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'newInputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_create', 'description': 'Create a new input as a scene item inside a scene.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'inputKind', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'inputSettings', 'type': 'object', 'required': false}, <String, dynamic>{'name': 'sceneItemEnabled', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_remove', 'description': 'Delete an input by name or uuid.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_stream_status', 'description': 'Return the current streaming status.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_stream_start', 'description': 'Start the active streaming output.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_stream_stop', 'description': 'Stop the active streaming output.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_stream_toggle', 'description': 'Toggle streaming. Returns the resulting active state.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_stream_send_caption', 'description': 'Send a caption line to the active stream.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'captionText', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_record_status', 'description': 'Return the current recording status.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_start', 'description': 'Start a new recording.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_stop', 'description': 'Stop the current recording and return the resulting file path.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_toggle', 'description': 'Toggle recording on/off.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_pause', 'description': 'Pause the active recording.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_resume', 'description': 'Resume a paused recording.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_toggle_pause', 'description': 'Toggle pause state of the active recording.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_virtual_cam_status', 'description': 'Return whether the virtual camera output is active.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_virtual_cam_toggle', 'description': 'Toggle the virtual camera output. Returns new state.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_virtual_cam_start', 'description': 'Start the virtual camera output.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_virtual_cam_stop', 'description': 'Stop the virtual camera output.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_status', 'description': 'Return whether the replay buffer is currently active.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_toggle', 'description': 'Toggle the replay buffer. Returns the new active state.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_start', 'description': 'Start the replay buffer.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_stop', 'description': 'Stop the replay buffer.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_save', 'description': 'Flush the replay buffer contents to a replay file.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_outputs_toggle', 'description': 'Toggle a named OBS output. Returns the new active state.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_outputs_start', 'description': 'Start a named OBS output.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_outputs_stop', 'description': 'Stop a named OBS output.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_config_record_directory', 'description': 'Return the current recording directory.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_config_stream_service_settings', 'description': 'Return the active streaming service name + settings.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_ui_studio_mode_enabled', 'description': 'Return whether OBS studio mode is currently enabled.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_ui_set_studio_mode', 'description': 'Enable or disable OBS studio mode.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'enabled', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_ui_open_input_properties', 'description': 'Open the properties dialog window in the OBS UI for the given input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_ui_open_input_filters', 'description': 'Open the filters dialog in the OBS UI for the given input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_ui_open_input_interact', 'description': 'Open the interact dialog in the OBS UI for the given input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_ui_monitor_list', 'description': 'Return the list of connected monitors.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_trigger_studio', 'description': 'Trigger the studio-mode transition from the preview scene to program.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_kind_list', 'description': 'Return the list of all available transition kinds.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_scene_list', 'description': 'Return the list of all scene transitions configured in OBS.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_get_current', 'description': 'Return information about the current scene transition.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_set_current', 'description': 'Set the current scene transition by name.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'transitionName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_transitions_set_duration', 'description': 'Set the duration of the current scene transition in milliseconds (50-20000).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'duration', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_transitions_set_settings', 'description': 'Set the settings of the current scene transition.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'transitionSettings', 'type': 'object', 'required': true}, <String, dynamic>{'name': 'overlay', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_transitions_get_cursor', 'description': 'Return the cursor position (0.0-1.0) of the current scene transition.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_set_tbar', 'description': 'Set the T-Bar position (0.0-1.0). Requires Studio Mode to be enabled.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'position', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'release', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_canvases_list', 'description': 'Return the list of all canvases configured in OBS (v5.7.0+).', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_filters_kind_list', 'description': 'Return the list of all available source filter kinds.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_filters_list', 'description': 'Return the list of filters applied to a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_filters_default_settings', 'description': 'Return the default settings for a given filter kind.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'filterKind', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_filters_create', 'description': 'Create a new filter and apply it to a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterKind', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterSettings', 'type': 'object', 'required': false}]}, <String, dynamic>{'name': 'obs_filters_remove', 'description': 'Remove a filter from a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_filters_rename', 'description': 'Rename a filter on a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'newFilterName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_filters_get', 'description': 'Return information about a specific filter on a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_filters_set_index', 'description': 'Set the index position (order) of a filter on a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterIndex', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_filters_set_settings', 'description': 'Set or merge the settings of a filter on a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterSettings', 'type': 'object', 'required': true}, <String, dynamic>{'name': 'overlay', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_filters_set_enabled', 'description': 'Enable or disable a filter on a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterEnabled', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_outputs_list', 'description': 'Return the list of all available outputs in OBS.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_get_status', 'description': 'Return the status of a named output.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_outputs_get_settings', 'description': 'Return the settings of a named output.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_outputs_set_settings', 'description': 'Set the settings of a named output.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'outputSettings', 'type': 'object', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_audio_balance', 'description': 'Return the audio balance (left-right) of an input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_audio_balance', 'description': 'Set the audio balance of an input (0.0 = left, 1.0 = right, 0.5 = center).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputAudioBalance', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_audio_sync_offset', 'description': 'Return the audio sync offset of an input in milliseconds.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_audio_sync_offset', 'description': 'Set the audio sync offset of an input in milliseconds.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputAudioSyncOffset', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_audio_monitor_type', 'description': 'Return the audio monitor type of an input (none, monitor only, monitor and output).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_audio_monitor_type', 'description': 'Set the audio monitor type of an input (0 = none, 1 = monitor only, 2 = monitor and output).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'monitorType', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_audio_tracks', 'description': 'Return the audio track bitmask of an input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_audio_tracks', 'description': 'Set the audio tracks of an input (bitmask: 1=track1, 2=track2, 4=track3, etc.).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputAudioTracks', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_properties_list_items', 'description': 'Return the items of a list property from an input\'s properties dialog.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'propertyName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_press_properties_button', 'description': 'Press a button property in an input\'s properties dialog.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'propertyName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_source', 'description': 'Return the source name for a given scene item.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_private_settings', 'description': 'Return the private settings of a scene item.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_set_private_settings', 'description': 'Set the private settings of a scene item.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'sceneItemSettings', 'type': 'object', 'required': true}]}];
   FutureOr<CallToolResult> _search(CallToolRequest request) async {
     try {
       final query = (request.arguments?['query'] as String?) ?? '';
@@ -1817,6 +2577,42 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
     sb.writeln("async function external_obs_ui_open_input_interact(args) { return call_tool('obs_ui_open_input_interact', args); }");
     sb.writeln("async function external_obs_ui_monitor_list(args) { return call_tool('obs_ui_monitor_list', args); }");
     sb.writeln("async function external_obs_transitions_trigger_studio(args) { return call_tool('obs_transitions_trigger_studio', args); }");
+    sb.writeln("async function external_obs_transitions_kind_list(args) { return call_tool('obs_transitions_kind_list', args); }");
+    sb.writeln("async function external_obs_transitions_scene_list(args) { return call_tool('obs_transitions_scene_list', args); }");
+    sb.writeln("async function external_obs_transitions_get_current(args) { return call_tool('obs_transitions_get_current', args); }");
+    sb.writeln("async function external_obs_transitions_set_current(args) { return call_tool('obs_transitions_set_current', args); }");
+    sb.writeln("async function external_obs_transitions_set_duration(args) { return call_tool('obs_transitions_set_duration', args); }");
+    sb.writeln("async function external_obs_transitions_set_settings(args) { return call_tool('obs_transitions_set_settings', args); }");
+    sb.writeln("async function external_obs_transitions_get_cursor(args) { return call_tool('obs_transitions_get_cursor', args); }");
+    sb.writeln("async function external_obs_transitions_set_tbar(args) { return call_tool('obs_transitions_set_tbar', args); }");
+    sb.writeln("async function external_obs_canvases_list(args) { return call_tool('obs_canvases_list', args); }");
+    sb.writeln("async function external_obs_filters_kind_list(args) { return call_tool('obs_filters_kind_list', args); }");
+    sb.writeln("async function external_obs_filters_list(args) { return call_tool('obs_filters_list', args); }");
+    sb.writeln("async function external_obs_filters_default_settings(args) { return call_tool('obs_filters_default_settings', args); }");
+    sb.writeln("async function external_obs_filters_create(args) { return call_tool('obs_filters_create', args); }");
+    sb.writeln("async function external_obs_filters_remove(args) { return call_tool('obs_filters_remove', args); }");
+    sb.writeln("async function external_obs_filters_rename(args) { return call_tool('obs_filters_rename', args); }");
+    sb.writeln("async function external_obs_filters_get(args) { return call_tool('obs_filters_get', args); }");
+    sb.writeln("async function external_obs_filters_set_index(args) { return call_tool('obs_filters_set_index', args); }");
+    sb.writeln("async function external_obs_filters_set_settings(args) { return call_tool('obs_filters_set_settings', args); }");
+    sb.writeln("async function external_obs_filters_set_enabled(args) { return call_tool('obs_filters_set_enabled', args); }");
+    sb.writeln("async function external_obs_outputs_list(args) { return call_tool('obs_outputs_list', args); }");
+    sb.writeln("async function external_obs_outputs_get_status(args) { return call_tool('obs_outputs_get_status', args); }");
+    sb.writeln("async function external_obs_outputs_get_settings(args) { return call_tool('obs_outputs_get_settings', args); }");
+    sb.writeln("async function external_obs_outputs_set_settings(args) { return call_tool('obs_outputs_set_settings', args); }");
+    sb.writeln("async function external_obs_inputs_get_audio_balance(args) { return call_tool('obs_inputs_get_audio_balance', args); }");
+    sb.writeln("async function external_obs_inputs_set_audio_balance(args) { return call_tool('obs_inputs_set_audio_balance', args); }");
+    sb.writeln("async function external_obs_inputs_get_audio_sync_offset(args) { return call_tool('obs_inputs_get_audio_sync_offset', args); }");
+    sb.writeln("async function external_obs_inputs_set_audio_sync_offset(args) { return call_tool('obs_inputs_set_audio_sync_offset', args); }");
+    sb.writeln("async function external_obs_inputs_get_audio_monitor_type(args) { return call_tool('obs_inputs_get_audio_monitor_type', args); }");
+    sb.writeln("async function external_obs_inputs_set_audio_monitor_type(args) { return call_tool('obs_inputs_set_audio_monitor_type', args); }");
+    sb.writeln("async function external_obs_inputs_get_audio_tracks(args) { return call_tool('obs_inputs_get_audio_tracks', args); }");
+    sb.writeln("async function external_obs_inputs_set_audio_tracks(args) { return call_tool('obs_inputs_set_audio_tracks', args); }");
+    sb.writeln("async function external_obs_inputs_get_properties_list_items(args) { return call_tool('obs_inputs_get_properties_list_items', args); }");
+    sb.writeln("async function external_obs_inputs_press_properties_button(args) { return call_tool('obs_inputs_press_properties_button', args); }");
+    sb.writeln("async function external_obs_scene_items_get_source(args) { return call_tool('obs_scene_items_get_source', args); }");
+    sb.writeln("async function external_obs_scene_items_get_private_settings(args) { return call_tool('obs_scene_items_get_private_settings', args); }");
+    sb.writeln("async function external_obs_scene_items_set_private_settings(args) { return call_tool('obs_scene_items_set_private_settings', args); }");
     sb.writeln();
     sb.writeln('// Execute user code');
     sb.writeln('(async () => {');
@@ -1912,6 +2708,42 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
       case 'obs_ui_open_input_interact': result = await _obs_ui_open_input_interact(request); break;
       case 'obs_ui_monitor_list': result = await _obs_ui_monitor_list(request); break;
       case 'obs_transitions_trigger_studio': result = await _obs_transitions_trigger_studio(request); break;
+      case 'obs_transitions_kind_list': result = await _obs_transitions_kind_list(request); break;
+      case 'obs_transitions_scene_list': result = await _obs_transitions_scene_list(request); break;
+      case 'obs_transitions_get_current': result = await _obs_transitions_get_current(request); break;
+      case 'obs_transitions_set_current': result = await _obs_transitions_set_current(request); break;
+      case 'obs_transitions_set_duration': result = await _obs_transitions_set_duration(request); break;
+      case 'obs_transitions_set_settings': result = await _obs_transitions_set_settings(request); break;
+      case 'obs_transitions_get_cursor': result = await _obs_transitions_get_cursor(request); break;
+      case 'obs_transitions_set_tbar': result = await _obs_transitions_set_tbar(request); break;
+      case 'obs_canvases_list': result = await _obs_canvases_list(request); break;
+      case 'obs_filters_kind_list': result = await _obs_filters_kind_list(request); break;
+      case 'obs_filters_list': result = await _obs_filters_list(request); break;
+      case 'obs_filters_default_settings': result = await _obs_filters_default_settings(request); break;
+      case 'obs_filters_create': result = await _obs_filters_create(request); break;
+      case 'obs_filters_remove': result = await _obs_filters_remove(request); break;
+      case 'obs_filters_rename': result = await _obs_filters_rename(request); break;
+      case 'obs_filters_get': result = await _obs_filters_get(request); break;
+      case 'obs_filters_set_index': result = await _obs_filters_set_index(request); break;
+      case 'obs_filters_set_settings': result = await _obs_filters_set_settings(request); break;
+      case 'obs_filters_set_enabled': result = await _obs_filters_set_enabled(request); break;
+      case 'obs_outputs_list': result = await _obs_outputs_list(request); break;
+      case 'obs_outputs_get_status': result = await _obs_outputs_get_status(request); break;
+      case 'obs_outputs_get_settings': result = await _obs_outputs_get_settings(request); break;
+      case 'obs_outputs_set_settings': result = await _obs_outputs_set_settings(request); break;
+      case 'obs_inputs_get_audio_balance': result = await _obs_inputs_get_audio_balance(request); break;
+      case 'obs_inputs_set_audio_balance': result = await _obs_inputs_set_audio_balance(request); break;
+      case 'obs_inputs_get_audio_sync_offset': result = await _obs_inputs_get_audio_sync_offset(request); break;
+      case 'obs_inputs_set_audio_sync_offset': result = await _obs_inputs_set_audio_sync_offset(request); break;
+      case 'obs_inputs_get_audio_monitor_type': result = await _obs_inputs_get_audio_monitor_type(request); break;
+      case 'obs_inputs_set_audio_monitor_type': result = await _obs_inputs_set_audio_monitor_type(request); break;
+      case 'obs_inputs_get_audio_tracks': result = await _obs_inputs_get_audio_tracks(request); break;
+      case 'obs_inputs_set_audio_tracks': result = await _obs_inputs_set_audio_tracks(request); break;
+      case 'obs_inputs_get_properties_list_items': result = await _obs_inputs_get_properties_list_items(request); break;
+      case 'obs_inputs_press_properties_button': result = await _obs_inputs_press_properties_button(request); break;
+      case 'obs_scene_items_get_source': result = await _obs_scene_items_get_source(request); break;
+      case 'obs_scene_items_get_private_settings': result = await _obs_scene_items_get_private_settings(request); break;
+      case 'obs_scene_items_set_private_settings': result = await _obs_scene_items_set_private_settings(request); break;
       default:
         throw StateError('Unknown tool: $toolName');
     }

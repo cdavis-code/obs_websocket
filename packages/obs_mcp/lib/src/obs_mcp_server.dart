@@ -23,7 +23,6 @@ import 'dart:io';
 import 'package:easy_api_annotations/mcp_annotations.dart';
 import 'package:obs_websocket/event.dart';
 import 'package:obs_websocket/obs_websocket.dart';
-
 /// Unified MCP facade exposing the OBS WebSocket v5.1.0 protocol as tools.
 ///
 /// Callers invoke [connect] once (or rely on [bootstrapFromEnv] to connect
@@ -1064,7 +1063,597 @@ class ObsMcpServer {
         'Trigger the studio-mode transition from the preview scene to program.',
   )
   Future<Map<String, dynamic>> transitionsTriggerStudio() async {
-    await _obs.send('TriggerStudioModeTransition');
+    await _obs.transitions.triggerStudioModeTransition();
+    return _ok;
+  }
+
+  /// Returns the list of all available transition kinds.
+  @Tool(
+    name: 'transitions_kind_list',
+    description: 'Return the list of all available transition kinds.',
+  )
+  Future<List<String>> transitionsKindList() =>
+      _obs.transitions.getTransitionKindList();
+
+  /// Returns the list of all scene transitions in OBS.
+  @Tool(
+    name: 'transitions_scene_list',
+    description: 'Return the list of all scene transitions configured in OBS.',
+  )
+  Future<Map<String, dynamic>> transitionsSceneList() async =>
+      await _obs.transitions.getSceneTransitionList();
+
+  /// Returns information about the current scene transition.
+  @Tool(
+    name: 'transitions_get_current',
+    description: 'Return information about the current scene transition.',
+  )
+  Future<Map<String, dynamic>> transitionsGetCurrent() async =>
+      await _obs.transitions.getCurrentSceneTransition();
+
+  /// Sets the current scene transition.
+  @Tool(
+    name: 'transitions_set_current',
+    description: 'Set the current scene transition by name.',
+  )
+  Future<Map<String, dynamic>> transitionsSetCurrent(
+    @Parameter(title: 'Transition Name', example: 'Fade') String transitionName,
+  ) async {
+    await _obs.transitions.setCurrentSceneTransition(transitionName);
+    return _ok;
+  }
+
+  /// Sets the duration of the current scene transition.
+  @Tool(
+    name: 'transitions_set_duration',
+    description:
+        'Set the duration of the current scene transition in milliseconds (50-20000).',
+  )
+  Future<Map<String, dynamic>> transitionsSetDuration(
+    @Parameter(title: 'Duration (ms)', example: 300) int duration,
+  ) async {
+    await _obs.transitions.setCurrentSceneTransitionDuration(duration);
+    return _ok;
+  }
+
+  /// Sets the settings of the current scene transition.
+  @Tool(
+    name: 'transitions_set_settings',
+    description: 'Set the settings of the current scene transition.',
+  )
+  Future<Map<String, dynamic>> transitionsSetSettings({
+    @Parameter(title: 'Transition Settings')
+    required Map<String, dynamic> transitionSettings,
+    @Parameter(title: 'Overlay', description: 'Merge with existing settings.')
+    bool? overlay,
+  }) async {
+    await _obs.transitions.setCurrentSceneTransitionSettings(
+      transitionSettings: transitionSettings,
+      overlay: overlay,
+    );
+    return _ok;
+  }
+
+  /// Returns the cursor position of the current scene transition.
+  @Tool(
+    name: 'transitions_get_cursor',
+    description:
+        'Return the cursor position (0.0-1.0) of the current scene transition.',
+  )
+  Future<double> transitionsGetCursor() async =>
+      await _obs.transitions.getCurrentSceneTransitionCursor();
+
+  /// Sets the position of the T-Bar (transition slider).
+  @Tool(
+    name: 'transitions_set_tbar',
+    description:
+        'Set the T-Bar position (0.0-1.0). Requires Studio Mode to be enabled.',
+  )
+  Future<Map<String, dynamic>> transitionsSetTBar({
+    @Parameter(
+      title: 'Position',
+      description: 'Position between 0.0 and 1.0.',
+      example: 0.5,
+    )
+    required double position,
+    @Parameter(
+      title: 'Release',
+      description: 'Whether to release the T-Bar after setting.',
+    )
+    bool? release,
+  }) async {
+    await _obs.transitions.setTBarPosition(position: position, release: release);
+    return _ok;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Canvases (New in OBS WebSocket v5.7.0)
+  // ---------------------------------------------------------------------------
+
+  /// Returns the list of canvases configured in OBS.
+  @Tool(
+    name: 'canvases_list',
+    description:
+        'Return the list of all canvases configured in OBS (v5.7.0+).',
+  )
+  Future<Map<String, dynamic>> canvasesList() async =>
+      (await _obs.canvas.getCanvasList()).toJson();
+
+  // ---------------------------------------------------------------------------
+  // Filters (New in OBS WebSocket v5.7.0 MCP exposure)
+  // ---------------------------------------------------------------------------
+
+  /// Returns the list of all available source filter kinds.
+  @Tool(
+    name: 'filters_kind_list',
+    description: 'Return the list of all available source filter kinds.',
+  )
+  Future<List<String>> filtersKindList() =>
+      _obs.filters.getSourceFilterKindList();
+
+  /// Returns the list of filters for a source.
+  @Tool(
+    name: 'filters_list',
+    description: 'Return the list of filters applied to a source.',
+  )
+  Future<List<Map<String, dynamic>>> filtersList(String sourceName) async =>
+      await _obs.filters.getSourceFilterList(sourceName);
+
+  /// Returns the default settings for a filter kind.
+  @Tool(
+    name: 'filters_default_settings',
+    description: 'Return the default settings for a given filter kind.',
+  )
+  Future<Map<String, dynamic>> filtersDefaultSettings(String filterKind) async =>
+      await _obs.filters.getSourceFilterDefaultSettings(filterKind);
+
+  /// Creates a new filter on a source.
+  @Tool(
+    name: 'filters_create',
+    description: 'Create a new filter and apply it to a source.',
+  )
+  Future<Map<String, dynamic>> filtersCreate({
+    @Parameter(title: 'Source Name', example: 'Video Capture Device')
+    required String sourceName,
+    @Parameter(title: 'Filter Name', example: 'Color Correction')
+    required String filterName,
+    @Parameter(title: 'Filter Kind', example: 'color_correction_v2')
+    required String filterKind,
+    @Parameter(title: 'Filter Settings') Map<String, dynamic>? filterSettings,
+  }) async {
+    await _obs.filters.createSourceFilter(
+      sourceName: sourceName,
+      filterName: filterName,
+      filterKind: filterKind,
+      filterSettings: filterSettings,
+    );
+    return _ok;
+  }
+
+  /// Removes a filter from a source.
+  @Tool(
+    name: 'filters_remove',
+    description: 'Remove a filter from a source.',
+  )
+  Future<Map<String, dynamic>> filtersRemove({
+    @Parameter(title: 'Source Name') required String sourceName,
+    @Parameter(title: 'Filter Name') required String filterName,
+  }) async {
+    await _obs.filters.removeSourceFilter(
+      sourceName: sourceName,
+      filterName: filterName,
+    );
+    return _ok;
+  }
+
+  /// Renames a filter on a source.
+  @Tool(
+    name: 'filters_rename',
+    description: 'Rename a filter on a source.',
+  )
+  Future<Map<String, dynamic>> filtersRename({
+    @Parameter(title: 'Source Name') required String sourceName,
+    @Parameter(title: 'Current Filter Name') required String filterName,
+    @Parameter(title: 'New Filter Name') required String newFilterName,
+  }) async {
+    await _obs.filters.setSourceFilterName(
+      sourceName: sourceName,
+      filterName: filterName,
+      newFilterName: newFilterName,
+    );
+    return _ok;
+  }
+
+  /// Returns information about a specific filter.
+  @Tool(
+    name: 'filters_get',
+    description: 'Return information about a specific filter on a source.',
+  )
+  Future<Map<String, dynamic>> filtersGet({
+    @Parameter(title: 'Source Name') required String sourceName,
+    @Parameter(title: 'Filter Name') required String filterName,
+  }) async => await _obs.filters.getSourceFilter(
+    sourceName: sourceName,
+    filterName: filterName,
+  );
+
+  /// Sets the index position of a filter on a source.
+  @Tool(
+    name: 'filters_set_index',
+    description: 'Set the index position (order) of a filter on a source.',
+  )
+  Future<Map<String, dynamic>> filtersSetIndex({
+    @Parameter(title: 'Source Name') required String sourceName,
+    @Parameter(title: 'Filter Name') required String filterName,
+    @Parameter(title: 'Filter Index', example: 0) required int filterIndex,
+  }) async {
+    await _obs.filters.setSourceFilterIndex(
+      sourceName: sourceName,
+      filterName: filterName,
+      filterIndex: filterIndex,
+    );
+    return _ok;
+  }
+
+  /// Sets the settings of a filter.
+  @Tool(
+    name: 'filters_set_settings',
+    description: 'Set or merge the settings of a filter on a source.',
+  )
+  Future<Map<String, dynamic>> filtersSetSettings({
+    @Parameter(title: 'Source Name') required String sourceName,
+    @Parameter(title: 'Filter Name') required String filterName,
+    @Parameter(title: 'Filter Settings')
+    required Map<String, dynamic> filterSettings,
+    @Parameter(title: 'Overlay', description: 'Merge with existing settings.')
+    bool? overlay,
+  }) async {
+    await _obs.filters.setSourceFilterSettings(
+      sourceName: sourceName,
+      filterName: filterName,
+      filterSettings: filterSettings,
+      overlay: overlay,
+    );
+    return _ok;
+  }
+
+  /// Sets the enabled state of a filter.
+  @Tool(
+    name: 'filters_set_enabled',
+    description: 'Enable or disable a filter on a source.',
+  )
+  Future<Map<String, dynamic>> filtersSetEnabled({
+    @Parameter(title: 'Source Name') required String sourceName,
+    @Parameter(title: 'Filter Name') required String filterName,
+    @Parameter(title: 'Filter Enabled', example: true)
+    required bool filterEnabled,
+  }) async {
+    await _obs.filters.setSourceFilterEnabled(
+      sourceName: sourceName,
+      filterName: filterName,
+      filterEnabled: filterEnabled,
+    );
+    return _ok;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Outputs - Extended (New in OBS WebSocket v5.7.0 MCP exposure)
+  // ---------------------------------------------------------------------------
+
+  /// Returns the list of all available outputs.
+  @Tool(
+    name: 'outputs_list',
+    description: 'Return the list of all available outputs in OBS.',
+  )
+  Future<List<Map<String, dynamic>>> outputsList() async =>
+      await _obs.outputs.getOutputList();
+
+  /// Returns the status of a specific output.
+  @Tool(
+    name: 'outputs_get_status',
+    description: 'Return the status of a named output.',
+  )
+  Future<Map<String, dynamic>> outputsGetStatus(String outputName) async =>
+      await _obs.outputs.getOutputStatus(outputName);
+
+  /// Returns the settings of a specific output.
+  @Tool(
+    name: 'outputs_get_settings',
+    description: 'Return the settings of a named output.',
+  )
+  Future<Map<String, dynamic>> outputsGetSettings(String outputName) async =>
+      await _obs.outputs.getOutputSettings(outputName);
+
+  /// Sets the settings of a specific output.
+  @Tool(
+    name: 'outputs_set_settings',
+    description: 'Set the settings of a named output.',
+  )
+  Future<Map<String, dynamic>> outputsSetSettings({
+    @Parameter(title: 'Output Name') required String outputName,
+    @Parameter(title: 'Output Settings')
+    required Map<String, dynamic> outputSettings,
+  }) async {
+    await _obs.outputs.setOutputSettings(
+      outputName: outputName,
+      outputSettings: outputSettings,
+    );
+    return _ok;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Inputs - Audio Properties (New in OBS WebSocket v5.7.0 MCP exposure)
+  // ---------------------------------------------------------------------------
+
+  /// Returns the audio balance of an input.
+  @Tool(
+    name: 'inputs_get_audio_balance',
+    description: 'Return the audio balance (left-right) of an input.',
+  )
+  Future<Map<String, dynamic>> inputsGetAudioBalance({
+    String? inputName,
+    String? inputUuid,
+  }) async {
+    final response = await _obs.inputs.getInputAudioBalance(
+      inputName: inputName,
+      inputUuid: inputUuid,
+    );
+    return response.toJson();
+  }
+
+  /// Sets the audio balance of an input.
+  @Tool(
+    name: 'inputs_set_audio_balance',
+    description:
+        'Set the audio balance of an input (0.0 = left, 1.0 = right, 0.5 = center).',
+  )
+  Future<Map<String, dynamic>> inputsSetAudioBalance({
+    String? inputName,
+    String? inputUuid,
+    @Parameter(
+      title: 'Audio Balance',
+      description: '0.0 = full left, 1.0 = full right, 0.5 = center.',
+      example: 0.5,
+    )
+    required double inputAudioBalance,
+  }) async {
+    await _obs.inputs.setInputAudioBalance(
+      inputName: inputName,
+      inputUuid: inputUuid,
+      inputAudioBalance: inputAudioBalance,
+    );
+    return _ok;
+  }
+
+  /// Returns the audio sync offset of an input.
+  @Tool(
+    name: 'inputs_get_audio_sync_offset',
+    description: 'Return the audio sync offset of an input in milliseconds.',
+  )
+  Future<Map<String, dynamic>> inputsGetAudioSyncOffset({
+    String? inputName,
+    String? inputUuid,
+  }) async {
+    final response = await _obs.inputs.getInputAudioSyncOffset(
+      inputName: inputName,
+      inputUuid: inputUuid,
+    );
+    return response.toJson();
+  }
+
+  /// Sets the audio sync offset of an input.
+  @Tool(
+    name: 'inputs_set_audio_sync_offset',
+    description: 'Set the audio sync offset of an input in milliseconds.',
+  )
+  Future<Map<String, dynamic>> inputsSetAudioSyncOffset({
+    String? inputName,
+    String? inputUuid,
+    @Parameter(
+      title: 'Sync Offset (ms)',
+      description: 'Audio sync offset in milliseconds.',
+      example: 0,
+    )
+    required int inputAudioSyncOffset,
+  }) async {
+    await _obs.inputs.setInputAudioSyncOffset(
+      inputName: inputName,
+      inputUuid: inputUuid,
+      inputAudioSyncOffset: inputAudioSyncOffset,
+    );
+    return _ok;
+  }
+
+  /// Returns the audio monitor type of an input.
+  @Tool(
+    name: 'inputs_get_audio_monitor_type',
+    description:
+        'Return the audio monitor type of an input (none, monitor only, monitor and output).',
+  )
+  Future<Map<String, dynamic>> inputsGetAudioMonitorType({
+    String? inputName,
+    String? inputUuid,
+  }) async {
+    final response = await _obs.inputs.getInputAudioMonitorType(
+      inputName: inputName,
+      inputUuid: inputUuid,
+    );
+    return response.toJson();
+  }
+
+  /// Sets the audio monitor type of an input.
+  @Tool(
+    name: 'inputs_set_audio_monitor_type',
+    description:
+        'Set the audio monitor type of an input (0 = none, 1 = monitor only, 2 = monitor and output).',
+  )
+  Future<Map<String, dynamic>> inputsSetAudioMonitorType({
+    String? inputName,
+    String? inputUuid,
+    @Parameter(
+      title: 'Monitor Type',
+      description: '0 = none, 1 = monitor only, 2 = monitor and output.',
+      example: 0,
+    )
+    required int monitorType,
+  }) async {
+    final type = switch (monitorType) {
+      0 => ObsMonitoringType.none,
+      1 => ObsMonitoringType.monitorOnly,
+      2 => ObsMonitoringType.monitorAndOutput,
+      _ => throw ArgumentError(
+          'Invalid monitor type: $monitorType. Must be 0, 1, or 2.',
+        ),
+    };
+    
+    await _obs.inputs.setInputAudioMonitorType(
+      inputName: inputName,
+      inputUuid: inputUuid,
+      monitorType: type,
+    );
+    return _ok;
+  }
+
+  /// Returns the audio tracks of an input.
+  @Tool(
+    name: 'inputs_get_audio_tracks',
+    description: 'Return the audio track bitmask of an input.',
+  )
+  Future<Map<String, dynamic>> inputsGetAudioTracks({
+    String? inputName,
+    String? inputUuid,
+  }) async {
+    final response = await _obs.inputs.getInputAudioTracks(
+      inputName: inputName,
+      inputUuid: inputUuid,
+    );
+    return response.toJson();
+  }
+
+  /// Sets the audio tracks of an input.
+  @Tool(
+    name: 'inputs_set_audio_tracks',
+    description:
+        'Set the audio tracks of an input (bitmask: 1=track1, 2=track2, 4=track3, etc.).',
+  )
+  Future<Map<String, dynamic>> inputsSetAudioTracks({
+    String? inputName,
+    String? inputUuid,
+    @Parameter(
+      title: 'Audio Tracks',
+      description:
+          'Bitmask representing audio tracks (1=track1, 2=track2, 4=track3, 8=track4, 16=track5, 32=track6).',
+      example: 1,
+    )
+    required int inputAudioTracks,
+  }) async {
+    await _obs.inputs.setInputAudioTracks(
+      inputName: inputName,
+      inputUuid: inputUuid,
+      inputAudioTracks: inputAudioTracks,
+    );
+    return _ok;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Inputs - Properties Dialog (New in OBS WebSocket v5.7.0 MCP exposure)
+  // ---------------------------------------------------------------------------
+
+  /// Returns the items of a list property from an input's properties.
+  @Tool(
+    name: 'inputs_get_properties_list_items',
+    description:
+        'Return the items of a list property from an input\'s properties dialog.',
+  )
+  Future<Map<String, dynamic>> inputsGetPropertiesListItems({
+    String? inputName,
+    String? inputUuid,
+    @Parameter(title: 'Property Name') required String propertyName,
+  }) async {
+    final response = await _obs.inputs.getInputPropertiesListPropertyItems(
+      inputName: inputName,
+      inputUuid: inputUuid,
+      propertyName: propertyName,
+    );
+    return response.toJson();
+  }
+
+  /// Presses a button in the input's properties dialog.
+  @Tool(
+    name: 'inputs_press_properties_button',
+    description: 'Press a button property in an input\'s properties dialog.',
+  )
+  Future<Map<String, dynamic>> inputsPressPropertiesButton({
+    String? inputName,
+    String? inputUuid,
+    @Parameter(title: 'Property Name') required String propertyName,
+  }) async {
+    await _obs.inputs.pressInputPropertiesButton(
+      inputName: inputName,
+      inputUuid: inputUuid,
+      propertyName: propertyName,
+    );
+    return _ok;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Scene Items - Extended (New in OBS WebSocket v5.7.0 MCP exposure)
+  // ---------------------------------------------------------------------------
+
+  /// Returns the source name for a scene item.
+  @Tool(
+    name: 'scene_items_get_source',
+    description: 'Return the source name for a given scene item.',
+  )
+  Future<Map<String, dynamic>> sceneItemsGetSource({
+    @Parameter(title: 'Scene Name') String? sceneName,
+    @Parameter(title: 'Scene UUID') String? sceneUuid,
+    @Parameter(title: 'Scene Item ID') required int sceneItemId,
+  }) async {
+    final response = await _obs.sceneItems.getSceneItemSource(
+      sceneName: sceneName,
+      sceneUuid: sceneUuid,
+      sceneItemId: sceneItemId,
+    );
+    return response;
+  }
+
+  /// Returns the private settings of a scene item.
+  @Tool(
+    name: 'scene_items_get_private_settings',
+    description: 'Return the private settings of a scene item.',
+  )
+  Future<Map<String, dynamic>> sceneItemsGetPrivateSettings({
+    @Parameter(title: 'Scene Name') String? sceneName,
+    @Parameter(title: 'Scene UUID') String? sceneUuid,
+    @Parameter(title: 'Scene Item ID') required int sceneItemId,
+  }) async {
+    final response = await _obs.sceneItems.getSceneItemPrivateSettings(
+      sceneName: sceneName,
+      sceneUuid: sceneUuid,
+      sceneItemId: sceneItemId,
+    );
+    return response;
+  }
+
+  /// Sets the private settings of a scene item.
+  @Tool(
+    name: 'scene_items_set_private_settings',
+    description: 'Set the private settings of a scene item.',
+  )
+  Future<Map<String, dynamic>> sceneItemsSetPrivateSettings({
+    @Parameter(title: 'Scene Name') String? sceneName,
+    @Parameter(title: 'Scene UUID') String? sceneUuid,
+    @Parameter(title: 'Scene Item ID') required int sceneItemId,
+    @Parameter(title: 'Private Settings')
+    required Map<String, dynamic> sceneItemSettings,
+  }) async {
+    await _obs.sceneItems.setSceneItemPrivateSettings(
+      sceneName: sceneName,
+      sceneUuid: sceneUuid,
+      sceneItemId: sceneItemId,
+      sceneItemSettings: sceneItemSettings,
+    );
     return _ok;
   }
 }

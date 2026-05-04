@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>obs-cli</id>
+    <version>5.7.0</version>
+    <title>obs-cli - OBS WebSocket CLI Tool</title>
+    <authors>cdavis-code</authors>
+    <owners>cdavis-code</owners>
+    <projectUrl>https://github.com/cdavis-code/obs_websocket</projectUrl>
+    <packageSourceUrl>https://github.com/cdavis-code/obs_websocket/tree/main/packages/obs_cli</packageSourceUrl>
+    <licenseUrl>https://github.com/cdavis-code/obs_websocket/blob/main/packages/obs_cli/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/cdavis-code/obs_websocket</projectSourceUrl>
+    <docsUrl>https://pub.dev/documentation/obs_cli/latest/</docsUrl>
+    <bugTrackerUrl>https://github.com/cdavis-code/obs_websocket/issues</bugTrackerUrl>
+    <tags>obs obs-websocket obs-studio streaming broadcasting cli</tags>
+    <summary>A command line interface for controlling OBS Studio via the obs-websocket protocol.</summary>
+    <description>A CLI tool for controlling OBS Studio with shell commands via the obs-websocket protocol.
+
+Features:
+- Scene management (list, switch, get current)
+- Input control (mute, volume, audio settings)
+- Stream control (start, stop, toggle)
+- Recording control (start, stop, pause, resume)
+- Filter management
+- Transition control
+- Event listening and monitoring
+- Virtual camera control
+- Replay buffer management
+
+Installation requires OBS Studio with obs-websocket plugin enabled.</description>
+    <releaseNotes>https://github.com/cdavis-code/obs_websocket/blob/main/packages/obs_cli/CHANGELOG.md</releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
