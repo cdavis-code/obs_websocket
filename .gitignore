@@ -39,6 +39,8 @@ tool/publish_tools.yaml
 
 **/doc
 
+reddit*.md
+
 # Local OBS MCP server credentials.
 .env
 bin/.env
