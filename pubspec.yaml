@@ -47,10 +47,16 @@ melos:
       exec:
         concurrency: 1
     test:
-      run: dart test
-      packageFilters:
-        dirExists: test
+      run: melos run _test_internal --no-select
+      exec:
+        concurrency: 1
     dartdoc:
       run: dart doc
       packageFilters:
         scope: obs_websocket
+
+    # The internal command that actually does the work
+    _test_internal:
+      exec: dart test
+      packageFilters:
+        dirExists: test

@@ -1,22 +1,31 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:loggy/loggy.dart';
 import 'package:obs_websocket/event.dart';
 import 'package:obs_websocket/obs_websocket.dart';
-import 'package:universal_io/io.dart';
-import 'package:yaml/yaml.dart';
+
+/// Example demonstrating general OBS operations using .env file for credentials.
+///
+/// This example shows the new simplified approach using connectFromEnv().
+/// For the old manual approach, see event.dart.
 
 void main(List<String> args) async {
-  final config = loadYaml(File('config.yaml').readAsStringSync());
-
-  final obs = await ObsWebSocket.connect(
-    config['host'],
-    password: config['password'],
+  // Connect using .env file or environment variables
+  final obs = await ObsWebSocket.connectFromEnv(
     logOptions: const LogOptions(LogLevel.debug),
     fallbackEventHandler: (Event event) =>
-        print('type: ${event.eventType} data: ${event.eventData}'),
-    onDone: () => print('done'),
+        print('Event: ${event.eventType} | Data: ${event.eventData}'),
+    onDone: () => print('Connection closed'),
   );
+
+  if (obs == null) {
+    print(
+      'Error: No OBS connection configured.\n'
+      'Set OBS_WEBSOCKET_URL environment variable or create a .env file.',
+    );
+    exit(1);
+  }
 
   await obs.subscribe(EventSubscription.all);
 
@@ -28,7 +37,8 @@ void main(List<String> args) async {
     print('scene list changed: \n$sceneListChanged');
   });
 
-  obs.addHandler<InputVolumeChanged>((InputVolumeChanged inputVolumeChanged) async {
+  obs.addHandler<InputVolumeChanged>(
+      (InputVolumeChanged inputVolumeChanged) async {
     print('''input volume changed: \n
     inputVolumeMul - ${inputVolumeChanged.inputVolumeMul}
     inputVolumeDb - ${inputVolumeChanged.inputVolumeDb} 
@@ -47,13 +57,13 @@ void main(List<String> args) async {
 
   print(recordDirectoryResponse.recordDirectory);
 
-  final vol = await obs.inputs.getInputVolume(inputName: 'Media Source');
+  // final vol = await obs.inputs.getInputVolume(inputName: 'Media Source');
 
-  print(vol.inputVolumeMul);
+  // print(vol.inputVolumeMul);
 
-  final res = await obs.outputs.toggleReplayBuffer();
+  // final res = await obs.outputs.toggleReplayBuffer();
 
-  print(res);
+  // print(res);
 
   // final currentScene = await obs.scenes.getCurrentProgramScene();
 
@@ -70,6 +80,18 @@ void main(List<String> args) async {
 
   // await obs.sceneItems.setIndex(
   //     sceneName: currentScene, sceneItemId: sceneItemId, sceneItemIndex: 4);
+
+  // Use the raw send() method to call GetCanvasList
+  print('\n=== Testing GetCanvasList with raw send() ===');
+  final canvasListResponse = await obs.send('GetCanvasList');
+
+  if (canvasListResponse != null && canvasListResponse.requestStatus.result) {
+    print('GetCanvasList response:');
+    print('Request Status: ${canvasListResponse.requestStatus.result}');
+    print('Response Data: ${canvasListResponse.responseData}');
+  } else {
+    print('GetCanvasList request failed or returned no data');
+  }
 
   final versionResponse = await obs.general.version;
 

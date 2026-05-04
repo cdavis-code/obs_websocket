@@ -264,4 +264,17 @@ class Config {
 
     return RecordDirectoryResponse.fromJson(response!.responseData!);
   }
+
+  /// Sets the current directory that the record output writes files to.
+  ///
+  /// - Complexity Rating: 1/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.3.0
+  Future<void> setRecordDirectory(String recordDirectory) async =>
+      await obsWebSocket.sendRequest(
+        Request(
+          'SetRecordDirectory',
+          requestData: {'recordDirectory': recordDirectory},
+        ),
+      );
 }

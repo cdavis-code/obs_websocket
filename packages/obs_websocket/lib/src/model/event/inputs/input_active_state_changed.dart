@@ -25,15 +25,18 @@ class InputActiveStateChanged implements BaseEvent {
   /// Whether the input is active
   final bool videoActive;
 
+  /// Creates an event for when an input's active state changes.
   InputActiveStateChanged({
     required this.inputName,
     required this.inputUuid,
     required this.videoActive,
   });
 
+  /// Creates an event from a JSON map.
   factory InputActiveStateChanged.fromJson(Map<String, dynamic> json) =>
       _$InputActiveStateChangedFromJson(json);
 
+  /// Converts the event to a JSON map.
   @override
   Map<String, dynamic> toJson() => _$InputActiveStateChangedToJson(this);
 

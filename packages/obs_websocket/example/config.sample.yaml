@@ -1,8 +1,0 @@
-host: '[device_ip_address]'
-password: '[passwd]'
-
-stream: 
-  type: rtmp_custom
-  settings:
-    server: '[rtmp_url]'
-    key: '[stream_key]'

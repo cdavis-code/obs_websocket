@@ -385,4 +385,381 @@ class Inputs {
 
     return InputVolumeResponse.fromJson(response!.responseData!);
   }
+
+  /// Gets the deinterlace mode of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<InputDeinterlaceModeResponse> getInputDeinterlaceMode({
+    String? inputName,
+    String? inputUuid,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetInputDeinterlaceMode',
+        requestData: {'inputName': inputName, 'inputUuid': inputUuid},
+      ),
+    );
+
+    return InputDeinterlaceModeResponse.fromJson(response!.responseData!);
+  }
+
+  /// Sets the deinterlace mode of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> setInputDeinterlaceMode({
+    String? inputName,
+    String? inputUuid,
+    required ObsDeinterlaceMode deinterlaceMode,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    await obsWebSocket.sendRequest(
+      Request(
+        'SetInputDeinterlaceMode',
+        requestData: {
+          'inputName': inputName,
+          'inputUuid': inputUuid,
+          'deinterlaceMode': deinterlaceMode.code,
+        },
+      ),
+    );
+  }
+
+  /// Gets the deinterlace field order of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<InputDeinterlaceFieldOrderResponse> getInputDeinterlaceFieldOrder({
+    String? inputName,
+    String? inputUuid,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetInputDeinterlaceFieldOrder',
+        requestData: {'inputName': inputName, 'inputUuid': inputUuid},
+      ),
+    );
+
+    return InputDeinterlaceFieldOrderResponse.fromJson(response!.responseData!);
+  }
+
+  /// Sets the deinterlace field order of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> setInputDeinterlaceFieldOrder({
+    String? inputName,
+    String? inputUuid,
+    required ObsDeinterlaceFieldOrder deinterlaceFieldOrder,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    await obsWebSocket.sendRequest(
+      Request(
+        'SetInputDeinterlaceFieldOrder',
+        requestData: {
+          'inputName': inputName,
+          'inputUuid': inputUuid,
+          'deinterlaceFieldOrder': deinterlaceFieldOrder.code,
+        },
+      ),
+    );
+  }
+
+  /// Sets the volume of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> setInputVolume({
+    String? inputName,
+    String? inputUuid,
+    required double inputVolume,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    await obsWebSocket.sendRequest(
+      Request(
+        'SetInputVolume',
+        requestData: {
+          'inputName': inputName,
+          'inputUuid': inputUuid,
+          'inputVolume': inputVolume,
+        },
+      ),
+    );
+  }
+
+  /// Gets the audio balance of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<InputAudioBalanceResponse> getInputAudioBalance({
+    String? inputName,
+    String? inputUuid,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetInputAudioBalance',
+        requestData: {'inputName': inputName, 'inputUuid': inputUuid},
+      ),
+    );
+
+    return InputAudioBalanceResponse.fromJson(response!.responseData!);
+  }
+
+  /// Sets the audio balance of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> setInputAudioBalance({
+    String? inputName,
+    String? inputUuid,
+    required double inputAudioBalance,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    await obsWebSocket.sendRequest(
+      Request(
+        'SetInputAudioBalance',
+        requestData: {
+          'inputName': inputName,
+          'inputUuid': inputUuid,
+          'inputAudioBalance': inputAudioBalance,
+        },
+      ),
+    );
+  }
+
+  /// Gets the audio sync offset of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<InputAudioSyncOffsetResponse> getInputAudioSyncOffset({
+    String? inputName,
+    String? inputUuid,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetInputAudioSyncOffset',
+        requestData: {'inputName': inputName, 'inputUuid': inputUuid},
+      ),
+    );
+
+    return InputAudioSyncOffsetResponse.fromJson(response!.responseData!);
+  }
+
+  /// Sets the audio sync offset of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> setInputAudioSyncOffset({
+    String? inputName,
+    String? inputUuid,
+    required int inputAudioSyncOffset,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    await obsWebSocket.sendRequest(
+      Request(
+        'SetInputAudioSyncOffset',
+        requestData: {
+          'inputName': inputName,
+          'inputUuid': inputUuid,
+          'inputAudioSyncOffset': inputAudioSyncOffset,
+        },
+      ),
+    );
+  }
+
+  /// Gets the audio monitor type of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<InputAudioMonitorTypeResponse> getInputAudioMonitorType({
+    String? inputName,
+    String? inputUuid,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetInputAudioMonitorType',
+        requestData: {'inputName': inputName, 'inputUuid': inputUuid},
+      ),
+    );
+
+    return InputAudioMonitorTypeResponse.fromJson(response!.responseData!);
+  }
+
+  /// Sets the audio monitor type of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> setInputAudioMonitorType({
+    String? inputName,
+    String? inputUuid,
+    required ObsMonitoringType monitorType,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    await obsWebSocket.sendRequest(
+      Request(
+        'SetInputAudioMonitorType',
+        requestData: {
+          'inputName': inputName,
+          'inputUuid': inputUuid,
+          'monitorType': monitorType.code,
+        },
+      ),
+    );
+  }
+
+  /// Gets the audio tracks of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<InputAudioTracksResponse> getInputAudioTracks({
+    String? inputName,
+    String? inputUuid,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetInputAudioTracks',
+        requestData: {'inputName': inputName, 'inputUuid': inputUuid},
+      ),
+    );
+
+    return InputAudioTracksResponse.fromJson(response!.responseData!);
+  }
+
+  /// Sets the audio tracks of an input.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> setInputAudioTracks({
+    String? inputName,
+    String? inputUuid,
+    required int inputAudioTracks,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    await obsWebSocket.sendRequest(
+      Request(
+        'SetInputAudioTracks',
+        requestData: {
+          'inputName': inputName,
+          'inputUuid': inputUuid,
+          'inputAudioTracks': inputAudioTracks,
+        },
+      ),
+    );
+  }
+
+  /// Gets the items of a list property from an input's properties.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<InputPropertiesListPropertyItemsResponse>
+  getInputPropertiesListPropertyItems({
+    String? inputName,
+    String? inputUuid,
+    required String propertyName,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetInputPropertiesListPropertyItems',
+        requestData: {
+          'inputName': inputName,
+          'inputUuid': inputUuid,
+          'propertyName': propertyName,
+        },
+      ),
+    );
+
+    return InputPropertiesListPropertyItemsResponse.fromJson(
+      response!.responseData!,
+    );
+  }
+
+  /// Presses a button in the input's properties.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> pressInputPropertiesButton({
+    String? inputName,
+    String? inputUuid,
+    required String propertyName,
+  }) async {
+    if (inputName == null && inputUuid == null) {
+      throw ArgumentError('inputName or inputUuid must be provided');
+    }
+
+    await obsWebSocket.sendRequest(
+      Request(
+        'PressInputPropertiesButton',
+        requestData: {
+          'inputName': inputName,
+          'inputUuid': inputUuid,
+          'propertyName': propertyName,
+        },
+      ),
+    );
+  }
 }

@@ -4,6 +4,14 @@ class FromJsonSingleton {
   static final _singleton = FromJsonSingleton._internal();
 
   final factories = <String, Function>{
+    // canvases
+    'CanvasCreated': (Map<String, dynamic> json) =>
+        CanvasCreated.fromJson(json),
+    'CanvasNameChanged': (Map<String, dynamic> json) =>
+        CanvasNameChanged.fromJson(json),
+    'CanvasRemoved': (Map<String, dynamic> json) =>
+        CanvasRemoved.fromJson(json),
+
     // config
     'CurrentProfileChanged': (Map<String, dynamic> json) =>
         CurrentProfileChanged.fromJson(json),
@@ -49,7 +57,31 @@ class FromJsonSingleton {
     'InputVolumeMeters': (Map<String, dynamic> json) =>
         InputVolumeMeters.fromJson(json),
 
+    // filters
+    'SourceFilterCreated': (Map<String, dynamic> json) =>
+        SourceFilterCreated.fromJson(json),
+    'SourceFilterEnableStateChanged': (Map<String, dynamic> json) =>
+        SourceFilterEnableStateChanged.fromJson(json),
+    'SourceFilterListReindexed': (Map<String, dynamic> json) =>
+        SourceFilterListReindexed.fromJson(json),
+    'SourceFilterNameChanged': (Map<String, dynamic> json) =>
+        SourceFilterNameChanged.fromJson(json),
+    'SourceFilterRemoved': (Map<String, dynamic> json) =>
+        SourceFilterRemoved.fromJson(json),
+    'SourceFilterSettingsChanged': (Map<String, dynamic> json) =>
+        SourceFilterSettingsChanged.fromJson(json),
+
+    // media inputs
+    'MediaInputActionTriggered': (Map<String, dynamic> json) =>
+        MediaInputActionTriggered.fromJson(json),
+    'MediaInputPlaybackEnded': (Map<String, dynamic> json) =>
+        MediaInputPlaybackEnded.fromJson(json),
+    'MediaInputPlaybackStarted': (Map<String, dynamic> json) =>
+        MediaInputPlaybackStarted.fromJson(json),
+
     // outputs
+    'RecordFileChanged': (Map<String, dynamic> json) =>
+        RecordFileChanged.fromJson(json),
     'RecordStateChanged': (Map<String, dynamic> json) =>
         RecordStateChanged.fromJson(json),
     'ReplayBufferSaved': (Map<String, dynamic> json) =>
@@ -66,6 +98,7 @@ class FromJsonSingleton {
         CurrentPreviewSceneChanged.fromJson(json),
     'CurrentProgramSceneChanged': (Map<String, dynamic> json) =>
         CurrentProgramSceneChanged.fromJson(json),
+    'SceneCreated': (Map<String, dynamic> json) => SceneCreated.fromJson(json),
     'SceneListChanged': (Map<String, dynamic> json) =>
         SceneListChanged.fromJson(json),
     'SceneNameChanged': (Map<String, dynamic> json) =>
@@ -76,10 +109,28 @@ class FromJsonSingleton {
         SceneItemCreated.fromJson(json),
     'SceneItemEnableStateChanged': (Map<String, dynamic> json) =>
         SceneItemEnableStateChanged.fromJson(json),
+    'SceneItemListReindexed': (Map<String, dynamic> json) =>
+        SceneItemListReindexed.fromJson(json),
+    'SceneItemLockStateChanged': (Map<String, dynamic> json) =>
+        SceneItemLockStateChanged.fromJson(json),
     'SceneItemRemoved': (Map<String, dynamic> json) =>
         SceneItemRemoved.fromJson(json),
     'SceneItemSelected': (Map<String, dynamic> json) =>
         SceneItemSelected.fromJson(json),
+    'SceneItemTransformChanged': (Map<String, dynamic> json) =>
+        SceneItemTransformChanged.fromJson(json),
+
+    // transitions
+    'CurrentSceneTransitionChanged': (Map<String, dynamic> json) =>
+        CurrentSceneTransitionChanged.fromJson(json),
+    'CurrentSceneTransitionDurationChanged': (Map<String, dynamic> json) =>
+        CurrentSceneTransitionDurationChanged.fromJson(json),
+    'SceneTransitionEnded': (Map<String, dynamic> json) =>
+        SceneTransitionEnded.fromJson(json),
+    'SceneTransitionStarted': (Map<String, dynamic> json) =>
+        SceneTransitionStarted.fromJson(json),
+    'SceneTransitionVideoEnded': (Map<String, dynamic> json) =>
+        SceneTransitionVideoEnded.fromJson(json),
 
     // ui
     'ScreenshotSaved': (Map<String, dynamic> json) =>

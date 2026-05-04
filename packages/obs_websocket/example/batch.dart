@@ -1,18 +1,24 @@
+import 'dart:io';
+
 import 'package:loggy/loggy.dart';
 import 'package:obs_websocket/obs_websocket.dart';
-import 'package:universal_io/io.dart';
-import 'package:yaml/yaml.dart';
 
+/// Example demonstrating batch request operations using .env file for credentials.
 void main(List<String> args) async {
-  final config = loadYaml(File('config.yaml').readAsStringSync());
-
-  final obs = await ObsWebSocket.connect(
-    config['host'],
-    password: config['password'],
+  // Connect using .env file or environment variables
+  final obs = await ObsWebSocket.connectFromEnv(
     logOptions: const LogOptions(LogLevel.debug),
     fallbackEventHandler: (Event event) =>
-        print('type: ${event.eventType} data: ${event.eventData}'),
+        print('Event: ${event.eventType} | Data: ${event.eventData}'),
   );
+
+  if (obs == null) {
+    print(
+      'Error: No OBS connection configured.\n'
+      'Set OBS_WEBSOCKET_URL environment variable or create a .env file.',
+    );
+    exit(1);
+  }
 
   final requests = [
     Request('GetVersion'),
@@ -24,6 +30,8 @@ void main(List<String> args) async {
 
   for (final requestResponse in result.results) {
     print(
-        'response type: ${requestResponse.requestType}, with status code: ${requestResponse.requestStatus.code}');
+        'Response type: ${requestResponse.requestType}, with status code: ${requestResponse.requestStatus.code}');
   }
+
+  await obs.close();
 }

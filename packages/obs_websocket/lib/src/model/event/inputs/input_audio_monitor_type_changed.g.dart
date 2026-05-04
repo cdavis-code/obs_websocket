@@ -23,7 +23,7 @@ Map<String, dynamic> _$InputAudioMonitorTypeChangedToJson(
 };
 
 const _$ObsMonitoringTypeEnumMap = {
-  ObsMonitoringType.none: 'none',
-  ObsMonitoringType.play: 'play',
-  ObsMonitoringType.pause: 'pause',
+  ObsMonitoringType.none: 'OBS_MONITORING_TYPE_NONE',
+  ObsMonitoringType.monitorOnly: 'OBS_MONITORING_TYPE_MONITOR_ONLY',
+  ObsMonitoringType.monitorAndOutput: 'OBS_MONITORING_TYPE_MONITOR_AND_OUTPUT',
 };

@@ -92,4 +92,49 @@ class Sources {
 
     return SourceScreenshotResponse.fromJson(response!.responseData!);
   }
+
+  /// Gets the private settings of a source. This request is mainly just used
+  /// in interacting with global sources (e.g. Global Audio Devices).
+  ///
+  /// Note: Source UUIDs are supported via [sourceUuid].
+  ///
+  /// - Complexity Rating: 4/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.6.0
+  Future<Map<String, dynamic>> getSourcePrivateSettings({
+    String? sourceName,
+    String? sourceUuid,
+  }) async {
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetSourcePrivateSettings',
+        requestData: {'sourceName': ?sourceName, 'sourceUuid': ?sourceUuid},
+      ),
+    );
+
+    return response!.responseData!;
+  }
+
+  /// Sets the private settings of a source. This request is mainly just used
+  /// in interacting with global sources (e.g. Global Audio Devices).
+  ///
+  /// Note: Source UUIDs are supported via [sourceUuid].
+  ///
+  /// - Complexity Rating: 4/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.6.0
+  Future<void> setSourcePrivateSettings({
+    String? sourceName,
+    String? sourceUuid,
+    required Map<String, dynamic> sourceSettings,
+  }) async => await obsWebSocket.sendRequest(
+    Request(
+      'SetSourcePrivateSettings',
+      requestData: {
+        'sourceName': ?sourceName,
+        'sourceUuid': ?sourceUuid,
+        'sourceSettings': sourceSettings,
+      },
+    ),
+  );
 }

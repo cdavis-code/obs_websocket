@@ -124,4 +124,30 @@ class Record {
   /// - Added in v5.0.0
   Future<void> resume() async =>
       await obsWebSocket.sendRequest(Request('ResumeRecord'));
+
+  /// Splits the current file being recorded into a new file.
+  ///
+  /// - Complexity Rating: 1/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.5.0
+  Future<void> splitRecordFile() async =>
+      await obsWebSocket.sendRequest(Request('SplitRecordFile'));
+
+  /// Adds a new chapter marker to the file currently being recorded.
+  ///
+  /// Note: As of OBS 30.2.0, the only file format supporting this feature is
+  /// Hybrid MP4.
+  ///
+  /// - Complexity Rating: 1/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.5.0
+  Future<void> createRecordChapter({String? chapterName}) async =>
+      await obsWebSocket.sendRequest(
+        Request(
+          'CreateRecordChapter',
+          requestData: chapterName == null
+              ? null
+              : {'chapterName': chapterName},
+        ),
+      );
 }

@@ -1,23 +1,34 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:loggy/loggy.dart';
 import 'package:obs_websocket/event.dart';
 import 'package:obs_websocket/obs_websocket.dart';
-import 'package:universal_io/io.dart';
-import 'package:yaml/yaml.dart';
 
+/// Example demonstrating scene item automation using .env file for credentials.
 void main(List<String> args) async {
   Loggy.initLoggy();
 
-  final config = loadYaml(File('config.yaml').readAsStringSync());
-
-  final sceneItem = 'my face';
-
-  final obsWebSocket = await ObsWebSocket.connect(
-    config['host'],
-    password: config['password'],
+  // Connect using .env file or environment variables
+  final obsWebSocket = await ObsWebSocket.connectFromEnv(
+    logOptions: const LogOptions(LogLevel.debug),
+    fallbackEventHandler: (Event event) =>
+        print('Event: ${event.eventType} | Data: ${event.eventData}'),
   );
+
+  if (obsWebSocket == null) {
+    print(
+      'Error: No OBS connection configured.\n'
+      'Set OBS_WEBSOCKET_URL environment variable or create a .env file.',
+    );
+    exit(1);
+  }
 
   // tell obsWebSocket to listen to events, since the default is to ignore them
   await obsWebSocket.subscribe(EventSubscription.all);
+
+  // Scene item to show/hide
+  final sceneItem = 'my face';
 
   // get the current scene
   final currentScene = await obsWebSocket.scenes.getCurrentProgramScene();

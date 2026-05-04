@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:obs_cli/command.dart';
-import 'package:obs_websocket/obs_websocket.dart'
-    show CommandLineConverter, Event, EventSubscription;
+import 'package:obs_cli/src/util/command_line_converter.dart';
+import 'package:obs_websocket/obs_websocket.dart' show Event, EventSubscription;
 import 'package:universal_io/io.dart';
 
 /// Listen fir OBS events
@@ -33,6 +33,7 @@ class ObsListenCommand extends ObsHelperCommand {
           'mediaInputs',
           'vendors',
           'ui',
+          'canvases',
           'all',
           'inputVolumeMeters',
           'inputActiveStateChanged',
@@ -61,6 +62,8 @@ class ObsListenCommand extends ObsHelperCommand {
               'Subscription value to receive events in the MediaInputs category.',
           'vendors': 'Subscription value to receive the VendorEvent event.',
           'ui': 'Subscription value to receive events in the Ui category.',
+          'canvases':
+              'Subscription value to receive events in the Canvases category.',
           'all': 'Helper to receive all non-high-volume events.',
           'inputVolumeMeters':
               'Subscription value to receive the InputVolumeMeters high-volume event.',

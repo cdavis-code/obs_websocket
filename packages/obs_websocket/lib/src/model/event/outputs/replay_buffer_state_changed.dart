@@ -15,14 +15,17 @@ class ReplayBufferStateChanged implements BaseEvent {
   /// The specific state of the output
   final String outputState;
 
+  /// Creates an event for when the replay buffer state changes.
   ReplayBufferStateChanged({
     required this.outputActive,
     required this.outputState,
   });
 
+  /// Creates an event from a JSON map.
   factory ReplayBufferStateChanged.fromJson(Map<String, dynamic> json) =>
       _$ReplayBufferStateChangedFromJson(json);
 
+  /// Converts the event to a JSON map.
   @override
   Map<String, dynamic> toJson() => _$ReplayBufferStateChangedToJson(this);
 

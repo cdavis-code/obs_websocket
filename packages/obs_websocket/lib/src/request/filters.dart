@@ -136,4 +136,118 @@ class Filters {
       },
     ),
   );
+
+  /// Gets an array of all available source filter kinds.
+  ///
+  /// Similar to `GetInputKindList`.
+  ///
+  /// - Complexity Rating: 2/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.4.0
+  Future<List<String>> getSourceFilterKindList() async {
+    final response = await obsWebSocket.sendRequest(
+      Request('GetSourceFilterKindList'),
+    );
+
+    return (response!.responseData!['sourceFilterKinds'] as List)
+        .cast<String>();
+  }
+
+  /// Gets an array of all of a source's filters.
+  ///
+  /// - Complexity Rating: 2/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<List<Map<String, dynamic>>> getSourceFilterList(
+    String sourceName,
+  ) async {
+    final response = await obsWebSocket.sendRequest(
+      Request('GetSourceFilterList', requestData: {'sourceName': sourceName}),
+    );
+
+    return (response!.responseData!['filters'] as List)
+        .cast<Map<String, dynamic>>();
+  }
+
+  /// Gets the default settings for a filter kind.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<Map<String, dynamic>> getSourceFilterDefaultSettings(
+    String filterKind,
+  ) async {
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetSourceFilterDefaultSettings',
+        requestData: {'filterKind': filterKind},
+      ),
+    );
+
+    return response!.responseData!['defaultFilterSettings']
+        as Map<String, dynamic>;
+  }
+
+  /// Creates a new filter, adding it to the specified source.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> createSourceFilter({
+    required String sourceName,
+    required String filterName,
+    required String filterKind,
+    Map<String, dynamic>? filterSettings,
+  }) async => await obsWebSocket.sendRequest(
+    Request(
+      'CreateSourceFilter',
+      requestData: {
+        'sourceName': sourceName,
+        'filterName': filterName,
+        'filterKind': filterKind,
+        'filterSettings': ?filterSettings,
+      },
+    ),
+  );
+
+  /// Gets the info for a specific source filter.
+  ///
+  /// - Complexity Rating: 2/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<Map<String, dynamic>> getSourceFilter({
+    required String sourceName,
+    required String filterName,
+  }) async {
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetSourceFilter',
+        requestData: {'sourceName': sourceName, 'filterName': filterName},
+      ),
+    );
+
+    return response!.responseData!;
+  }
+
+  /// Sets the settings of a source filter.
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> setSourceFilterSettings({
+    required String sourceName,
+    required String filterName,
+    required Map<String, dynamic> filterSettings,
+    bool? overlay,
+  }) async => await obsWebSocket.sendRequest(
+    Request(
+      'SetSourceFilterSettings',
+      requestData: {
+        'sourceName': sourceName,
+        'filterName': filterName,
+        'filterSettings': filterSettings,
+        'overlay': ?overlay,
+      },
+    ),
+  );
 }

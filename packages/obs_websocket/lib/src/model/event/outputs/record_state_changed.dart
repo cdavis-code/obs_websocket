@@ -18,15 +18,18 @@ class RecordStateChanged implements BaseEvent {
   /// File name for the saved recording, if record stopped. null otherwise
   final String outputPath;
 
+  /// Creates an event for when the record state changes.
   RecordStateChanged({
     required this.outputActive,
     required this.outputState,
     required this.outputPath,
   });
 
+  /// Creates an event from a JSON map.
   factory RecordStateChanged.fromJson(Map<String, dynamic> json) =>
       _$RecordStateChangedFromJson(json);
 
+  /// Converts the event to a JSON map.
   @override
   Map<String, dynamic> toJson() => _$RecordStateChangedToJson(this);
 

@@ -35,6 +35,10 @@ tool/publish_tools.yaml
 
 .pt-build/
 
+.DS_Store
+
+**/doc
+
 # Local OBS MCP server credentials.
 .env
 bin/.env

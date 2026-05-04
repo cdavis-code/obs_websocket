@@ -4,6 +4,7 @@ import 'package:loggy/loggy.dart';
 import 'package:obs_websocket/obs_websocket.dart';
 import 'package:obs_websocket/src/connect.dart';
 import 'package:obs_websocket/request.dart' as request;
+import 'package:universal_io/io.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -23,6 +24,8 @@ class ObsWebSocket with UiLoggy {
   final fromJsonSingleton = FromJsonSingleton();
 
   request.Config? _config;
+
+  request.Canvas? _canvas;
 
   request.Filters? _filters;
 
@@ -56,9 +59,11 @@ class ObsWebSocket with UiLoggy {
 
   int get negotiatedRpcVersion => handshakeComplete
       ? _negotiatedRpcVersion!
-      : throw Exception('authentication not completed');
+      : throw const ObsAuthenticationException('Authentication not completed');
 
   request.Config get config => _config!;
+
+  request.Canvas get canvas => _canvas!;
 
   request.Filters get filters => _filters!;
 
@@ -101,6 +106,8 @@ class ObsWebSocket with UiLoggy {
     Function? fallbackEventHandler,
   }) : broadcastStream = websocketChannel.stream.asBroadcastStream() {
     _config = request.Config(this);
+
+    _canvas = request.Canvas(this);
 
     _filters = request.Filters(this);
 
@@ -145,9 +152,7 @@ class ObsWebSocket with UiLoggy {
   }) async {
     Loggy.initLoggy(logPrinter: printer, logOptions: logOptions);
 
-    if (!connectUrl.startsWith('ws://')) {
-      connectUrl = 'ws://$connectUrl';
-    }
+    connectUrl = _normalizeConnectUrl(connectUrl);
 
     logDebug('connecting to $connectUrl');
 
@@ -168,6 +173,85 @@ class ObsWebSocket with UiLoggy {
     await obsWebSocket.init();
 
     return obsWebSocket;
+  }
+
+  /// Connects to OBS using credentials from environment variables or a `.env`
+  /// file.
+  ///
+  /// **Priority order (highest to lowest):**
+  ///   1. System environment variables: `OBS_WEBSOCKET_URL`, `OBS_WEBSOCKET_PASSWORD`,
+  ///      `OBS_WEBSOCKET_TIMEOUT`
+  ///   2. `.env` file in the project root
+  ///
+  /// **Required `.env` file format:**
+  /// ```env
+  /// OBS_WEBSOCKET_URL=ws://localhost:4455
+  /// OBS_WEBSOCKET_PASSWORD=your_password
+  /// OBS_WEBSOCKET_TIMEOUT=120
+  /// ```
+  ///
+  /// **Example usage:**
+  /// ```dart
+  /// final obs = await ObsWebSocket.connectFromEnv();
+  /// ```
+  ///
+  /// Returns `null` if no URL is configured.
+  static Future<ObsWebSocket?> connectFromEnv({
+    Duration timeout = const Duration(seconds: 120),
+    void Function()? onDone,
+    Function? fallbackEventHandler,
+    LogOptions logOptions = const LogOptions(
+      LogLevel.error,
+      stackTraceLevel: LogLevel.off,
+    ),
+    LoggyPrinter printer = const PrettyPrinter(showColors: false),
+  }) async {
+    Loggy.initLoggy(logPrinter: printer, logOptions: logOptions);
+
+    // Check system environment variables first, then fall back to .env file
+    final url = Platform.environment['OBS_WEBSOCKET_URL'] ?? ObsEnv.url;
+    if (url.isEmpty) {
+      logDebug('No OBS_WEBSOCKET_URL found in environment or .env file');
+      return null;
+    }
+
+    final password =
+        Platform.environment['OBS_WEBSOCKET_PASSWORD'] ?? ObsEnv.password;
+    final timeoutStr =
+        Platform.environment['OBS_WEBSOCKET_TIMEOUT'] ?? ObsEnv.timeout;
+    final timeoutSeconds = int.tryParse(timeoutStr) ?? timeout.inSeconds;
+
+    return connect(
+      url,
+      password: password.isEmpty ? null : password,
+      timeout: Duration(seconds: timeoutSeconds),
+      onDone: onDone,
+      fallbackEventHandler: fallbackEventHandler,
+      logOptions: logOptions,
+      printer: printer,
+    );
+  }
+
+  /// Validates [input] and returns a normalized `ws://` or `wss://` URL.
+  ///
+  /// - A scheme-less input like `host:4455` is prefixed with `ws://`.
+  /// - `ws://` and `wss://` are preserved as-is.
+  /// - Any other scheme (http, wss typo, ftp, ...) throws
+  ///   [ObsArgumentException] so callers never get a silently rewritten URL.
+  static String _normalizeConnectUrl(String input) {
+    final parsed = Uri.tryParse(input);
+    if (parsed == null) {
+      throw ObsArgumentException('Invalid WebSocket URL: $input');
+    }
+    if (parsed.scheme.isEmpty) {
+      return 'ws://$input';
+    }
+    if (parsed.scheme != 'ws' && parsed.scheme != 'wss') {
+      throw ObsArgumentException(
+        'Only ws:// and wss:// schemes are supported, got ${parsed.scheme}://',
+      );
+    }
+    return input;
   }
 
   Future<void> init() async {
@@ -192,7 +276,9 @@ class ObsWebSocket with UiLoggy {
     final helloOpcode = await getStreamOpcode(WebSocketOpCode.hello.code);
 
     if (helloOpcode == null) {
-      throw Exception('Handshake error with Hello response');
+      throw const ObsConnectionException(
+        'Handshake error: no Hello opcode received from server',
+      );
     }
 
     final hello = Hello.fromJson(helloOpcode.d);
@@ -220,7 +306,9 @@ class ObsWebSocket with UiLoggy {
     final identifiedOpcode = await sendOpcode(identifyOpcode);
 
     if (identifiedOpcode == null) {
-      throw Exception('Authentication error with identified response');
+      throw const ObsAuthenticationException(
+        'Authentication error: no Identified opcode received from server',
+      );
     }
 
     final identified = Identified.fromJson(identifiedOpcode.d);
@@ -284,7 +372,7 @@ class ObsWebSocket with UiLoggy {
     } else if (eventSubscription is int) {
       await listenForMask(eventSubscription);
     } else {
-      throw ArgumentError(
+      throw ObsArgumentException(
         'eventSubscription must be either EventSubscription or int, got ${eventSubscription.runtimeType}',
       );
     }
@@ -380,7 +468,9 @@ class ObsWebSocket with UiLoggy {
     }
 
     if (requestBatchResponse == null) {
-      throw Exception('Problem retrieving batch response.');
+      throw const ObsConnectionException(
+        'Batch response not received before stream closed',
+      );
     }
 
     return requestBatchResponse;
@@ -418,8 +508,11 @@ class ObsWebSocket with UiLoggy {
 
   void _checkResponse(Request request, RequestResponse response) {
     if (request.hasResponseData && !response.requestStatus.result) {
-      throw Exception(
-        'Problem with command: ${request.requestType}, Error Code: ${response.requestStatus.code}, Message: ${response.requestStatus.comment}',
+      throw ObsRequestException(
+        requestType: request.requestType,
+        code: response.requestStatus.code,
+        comment: response.requestStatus.comment,
+        stackTrace: StackTrace.current,
       );
     }
   }

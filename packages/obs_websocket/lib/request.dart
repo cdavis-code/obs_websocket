@@ -3,6 +3,7 @@
 /// Hamilton, with new commands specific to OBS Studio.
 library;
 
+export 'src/request/canvas.dart';
 export 'src/request/config.dart';
 export 'src/request/filters.dart';
 export 'src/request/general.dart';

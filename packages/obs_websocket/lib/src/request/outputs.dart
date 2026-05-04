@@ -150,4 +150,57 @@ class Outputs {
   /// - Added in v5.0.0
   Future<void> stop(String outputName) async =>
       await obsWebSocket.sendRequest(Request('StopOutput'));
+
+  /// Gets the list of available outputs.
+  ///
+  /// - Complexity Rating: 4/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<List<Map<String, dynamic>>> getOutputList() async {
+    final response = await obsWebSocket.sendRequest(Request('GetOutputList'));
+
+    return (response!.responseData!['outputs'] as List)
+        .cast<Map<String, dynamic>>();
+  }
+
+  /// Gets the status of an output.
+  ///
+  /// - Complexity Rating: 4/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<Map<String, dynamic>> getOutputStatus(String outputName) async {
+    final response = await obsWebSocket.sendRequest(
+      Request('GetOutputStatus', requestData: {'outputName': outputName}),
+    );
+
+    return response!.responseData!;
+  }
+
+  /// Gets the settings of an output.
+  ///
+  /// - Complexity Rating: 4/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<Map<String, dynamic>> getOutputSettings(String outputName) async {
+    final response = await obsWebSocket.sendRequest(
+      Request('GetOutputSettings', requestData: {'outputName': outputName}),
+    );
+
+    return response!.responseData!['outputSettings'] as Map<String, dynamic>;
+  }
+
+  /// Sets the settings of an output.
+  ///
+  /// - Complexity Rating: 4/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> setOutputSettings({
+    required String outputName,
+    required Map<String, dynamic> outputSettings,
+  }) async => await obsWebSocket.sendRequest(
+    Request(
+      'SetOutputSettings',
+      requestData: {'outputName': outputName, 'outputSettings': outputSettings},
+    ),
+  );
 }

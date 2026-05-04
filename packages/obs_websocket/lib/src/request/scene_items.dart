@@ -363,4 +363,199 @@ class SceneItems {
       },
     ),
   );
+
+  /// Creates a new scene item using a source.
+  ///
+  /// Scenes only
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<int> createSceneItem({
+    required String sceneName,
+    required String sourceName,
+    bool? sceneItemEnabled,
+  }) async {
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'CreateSceneItem',
+        requestData: {
+          'sceneName': sceneName,
+          'sourceName': sourceName,
+          'sceneItemEnabled': ?sceneItemEnabled,
+        },
+      ),
+    );
+
+    return IntegerResponse.fromJson(response!.responseData!).itemId;
+  }
+
+  /// Removes a scene item from a scene.
+  ///
+  /// Scenes only
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> removeSceneItem({
+    required String sceneName,
+    required int sceneItemId,
+  }) async => await obsWebSocket.sendRequest(
+    Request(
+      'RemoveSceneItem',
+      requestData: {'sceneName': sceneName, 'sceneItemId': sceneItemId},
+    ),
+  );
+
+  /// Duplicates a scene item, copying all transform and crop info.
+  ///
+  /// Scenes only
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<int> duplicateSceneItem({
+    required String sceneName,
+    required int sceneItemId,
+    String? destinationSceneName,
+  }) async {
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'DuplicateSceneItem',
+        requestData: {
+          'sceneName': sceneName,
+          'sceneItemId': sceneItemId,
+          'destinationSceneName': ?destinationSceneName,
+        },
+      ),
+    );
+
+    return IntegerResponse.fromJson(response!.responseData!).itemId;
+  }
+
+  /// Gets the blend mode of a scene item.
+  ///
+  /// Blend modes: normal, additive, subtract, screen, multiply, lighten,
+  /// darken.
+  ///
+  /// Scenes and Groups
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<String> getSceneItemBlendMode({
+    required String sceneName,
+    required int sceneItemId,
+  }) async {
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetSceneItemBlendMode',
+        requestData: {'sceneName': sceneName, 'sceneItemId': sceneItemId},
+      ),
+    );
+
+    return response!.responseData!['sceneItemBlendMode'] as String;
+  }
+
+  /// Sets the blend mode of a scene item.
+  ///
+  /// Scenes and Groups
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.0.0
+  Future<void> setSceneItemBlendMode({
+    required String sceneName,
+    required int sceneItemId,
+    required String sceneItemBlendMode,
+  }) async => await obsWebSocket.sendRequest(
+    Request(
+      'SetSceneItemBlendMode',
+      requestData: {
+        'sceneName': sceneName,
+        'sceneItemId': sceneItemId,
+        'sceneItemBlendMode': sceneItemBlendMode,
+      },
+    ),
+  );
+
+  /// Gets the source associated with a scene item.
+  ///
+  /// Scenes and Groups
+  ///
+  /// - Complexity Rating: 3/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.4.0
+  Future<Map<String, dynamic>> getSceneItemSource({
+    String? sceneName,
+    String? sceneUuid,
+    required int sceneItemId,
+  }) async {
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetSceneItemSource',
+        requestData: {
+          'sceneName': ?sceneName,
+          'sceneUuid': ?sceneUuid,
+          'sceneItemId': sceneItemId,
+        },
+      ),
+    );
+
+    return response!.responseData!;
+  }
+
+  /// Gets the private settings of a scene item.
+  ///
+  /// Note: This request is mainly used internally by OBS.
+  ///
+  /// Scenes and Groups
+  ///
+  /// - Complexity Rating: 4/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.6.0
+  Future<Map<String, dynamic>> getSceneItemPrivateSettings({
+    String? sceneName,
+    String? sceneUuid,
+    required int sceneItemId,
+  }) async {
+    final response = await obsWebSocket.sendRequest(
+      Request(
+        'GetSceneItemPrivateSettings',
+        requestData: {
+          'sceneName': ?sceneName,
+          'sceneUuid': ?sceneUuid,
+          'sceneItemId': sceneItemId,
+        },
+      ),
+    );
+
+    return response!.responseData!;
+  }
+
+  /// Sets the private settings of a scene item.
+  ///
+  /// Note: This request is mainly used internally by OBS.
+  ///
+  /// Scenes and Groups
+  ///
+  /// - Complexity Rating: 4/5
+  /// - Latest Supported RPC Version: 1
+  /// - Added in v5.6.0
+  Future<void> setSceneItemPrivateSettings({
+    String? sceneName,
+    String? sceneUuid,
+    required int sceneItemId,
+    required Map<String, dynamic> sceneItemSettings,
+  }) async => await obsWebSocket.sendRequest(
+    Request(
+      'SetSceneItemPrivateSettings',
+      requestData: {
+        'sceneName': ?sceneName,
+        'sceneUuid': ?sceneUuid,
+        'sceneItemId': sceneItemId,
+        'sceneItemSettings': sceneItemSettings,
+      },
+    ),
+  );
 }

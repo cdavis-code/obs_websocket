@@ -25,15 +25,18 @@ class InputShowStateChanged implements BaseEvent {
   /// Whether the input is showing
   final bool videoShowing;
 
+  /// Creates an event for when an input's show state changes.
   InputShowStateChanged({
     required this.inputName,
     required this.inputUuid,
     required this.videoShowing,
   });
 
+  /// Creates an event from a JSON map.
   factory InputShowStateChanged.fromJson(Map<String, dynamic> json) =>
       _$InputShowStateChangedFromJson(json);
 
+  /// Converts the event to a JSON map.
   @override
   Map<String, dynamic> toJson() => _$InputShowStateChangedToJson(this);
 
