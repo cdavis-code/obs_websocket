@@ -34,3 +34,11 @@ tool/config.yaml
 tool/publish_tools.yaml
 
 .pt-build/
+
+# Local OBS MCP server credentials.
+.env
+bin/.env
+!.env.example
+
+# Melos generates this during bootstrap
+pubspec_overrides.yaml
