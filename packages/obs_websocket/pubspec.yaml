@@ -6,7 +6,7 @@ repository: https://github.com/cdavis-code/obs_websocket/tree/main/packages/obs_
 issue_tracker: https://github.com/cdavis-code/obs_websocket/issues
 documentation: https://pub.dev/documentation/obs_websocket/latest/
 funding:
-  - https://www.buymeacoffee.com/faithoflif2
+  - https://buymeacoffee.com/cdavis
 topics:
   - obs-websocket
   - obs-studio

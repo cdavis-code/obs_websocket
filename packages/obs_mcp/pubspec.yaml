@@ -1,7 +1,18 @@
 name: obs_mcp
 version: 5.2.3+2
 description: MCP server for controlling OBS Studio via the obs-websocket v5.x protocol.
-repository: https://github.com/faithoflifedev/obs_websocket
+homepage: https://github.com/cdavis-code/obs_websocket
+repository: https://github.com/cdavis-code/obs_websocket/tree/main/packages/obs_mcp
+issue_tracker: https://github.com/cdavis-code/obs_websocket/issues
+documentation: https://pub.dev/documentation/obs_mcp/latest/
+funding:
+  - https://buymeacoffee.com/cdavis
+topics:
+  - obs-websocket
+  - obs-studio
+  - mcp
+  - streaming
+  - ai
 environment:
   sdk: ^3.8.0
 resolution: workspace
