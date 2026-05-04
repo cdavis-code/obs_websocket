@@ -1,5 +1,50 @@
 # Changelog
 
+## 5.7.0
+
+* **Code Quality & Refactoring**
+  * Split `obs_inputs_command.dart` (1203 lines) into 8 modular files for better maintainability
+    - `obs_inputs_base_command.dart` - Parent command registration
+    - `obs_inputs_list_command.dart` - List commands (get-input-list, get-input-kind-list, get-special-inputs)
+    - `obs_inputs_create_remove_command.dart` - Create/remove/settings commands
+    - `obs_inputs_mute_command.dart` - Mute commands (get/set/toggle)
+    - `obs_inputs_volume_command.dart` - Volume commands (get/set)
+    - `obs_inputs_deinterlace_command.dart` - Deinterlace commands (get/set mode/field order)
+    - `obs_inputs_audio_command.dart` - Audio commands (sync offset/monitor type/tracks)
+    - `obs_inputs_properties_command.dart` - Properties commands (get/set)
+  * Added MIT LICENSE file for proper open-source licensing
+  * Removed unused imports across all split files
+  * Enforced `always_use_package_imports` lint rule
+
+* **Bug Fixes**
+  * **CRITICAL**: Restored 3 missing commands lost during refactoring
+    - `get-input-default-settings` - Gets default settings for an input kind
+    - `get-input-settings` - Gets current settings of an input
+    - `set-input-settings` - Sets/updates settings of an input
+  * Fixed unsafe enum parsing in deinterlace commands
+    - Replaced `.firstWhere()` with safe `.byName()` method
+    - Updated allowed values to dynamically match enum definitions
+  * Fixed unsafe enum parsing in audio monitor type command
+    - Replaced `.firstWhere()` with safe `.byName()` method
+    - Removed invalid `outputOnly` option from allowed values
+  * Added `withObs()` helper method for guaranteed resource cleanup
+    - Prevents WebSocket connection leaks when exceptions occur
+    - Ensures `obs.close()` is always called via try-finally pattern
+
+* **Improvements**
+  * Better error messages for enum parsing (clear `ArgumentError` instead of cryptic `StateError`)
+  * Help text now shows actual valid enum names for users
+  * All 28 input subcommands verified and tested
+  * All 54 unit tests passing
+
+* **API Changes**
+  * Deinterlace mode CLI values updated:
+    - Old: `none, discard, retro, blend, adaptive, linear`
+    - New: `disable, discard, retro, blend, blend2x, linear, linear2x, yadif, yadif2x`
+  * Audio monitor type CLI values corrected:
+    - Old: `none, monitorOnly, monitorAndOutput, outputOnly`
+    - New: `none, monitorOnly, monitorAndOutput`
+
 ## 5.2.3+2
 
 * Events

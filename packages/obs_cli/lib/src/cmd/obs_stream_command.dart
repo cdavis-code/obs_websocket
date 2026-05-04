@@ -34,7 +34,7 @@ class ObsGetStreamStatusCommand extends ObsHelperCommand {
 
     print(streamStatusResponse);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -52,7 +52,7 @@ class ObsToggleStreamCommand extends ObsHelperCommand {
 
     await obs.stream.toggleStream();
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -70,7 +70,7 @@ class ObsStartStreamCommand extends ObsHelperCommand {
 
     await obs.stream.startStream();
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -88,7 +88,7 @@ class ObsStopStreamCommand extends ObsHelperCommand {
 
     await obs.stream.stopStream();
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -116,6 +116,6 @@ class ObsSendStreamCaptionCommand extends ObsHelperCommand {
 
     await obs.stream.sendStreamCaption(argResults!['caption-Text']);
 
-    obs.close();
+    await obs.close();
   }
 }

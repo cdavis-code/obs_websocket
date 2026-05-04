@@ -189,6 +189,8 @@ Just like the main dart library, any responses provided through the above comman
 
 ## Quick start
 
+For comprehensive examples and real-world usage patterns, see the [example/README.md](example/README.md) file.
+
 ```sh
 # step 1 - Configure your OBS credentials in bin/.env
 # Edit bin/.env with your OBS WebSocket URL and password
@@ -2065,3 +2067,15 @@ The `listen` command provides an optional `--command` argument that allows the u
 # send an email for every scene event
 obs listen --event-subscriptions scenes --command 'mutt -s "OBS Scene Event" address@email.com'
 ```
+
+### More Examples
+
+For additional examples including:
+- Scene management workflows
+- Input control scripts
+- Stream and recording automation
+- Filter management
+- Event monitoring patterns
+- Integration with Python, Bash, and other tools
+
+See the comprehensive [example/README.md](example/README.md) documentation with real-world usage patterns and scripting examples.

@@ -33,7 +33,7 @@ class ObsGetStudioModeEnabledCommand extends ObsHelperCommand {
 
     print(studioModeEnabled);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -55,7 +55,7 @@ class ObsSetStudioModeEnabledCommand extends ObsHelperCommand {
 
     await obs.ui.setStudioModeEnabled(argResults!['studio-mode']);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -76,6 +76,6 @@ class ObsGetMonitorListCommand extends ObsHelperCommand {
 
     print(response);
 
-    obs.close();
+    await obs.close();
   }
 }

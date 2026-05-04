@@ -59,7 +59,7 @@ class ObsGetMediaInputStatusCommand extends ObsHelperCommand {
 
     print(mediaInputStatus);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -152,7 +152,7 @@ abstract class ObsMediaInputCursorCommandBase extends ObsHelperCommand {
 
     await executeCommand(inputs);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -304,6 +304,6 @@ class ObsTriggerMediaInputActionCommand extends ObsHelperCommand {
       mediaAction: mediaAction,
     );
 
-    obs.close();
+    await obs.close();
   }
 }

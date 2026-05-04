@@ -42,7 +42,7 @@ class ObsGetVideoSettingsCommand extends ObsHelperCommand {
 
     print(videoSettingsResponse);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -118,7 +118,7 @@ class ObsSetVideoSettingsCommand extends ObsHelperCommand {
       ),
     );
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -140,7 +140,7 @@ class ObsGetStreamServiceSettingsCommand extends ObsHelperCommand {
 
     print(streamServiceSettingsResponse);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -181,7 +181,7 @@ class ObsSetStreamServiceSettingsCommand extends ObsHelperCommand {
       ),
     );
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -202,6 +202,6 @@ class ObsGetRecordDirectoryCommand extends ObsHelperCommand {
 
     print(result.recordDirectory);
 
-    obs.close();
+    await obs.close();
   }
 }

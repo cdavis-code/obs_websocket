@@ -38,7 +38,7 @@ class ObsGetRecordStatusCommand extends ObsHelperCommand {
 
     print(status);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -58,7 +58,7 @@ class ObsToggleRecordCommand extends ObsHelperCommand {
 
     print('Recording toggled');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -78,7 +78,7 @@ class ObsStartRecordCommand extends ObsHelperCommand {
 
     print('Recording started');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -99,7 +99,7 @@ class ObsStopRecordCommand extends ObsHelperCommand {
     print('Recording stopped');
     print('Output path: $outputPath');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -119,7 +119,7 @@ class ObsToggleRecordPauseCommand extends ObsHelperCommand {
 
     print('Record pause toggled');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -139,7 +139,7 @@ class ObsPauseRecordCommand extends ObsHelperCommand {
 
     print('Recording paused');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -159,7 +159,7 @@ class ObsResumeRecordCommand extends ObsHelperCommand {
 
     print('Recording resumed');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -179,7 +179,7 @@ class ObsSplitRecordFileCommand extends ObsHelperCommand {
 
     print('Record file split');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -206,6 +206,6 @@ class ObsCreateRecordChapterCommand extends ObsHelperCommand {
 
     print('Chapter created: ${chapterName ?? "unnamed"}');
 
-    obs.close();
+    await obs.close();
   }
 }

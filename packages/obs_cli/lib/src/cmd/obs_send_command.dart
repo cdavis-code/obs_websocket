@@ -40,6 +40,6 @@ class ObsSendCommand extends ObsHelperCommand {
       print(requestResponse);
     }
 
-    obs.close();
+    await obs.close();
   }
 }

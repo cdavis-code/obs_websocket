@@ -47,7 +47,7 @@ class ObsGetVirtualCamStatusCommand extends ObsHelperCommand {
 
     print('outputActive: $status');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -67,7 +67,7 @@ class ObsToggleVirtualCamCommand extends ObsHelperCommand {
 
     print('outputActive: $status');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -87,7 +87,7 @@ class ObsStartVirtualCamCommand extends ObsHelperCommand {
 
     print('VirtualCam started');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -107,7 +107,7 @@ class ObsStopVirtualCamCommand extends ObsHelperCommand {
 
     print('VirtualCam stopped');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -127,7 +127,7 @@ class ObsGetReplayBufferStatusCommand extends ObsHelperCommand {
 
     print('outputActive: $status');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -147,7 +147,7 @@ class ObsToggleReplayBufferCommand extends ObsHelperCommand {
 
     print('outputActive: $status');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -167,7 +167,7 @@ class ObsStartReplayBufferCommand extends ObsHelperCommand {
 
     print('ReplayBuffer started');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -187,7 +187,7 @@ class ObsStopReplayBufferCommand extends ObsHelperCommand {
 
     print('ReplayBuffer stopped');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -207,7 +207,7 @@ class ObsSaveReplayBufferCommand extends ObsHelperCommand {
 
     print('ReplayBuffer saved');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -227,7 +227,7 @@ class ObsGetOutputListCommand extends ObsHelperCommand {
 
     print(outputs);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -257,7 +257,7 @@ class ObsGetOutputStatusCommand extends ObsHelperCommand {
 
     print(status);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -287,7 +287,7 @@ class ObsToggleOutputCommand extends ObsHelperCommand {
 
     print('outputActive: $status');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -317,7 +317,7 @@ class ObsStartOutputCommand extends ObsHelperCommand {
 
     print('Output started: $outputName');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -347,7 +347,7 @@ class ObsStopOutputCommand extends ObsHelperCommand {
 
     print('Output stopped: $outputName');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -377,7 +377,7 @@ class ObsGetOutputSettingsCommand extends ObsHelperCommand {
 
     print(settings);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -411,6 +411,6 @@ class ObsSetOutputSettingsCommand extends ObsHelperCommand {
       outputSettings: json.decode(outputSettings),
     );
 
-    obs.close();
+    await obs.close();
   }
 }

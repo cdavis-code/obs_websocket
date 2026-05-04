@@ -39,7 +39,7 @@ class ObsGetSourceFilterKindListCommand extends ObsHelperCommand {
     await initializeObs();
     final filterKinds = await obs.filters.getSourceFilterKindList();
     print(filterKinds.join('\n'));
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -64,7 +64,7 @@ class ObsGetSourceFilterListCommand extends ObsHelperCommand {
     }
     final filters = await obs.filters.getSourceFilterList(sourceName);
     print(const JsonEncoder.withIndent('  ').convert(filters));
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -91,7 +91,7 @@ class ObsGetSourceFilterDefaultSettingsCommand extends ObsHelperCommand {
       filterKind,
     );
     print(const JsonEncoder.withIndent('  ').convert(settings));
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -138,7 +138,7 @@ class ObsCreateSourceFilterCommand extends ObsHelperCommand {
       filterSettings: filterSettings,
     );
     print('Filter created');
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -174,7 +174,7 @@ class ObsGetSourceFilterCommand extends ObsHelperCommand {
       filterName: filterName,
     );
     print(const JsonEncoder.withIndent('  ').convert(filter));
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -225,7 +225,7 @@ class ObsSetSourceFilterSettingsCommand extends ObsHelperCommand {
       overlay: overlay,
     );
     print('Filter settings updated');
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -261,7 +261,7 @@ class ObsRemoveSourceFilterCommand extends ObsHelperCommand {
       filterName: filterName,
     );
     print('Filter removed');
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -300,7 +300,7 @@ class ObsSetSourceFilterNameCommand extends ObsHelperCommand {
       newFilterName: newFilterName,
     );
     print('Filter renamed');
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -341,7 +341,7 @@ class ObsSetSourceFilterIndexCommand extends ObsHelperCommand {
       filterIndex: filterIndex,
     );
     print('Filter index updated');
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -385,6 +385,6 @@ class ObsSetSourceFilterEnabledCommand extends ObsHelperCommand {
       filterEnabled: filterEnabled ?? true,
     );
     print('Filter enabled state updated');
-    obs.close();
+    await obs.close();
   }
 }

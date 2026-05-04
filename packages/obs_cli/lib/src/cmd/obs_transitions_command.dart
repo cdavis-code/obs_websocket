@@ -37,7 +37,7 @@ class ObsGetTransitionKindListCommand extends ObsHelperCommand {
 
     print(kinds);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -57,7 +57,7 @@ class ObsGetSceneTransitionListCommand extends ObsHelperCommand {
 
     print(transitions);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -78,7 +78,7 @@ class ObsGetCurrentSceneTransitionCommand extends ObsHelperCommand {
 
     print(transition);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -108,7 +108,7 @@ class ObsSetCurrentSceneTransitionCommand extends ObsHelperCommand {
 
     print('Transition set: $transitionName');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -139,7 +139,7 @@ class ObsSetCurrentSceneTransitionDurationCommand extends ObsHelperCommand {
 
     print('Transition duration set: ${duration}ms');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -160,7 +160,7 @@ class ObsGetCurrentSceneTransitionCursorCommand extends ObsHelperCommand {
 
     print('transitionCursor: $cursor');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -180,7 +180,7 @@ class ObsTriggerStudioModeTransitionCommand extends ObsHelperCommand {
 
     print('Studio mode transition triggered');
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -210,6 +210,6 @@ class ObsSetTBarPositionCommand extends ObsHelperCommand {
 
     print('T-Bar position set: $position');
 
-    obs.close();
+    await obs.close();
   }
 }

@@ -42,7 +42,7 @@ class ObsGetVersionCommand extends ObsHelperCommand {
 
     print(versionResponse);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -63,7 +63,7 @@ class ObsGetStatsCommand extends ObsHelperCommand {
 
     print(statsResponse);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -91,7 +91,7 @@ class ObsBroadcastCustomEventCommand extends ObsHelperCommand {
 
     await obs.general.broadcastCustomEvent(argResults!['event-data']);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -138,7 +138,7 @@ class ObsCallVendorRequestCommand extends ObsHelperCommand {
 
     print(callVendorRequestResponse);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -177,7 +177,7 @@ class ObsBrowserEventCommand extends ObsHelperCommand {
 
     print(callVendorRequestResponse);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -197,7 +197,7 @@ class ObsGetHotkeyListCommand extends ObsHelperCommand {
 
     print(hotkeyList);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -225,7 +225,7 @@ class ObsTriggerHotkeyByNameCommand extends ObsHelperCommand {
 
     await obs.general.triggerHotkeyByName(argResults!['hotkey-name']);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -265,7 +265,7 @@ class ObsTriggerHotkeyByKeySequenceCommand extends ObsHelperCommand {
       ),
     );
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -300,6 +300,6 @@ class ObSleepCommand extends ObsHelperCommand {
       sleepFrames: argResults?['sleep-frames'],
     );
 
-    obs.close();
+    await obs.close();
   }
 }

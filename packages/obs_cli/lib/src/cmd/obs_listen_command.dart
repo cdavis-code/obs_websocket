@@ -5,7 +5,7 @@ import 'package:obs_cli/src/util/command_line_converter.dart';
 import 'package:obs_websocket/obs_websocket.dart' show Event, EventSubscription;
 import 'package:universal_io/io.dart';
 
-/// Listen fir OBS events
+/// Listen for OBS events
 class ObsListenCommand extends ObsHelperCommand {
   @override
   String get description => 'Generate OBS events to stdout';

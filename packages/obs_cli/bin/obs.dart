@@ -56,6 +56,7 @@ CommandRunner<void> _buildRunner() {
       abbr: 'l',
       allowed: ['all', 'debug', 'info', 'warning', 'error', 'off'],
       defaultsTo: 'off',
+      help: 'Set the logging level (use "debug" or "all" for detailed output)',
     )
     ..argParser.addOption(
       'passwd',
@@ -74,8 +75,6 @@ CommandRunner<void> _buildRunner() {
     ..addCommand(ObsRecordCommand())
     ..addCommand(ObsSendCommand())
     ..addCommand(ObsSourcesCommand())
-    // ..addCommand(ObsProfilesCommand())
-    // ..addCommand(ObsRecordingCommand())
     ..addCommand(ObsSceneItemsCommand())
     ..addCommand(ObsScenesCommand())
     ..addCommand(ObsStreamCommand())

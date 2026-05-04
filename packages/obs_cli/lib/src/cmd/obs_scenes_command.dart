@@ -31,7 +31,7 @@ class ObsGetScenesListCommand extends ObsHelperCommand {
 
     print(sceneList);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -50,7 +50,7 @@ class ObsGetGroupListCommand extends ObsHelperCommand {
 
     print(groupList);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -69,6 +69,6 @@ class ObsGetCurrentProgramSceneCommand extends ObsHelperCommand {
 
     print(currentProgramScene);
 
-    obs.close();
+    await obs.close();
   }
 }

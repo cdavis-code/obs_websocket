@@ -44,7 +44,7 @@ class ObsGetSourceActiveCommand extends ObsHelperCommand {
 
     print(sourceActiveResponse);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -88,7 +88,7 @@ class ObsGetSourceScreenshotCommand extends ObsHelperCommand {
 
     print(sourceScreenshotResponse);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -137,6 +137,6 @@ class ObsSaveSourceScreenshotCommand extends ObsHelperCommand {
 
     print(sourceScreenshotResponse);
 
-    obs.close();
+    await obs.close();
   }
 }

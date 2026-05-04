@@ -44,7 +44,7 @@ class ObsGetSceneItemListCommand extends ObsHelperCommand {
 
     print(sceneItemDetailList);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -85,7 +85,7 @@ class ObsGetSceneItemLockedCommand extends ObsHelperCommand {
 
     print(isLocked);
 
-    obs.close();
+    await obs.close();
   }
 }
 
@@ -130,6 +130,6 @@ class ObsSetSceneItemLockedCommand extends ObsHelperCommand {
       sceneItemLocked: argResults!['scene-item-locked'],
     );
 
-    obs.close();
+    await obs.close();
   }
 }

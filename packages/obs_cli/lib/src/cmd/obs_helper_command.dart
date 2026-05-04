@@ -2,7 +2,6 @@ import 'dart:convert' show LineSplitter;
 
 import 'package:args/command_runner.dart';
 import 'package:obs_websocket/obs_websocket.dart' show ObsUtil, ObsWebSocket;
-import 'package:universal_io/io.dart';
 
 abstract class ObsHelperCommand extends Command<void> {
   ObsWebSocket? _obs;
@@ -10,14 +9,17 @@ abstract class ObsHelperCommand extends Command<void> {
   ObsWebSocket get obs => _obs!;
 
   Future<void> initializeObs() async {
-    // Try to connect using .env file or environment variables
+    // Try to connect using environment variables or .env file
+    // Priority: system env vars > .env file in current/parent directories > compile-time ObsEnv
     _obs = await ObsWebSocket.connectFromEnv(
       timeout: Duration(
         seconds: globalResults?['timeout'] == null
             ? 5
-            : int.parse(globalResults!['timeout']),
+            : int.parse(globalResults!['timeout'] as String),
       ),
-      logOptions: ObsUtil.convertToLogOptions(globalResults!['log-level']),
+      logOptions: ObsUtil.convertToLogOptions(
+        globalResults!['log-level'] as String,
+      ),
     );
 
     if (_obs == null) {
@@ -28,22 +30,6 @@ abstract class ObsHelperCommand extends Command<void> {
         usage,
       );
     }
-  }
-
-  /// Load environment variables from bin/.env file
-  Map<String, String> loadEnvFromBin() {
-    final envFile = File('bin/.env');
-
-    if (!envFile.existsSync()) {
-      throw UsageException(
-        'bin/.env file not found at ${envFile.absolute.path}. '
-        'Run the CLI from the directory containing bin/.env, or create one '
-        'from .env.example.',
-        usage,
-      );
-    }
-
-    return parseDotenv(envFile.readAsStringSync());
   }
 
   /// Minimal dependency-free dotenv parser. Supports KEY=VALUE,
@@ -76,5 +62,16 @@ abstract class ObsHelperCommand extends Command<void> {
       result[key] = value;
     }
     return result;
+  }
+
+  /// Executes a block of code with proper OBS connection cleanup.
+  /// Ensures obs.close() is called even if an exception occurs.
+  Future<void> withObs(Future<void> Function() block) async {
+    await initializeObs();
+    try {
+      await block();
+    } finally {
+      await obs.close();
+    }
   }
 }
