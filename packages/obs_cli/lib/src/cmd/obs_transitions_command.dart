@@ -1,5 +1,5 @@
 import 'package:args/command_runner.dart';
-import 'package:obs_cli/command.dart';
+import 'package:obs_cli/obs_cli.dart';
 
 /// Transitions Requests
 class ObsTransitionsCommand extends Command<void> {

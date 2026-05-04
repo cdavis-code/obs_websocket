@@ -1,5 +1,5 @@
 import 'package:args/command_runner.dart';
-import 'package:obs_cli/command.dart';
+import 'package:obs_cli/obs_cli.dart';
 
 /// Record Requests
 class ObsRecordCommand extends Command<void> {

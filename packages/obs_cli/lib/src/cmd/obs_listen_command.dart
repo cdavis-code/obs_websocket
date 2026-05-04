@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:obs_cli/command.dart';
+import 'package:obs_cli/obs_cli.dart';
 import 'package:obs_cli/src/util/command_line_converter.dart';
 import 'package:obs_websocket/obs_websocket.dart' show Event, EventSubscription;
 import 'package:universal_io/io.dart';

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:args/command_runner.dart';
-import 'package:obs_cli/command.dart';
+import 'package:obs_cli/obs_cli.dart';
 import 'package:obs_websocket/obs_websocket.dart'
     show
         ObsException,
