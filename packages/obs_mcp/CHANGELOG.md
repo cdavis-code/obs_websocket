@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.7.1+1
+
+* **Documentation**: Improved README structure and clarity
+  * Added Code Mode section with link to Cloudflare's code mode blog
+  * Clarified that sample code in "What Can You Do?" is executed via the `execute` tool
+  * Moved "What Can You Do?" section after Features table for better context
+  * Removed manual server run step from Quick Start (server is auto-launched by MCP host)
+  * Moved MCP Host Configuration section up to follow Quick Start
+  * Relocated development instructions to "Development Setup" section
+
 ## 5.7.1
 
 * **Fix**: Include generated `obs_mcp_server.mcp.dart` file in published package, which was previously excluded by `.pubignore`, causing `dart pub global activate obs_mcp` to fail with "No such file or directory" build error.
