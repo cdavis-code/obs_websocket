@@ -1,6 +1,6 @@
 # obs_mcp
 
-![obs_mcp banner](image/banner.svg)
+![obs_mcp banner](https://raw.githubusercontent.com/cdavis-code/obs_websocket/main/packages/obs_mcp/image/banner.svg)
 
 <p align="center">
   <strong>MCP Server for OBS Studio</strong><br/>
