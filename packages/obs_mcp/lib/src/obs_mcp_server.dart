@@ -23,6 +23,7 @@ import 'dart:io';
 import 'package:easy_api_annotations/mcp_annotations.dart';
 import 'package:obs_websocket/event.dart';
 import 'package:obs_websocket/obs_websocket.dart';
+
 /// Unified MCP facade exposing the OBS WebSocket v5.1.0 protocol as tools.
 ///
 /// Callers invoke [connect] once (or rely on [bootstrapFromEnv] to connect
@@ -52,6 +53,9 @@ class ObsMcpServer {
   /// created by the generated dispatcher.
   static ObsWebSocket? _client;
 
+  /// Stores the last bootstrap error to provide better error messages.
+  static String? _bootstrapError;
+
   /// Canonical acknowledgement payload for tools that have no natural
   /// return value. The generator cannot serialise `void` so every mutator
   /// returns a JSON-friendly ack.
@@ -62,9 +66,13 @@ class ObsMcpServer {
   static ObsWebSocket get _obs {
     final client = _client;
     if (client == null) {
+      final errorContext = _bootstrapError != null
+          ? ' Last attempt failed: $_bootstrapError'
+          : '';
       throw StateError(
         'Not connected to OBS. Set $envUrl (and optionally $envPassword) in '
-        'the environment or a .env file, or call obs_connect(url, password).',
+        'the environment or a .env file, or call obs_connect(url, password).'
+        '$errorContext',
       );
     }
     return client;
@@ -104,18 +112,18 @@ class ObsMcpServer {
         password: password,
         timeout: Duration(seconds: timeoutSeconds),
       );
+      _bootstrapError = null; // Clear any previous error on success
     } on ObsAuthenticationException catch (error) {
-      stderr.writeln(
-        '[obs_mcp] bootstrapFromEnv authentication failed: ${error.message}',
-      );
+      _bootstrapError = 'Authentication failed: ${error.message}';
+      stderr.writeln('[obs_mcp] bootstrapFromEnv: $_bootstrapError');
     } on ObsException catch (error) {
-      stderr.writeln(
-        '[obs_mcp] bootstrapFromEnv connect failed: ${error.message}',
-      );
+      _bootstrapError = 'Connect failed: ${error.message}';
+      stderr.writeln('[obs_mcp] bootstrapFromEnv: $_bootstrapError');
     } on Object catch (error) {
       // Surface the failure on stderr so MCP hosts can see it, but don't
       // abort startup — callers can still invoke obs_connect() manually.
-      stderr.writeln('[obs_mcp] bootstrapFromEnv connect failed: $error');
+      _bootstrapError = 'Connect failed: $error';
+      stderr.writeln('[obs_mcp] bootstrapFromEnv: $_bootstrapError');
     }
   }
 
@@ -1162,8 +1170,571 @@ class ObsMcpServer {
     )
     bool? release,
   }) async {
-    await _obs.transitions.setTBarPosition(position: position, release: release);
+    await _obs.transitions.setTBarPosition(
+      position: position,
+      release: release,
+    );
     return _ok;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Sources (New - Comprehensive coverage)
+  // ---------------------------------------------------------------------------
+
+  /// Gets the active and show state of a source.
+  @Tool(
+    name: 'sources_get_active',
+    description:
+        'Return whether a source is active (shown in preview/program) and visible.',
+  )
+  Future<Map<String, dynamic>> sourcesGetActive(
+    @Parameter(title: 'Source Name', example: 'Video Capture Device')
+    String sourceName,
+  ) async {
+    final response = await _obs.sources.active(sourceName);
+    return response.toJson();
+  }
+
+  /// Gets a Base64-encoded screenshot of a source.
+  @Tool(
+    name: 'sources_get_screenshot',
+    description:
+        'Get a Base64-encoded screenshot of a source. Returns image data as Base64 string.',
+  )
+  Future<Map<String, dynamic>> sourcesGetScreenshot({
+    @Parameter(title: 'Source Name') required String sourceName,
+    @Parameter(
+      title: 'Image Format',
+      description: 'Image format (png, jpg, jpeg, bmp, webp).',
+      example: 'png',
+    )
+    required String imageFormat,
+    @Parameter(
+      title: 'Image Width',
+      description: 'Width to scale to (keeps aspect ratio).',
+    )
+    int? imageWidth,
+    @Parameter(
+      title: 'Image Height',
+      description: 'Height to scale to (keeps aspect ratio).',
+    )
+    int? imageHeight,
+    @Parameter(
+      title: 'Compression Quality',
+      description: 'Compression quality (1-100, only for jpg/jpeg).',
+    )
+    int? compressionQuality,
+  }) async {
+    final screenshot = SourceScreenshot(
+      sourceName: sourceName,
+      imageFormat: imageFormat,
+      imageWidth: imageWidth,
+      imageHeight: imageHeight,
+      imageCompressionQuality: compressionQuality,
+    );
+    final response = await _obs.sources.screenshot(screenshot);
+    return response.toJson();
+  }
+
+  /// Saves a screenshot of a source to the filesystem.
+  @Tool(
+    name: 'sources_save_screenshot',
+    description:
+        'Save a screenshot of a source to a file path on the filesystem.',
+  )
+  Future<Map<String, dynamic>> sourcesSaveScreenshot({
+    @Parameter(title: 'Source Name') required String sourceName,
+    @Parameter(title: 'File Path') required String filePath,
+    @Parameter(
+      title: 'Image Format',
+      description: 'Image format (png, jpg, jpeg, bmp, webp).',
+      example: 'png',
+    )
+    required String imageFormat,
+    @Parameter(
+      title: 'Image Width',
+      description: 'Width to scale to (keeps aspect ratio).',
+    )
+    int? imageWidth,
+    @Parameter(
+      title: 'Image Height',
+      description: 'Height to scale to (keeps aspect ratio).',
+    )
+    int? imageHeight,
+    @Parameter(
+      title: 'Compression Quality',
+      description: 'Compression quality (1-100, only for jpg/jpeg).',
+    )
+    int? compressionQuality,
+  }) async {
+    final screenshot = SourceScreenshot(
+      sourceName: sourceName,
+      imageFormat: imageFormat,
+      imageWidth: imageWidth,
+      imageHeight: imageHeight,
+      imageCompressionQuality: compressionQuality,
+    );
+    final response = await _obs.sources.saveScreenshot(screenshot);
+    return response.toJson();
+  }
+
+  /// Gets the private settings of a source.
+  @Tool(
+    name: 'sources_get_private_settings',
+    description:
+        'Return the private settings of a source (e.g., global audio devices).',
+  )
+  Future<Map<String, dynamic>> sourcesGetPrivateSettings({
+    @Parameter(title: 'Source Name') String? sourceName,
+    @Parameter(title: 'Source UUID') String? sourceUuid,
+  }) async {
+    final response = await _obs.sources.getSourcePrivateSettings(
+      sourceName: sourceName,
+      sourceUuid: sourceUuid,
+    );
+    return response;
+  }
+
+  /// Sets the private settings of a source.
+  @Tool(
+    name: 'sources_set_private_settings',
+    description:
+        'Set the private settings of a source (e.g., global audio devices).',
+  )
+  Future<Map<String, dynamic>> sourcesSetPrivateSettings({
+    @Parameter(title: 'Source Name') String? sourceName,
+    @Parameter(title: 'Source UUID') String? sourceUuid,
+    @Parameter(title: 'Source Settings')
+    required Map<String, dynamic> sourceSettings,
+  }) async {
+    await _obs.sources.setSourcePrivateSettings(
+      sourceName: sourceName,
+      sourceUuid: sourceUuid,
+      sourceSettings: sourceSettings,
+    );
+    return _ok;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Media Inputs (New - Full media control)
+  // ---------------------------------------------------------------------------
+
+  /// Gets the status of a media input (playing, paused, stopped, etc.).
+  @Tool(
+    name: 'media_inputs_get_status',
+    description:
+        'Return the status of a media input (state, duration, cursor, etc.).',
+  )
+  Future<Map<String, dynamic>> mediaInputsGetStatus({
+    @Parameter(title: 'Input Name') String? inputName,
+    @Parameter(title: 'Input UUID') String? inputUuid,
+  }) async {
+    final response = await _obs.mediaInputs.getMediaInputStatus(
+      inputName: inputName,
+      inputUuid: inputUuid,
+    );
+    return response.toJson();
+  }
+
+  /// Sets the cursor position of a media input.
+  @Tool(
+    name: 'media_inputs_set_cursor',
+    description: 'Set the cursor position (in milliseconds) of a media input.',
+  )
+  Future<Map<String, dynamic>> mediaInputsSetCursor({
+    @Parameter(title: 'Input Name') String? inputName,
+    @Parameter(title: 'Input UUID') String? inputUuid,
+    @Parameter(
+      title: 'Media Cursor (ms)',
+      description: 'New cursor position in milliseconds.',
+      example: 5000,
+    )
+    required int mediaCursor,
+  }) async {
+    await _obs.mediaInputs.setMediaInputCursor(
+      inputName: inputName,
+      inputUuid: inputUuid,
+      mediaCursor: mediaCursor,
+    );
+    return _ok;
+  }
+
+  /// Offsets the current cursor position of a media input.
+  @Tool(
+    name: 'media_inputs_offset_cursor',
+    description:
+        'Offset the current cursor position of a media input by the specified value (in milliseconds).',
+  )
+  Future<Map<String, dynamic>> mediaInputsOffsetCursor({
+    @Parameter(title: 'Input Name') String? inputName,
+    @Parameter(title: 'Input UUID') String? inputUuid,
+    @Parameter(
+      title: 'Cursor Offset (ms)',
+      description: 'Value to offset the cursor by in milliseconds.',
+      example: 1000,
+    )
+    required int mediaCursorOffset,
+  }) async {
+    await _obs.mediaInputs.offsetMediaInputCursor(
+      inputName: inputName,
+      inputUuid: inputUuid,
+      mediaCursorOffset: mediaCursorOffset,
+    );
+    return _ok;
+  }
+
+  /// Triggers an action on a media input (play, pause, stop, restart, next, previous).
+  @Tool(
+    name: 'media_inputs_trigger_action',
+    description:
+        'Trigger an action on a media input (play, pause, stop, restart, next, previous).',
+  )
+  Future<Map<String, dynamic>> mediaInputsTriggerAction({
+    @Parameter(title: 'Input Name') String? inputName,
+    @Parameter(title: 'Input UUID') String? inputUuid,
+    @Parameter(
+      title: 'Media Action',
+      description:
+          'Action to trigger: play, pause, stop, restart, next, previous.',
+      example: 'play',
+    )
+    required String mediaAction,
+  }) async {
+    final action = _parseMediaAction(mediaAction);
+    await _obs.mediaInputs.triggerMediaInputAction(
+      inputName: inputName,
+      inputUuid: inputUuid,
+      mediaAction: action,
+    );
+    return _ok;
+  }
+
+  /// Parses a string media action into ObsMediaInputAction enum.
+  static ObsMediaInputAction _parseMediaAction(String value) {
+    return switch (value.toLowerCase()) {
+      'play' => ObsMediaInputAction.play,
+      'pause' => ObsMediaInputAction.pause,
+      'stop' => ObsMediaInputAction.stop,
+      'restart' => ObsMediaInputAction.restart,
+      'next' => ObsMediaInputAction.next,
+      'previous' => ObsMediaInputAction.previous,
+      _ => throw ArgumentError(
+        'Invalid media action: $value. Must be one of: play, pause, stop, restart, next, previous.',
+      ),
+    };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Inputs - Deinterlace (New in OBS WebSocket v5.7.0 MCP exposure)
+  // ---------------------------------------------------------------------------
+
+  /// Gets the deinterlace mode of an input.
+  @Tool(
+    name: 'inputs_get_deinterlace_mode',
+    description:
+        'Return the deinterlace mode of an input (none, discard, retro, etc.).',
+  )
+  Future<Map<String, dynamic>> inputsGetDeinterlaceMode({
+    String? inputName,
+    String? inputUuid,
+  }) async {
+    final response = await _obs.inputs.getInputDeinterlaceMode(
+      inputName: inputName,
+      inputUuid: inputUuid,
+    );
+    return response.toJson();
+  }
+
+  /// Sets the deinterlace mode of an input.
+  @Tool(
+    name: 'inputs_set_deinterlace_mode',
+    description:
+        'Set the deinterlace mode of an input (none, discard, retro, etc.).',
+  )
+  Future<Map<String, dynamic>> inputsSetDeinterlaceMode({
+    String? inputName,
+    String? inputUuid,
+    @Parameter(
+      title: 'Deinterlace Mode',
+      description:
+          'Mode: none, discard, retro, discard_top_field_first, discard_bottom_field_first.',
+      example: 'discard',
+    )
+    required String deinterlaceMode,
+  }) async {
+    final mode = _parseDeinterlaceMode(deinterlaceMode);
+    await _obs.inputs.setInputDeinterlaceMode(
+      inputName: inputName,
+      inputUuid: inputUuid,
+      deinterlaceMode: mode,
+    );
+    return _ok;
+  }
+
+  /// Parses a string deinterlace mode into ObsDeinterlaceMode enum.
+  static ObsDeinterlaceMode _parseDeinterlaceMode(String value) {
+    return switch (value.toLowerCase()) {
+      'disable' => ObsDeinterlaceMode.disable,
+      'discard' => ObsDeinterlaceMode.discard,
+      'retro' => ObsDeinterlaceMode.retro,
+      'blend' => ObsDeinterlaceMode.blend,
+      'blend_2x' => ObsDeinterlaceMode.blend2x,
+      'linear' => ObsDeinterlaceMode.linear,
+      'linear_2x' => ObsDeinterlaceMode.linear2x,
+      'yadif' => ObsDeinterlaceMode.yadif,
+      'yadif_2x' => ObsDeinterlaceMode.yadif2x,
+      _ => throw ArgumentError(
+        'Invalid deinterlace mode: $value. Must be one of: disable, discard, retro, blend, blend_2x, linear, linear_2x, yadif, yadif_2x.',
+      ),
+    };
+  }
+
+  /// Gets the deinterlace field order of an input.
+  @Tool(
+    name: 'inputs_get_deinterlace_field_order',
+    description: 'Return the deinterlace field order of an input.',
+  )
+  Future<Map<String, dynamic>> inputsGetDeinterlaceFieldOrder({
+    String? inputName,
+    String? inputUuid,
+  }) async {
+    final response = await _obs.inputs.getInputDeinterlaceFieldOrder(
+      inputName: inputName,
+      inputUuid: inputUuid,
+    );
+    return response.toJson();
+  }
+
+  /// Sets the deinterlace field order of an input.
+  @Tool(
+    name: 'inputs_set_deinterlace_field_order',
+    description: 'Set the deinterlace field order of an input.',
+  )
+  Future<Map<String, dynamic>> inputsSetDeinterlaceFieldOrder({
+    String? inputName,
+    String? inputUuid,
+    @Parameter(
+      title: 'Field Order',
+      description: 'Field order: top_field_first, bottom_field_first.',
+      example: 'top_field_first',
+    )
+    required String deinterlaceFieldOrder,
+  }) async {
+    final order = _parseDeinterlaceFieldOrder(deinterlaceFieldOrder);
+    await _obs.inputs.setInputDeinterlaceFieldOrder(
+      inputName: inputName,
+      inputUuid: inputUuid,
+      deinterlaceFieldOrder: order,
+    );
+    return _ok;
+  }
+
+  /// Parses a string deinterlace field order into ObsDeinterlaceFieldOrder enum.
+  static ObsDeinterlaceFieldOrder _parseDeinterlaceFieldOrder(String value) {
+    return switch (value.toLowerCase()) {
+      'top' => ObsDeinterlaceFieldOrder.top,
+      'bottom' => ObsDeinterlaceFieldOrder.bottom,
+      _ => throw ArgumentError(
+        'Invalid field order: $value. Must be one of: top, bottom.',
+      ),
+    };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Inputs - Volume & Default Settings (New)
+  // ---------------------------------------------------------------------------
+
+  /// Sets the volume of an input.
+  @Tool(
+    name: 'inputs_set_volume',
+    description: 'Set the volume of an input (0.0-1.0 multiplier).',
+  )
+  Future<Map<String, dynamic>> inputsSetVolume({
+    String? inputName,
+    String? inputUuid,
+    @Parameter(
+      title: 'Input Volume',
+      description: 'Volume as multiplier (0.0 = silence, 1.0 = 100%).',
+      example: 0.8,
+    )
+    required double inputVolume,
+  }) async {
+    await _obs.inputs.setInputVolume(
+      inputName: inputName,
+      inputUuid: inputUuid,
+      inputVolume: inputVolume,
+    );
+    return _ok;
+  }
+
+  /// Gets the default settings for an input kind.
+  @Tool(
+    name: 'inputs_get_default_settings',
+    description:
+        'Return the default settings for a given input kind (before customization).',
+  )
+  Future<Map<String, dynamic>> inputsGetDefaultSettings({
+    @Parameter(
+      title: 'Input Kind',
+      description: 'Type of input (e.g., video_capture_device, image_source).',
+      example: 'video_capture_device',
+    )
+    required String inputKind,
+  }) async {
+    final response = await _obs.inputs.getInputDefaultSettings(
+      inputKind: inputKind,
+    );
+    return response.toJson();
+  }
+
+  // ---------------------------------------------------------------------------
+  // General - Extended (Vendor requests, hotkeys)
+  // ---------------------------------------------------------------------------
+
+  /// Calls a vendor-specific request.
+  @Tool(
+    name: 'general_call_vendor_request',
+    description:
+        'Call a request registered to a third-party vendor/plugin (e.g., obs-browser).',
+  )
+  Future<Map<String, dynamic>> generalCallVendorRequest({
+    @Parameter(
+      title: 'Vendor Name',
+      description: 'Name of the vendor (e.g., obs-browser).',
+      example: 'obs-browser',
+    )
+    required String vendorName,
+    @Parameter(
+      title: 'Request Type',
+      description: 'Name of the vendor request to call.',
+      example: 'emit_event',
+    )
+    required String requestType,
+    @Parameter(title: 'Request Data') Map<String, dynamic>? requestData,
+  }) async {
+    final response = await _obs.general.callVendorRequest(
+      vendorName: vendorName,
+      requestType: requestType,
+      requestData: requestData != null
+          ? RequestData.fromJson(requestData)
+          : null,
+    );
+    return response.toJson();
+  }
+
+  /// Triggers a hotkey by key sequence.
+  @Tool(
+    name: 'general_trigger_hotkey_by_key',
+    description: 'Trigger a hotkey using a key sequence (e.g., Ctrl+Shift+A).',
+  )
+  Future<Map<String, dynamic>> generalTriggerHotkeyByKey({
+    @Parameter(
+      title: 'Key ID',
+      description: 'Key identifier (e.g., OBS_KEY_A, OBS_KEY_F1).',
+      example: 'OBS_KEY_A',
+    )
+    required String keyId,
+    @Parameter(title: 'Shift Key') bool? keyModifiersShift,
+    @Parameter(title: 'Control Key') bool? keyModifiersCtrl,
+    @Parameter(title: 'Alt Key') bool? keyModifiersAlt,
+    @Parameter(title: 'Command Key') bool? keyModifiersCmd,
+  }) async {
+    final modifiers = KeyModifiers(
+      shift: keyModifiersShift,
+      control: keyModifiersCtrl,
+      alt: keyModifiersAlt,
+      command: keyModifiersCmd,
+    );
+    await _obs.general.triggerHotkeyByKeySequence(
+      keyId: keyId,
+      keyModifiers: modifiers,
+    );
+    return _ok;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Scene Items - Create/Duplicate/Remove/Transform (New)
+  // ---------------------------------------------------------------------------
+
+  /// Creates a new scene item by adding an existing source to a scene.
+  @Tool(
+    name: 'scene_items_create',
+    description: 'Add an existing source as a new scene item in a scene.',
+  )
+  Future<Map<String, dynamic>> sceneItemsCreate({
+    @Parameter(title: 'Scene Name', example: 'Scene') required String sceneName,
+    @Parameter(
+      title: 'Source Name',
+      description: 'Name of the source to add to the scene.',
+      example: 'Video Capture Device',
+    )
+    required String sourceName,
+    @Parameter(title: 'Scene Item Enabled') bool? sceneItemEnabled,
+  }) async {
+    final response = await _obs.sceneItems.createSceneItem(
+      sceneName: sceneName,
+      sourceName: sourceName,
+      sceneItemEnabled: sceneItemEnabled,
+    );
+    return <String, dynamic>{'sceneItemId': response};
+  }
+
+  /// Duplicates a scene item (copies it within or between scenes).
+  @Tool(
+    name: 'scene_items_duplicate',
+    description:
+        'Duplicate a scene item, copying it to the same or a different scene.',
+  )
+  Future<Map<String, dynamic>> sceneItemsDuplicate({
+    @Parameter(title: 'Source Scene Name', example: 'Scene')
+    required String sceneName,
+    @Parameter(title: 'Scene Item ID') required int sceneItemId,
+    @Parameter(
+      title: 'Destination Scene Name',
+      description: 'Scene to copy to (defaults to same scene).',
+    )
+    String? destinationSceneName,
+  }) async {
+    final response = await _obs.sceneItems.duplicateSceneItem(
+      sceneName: sceneName,
+      sceneItemId: sceneItemId,
+      destinationSceneName: destinationSceneName,
+    );
+    return <String, dynamic>{'sceneItemId': response};
+  }
+
+  /// Removes a scene item from a scene.
+  @Tool(
+    name: 'scene_items_remove',
+    description:
+        'Remove a scene item from a scene (does not delete the source).',
+  )
+  Future<Map<String, dynamic>> sceneItemsRemove({
+    @Parameter(title: 'Scene Name', example: 'Scene') required String sceneName,
+    @Parameter(title: 'Scene Item ID') required int sceneItemId,
+  }) async {
+    await _obs.sceneItems.removeSceneItem(
+      sceneName: sceneName,
+      sceneItemId: sceneItemId,
+    );
+    return _ok;
+  }
+
+  /// Gets the transform of a scene item.
+  @Tool(
+    name: 'scene_items_get_transform',
+    description:
+        'Return the transform properties (position, scale, rotation, crop) of a scene item.',
+  )
+  Future<Map<String, dynamic>> sceneItemsGetTransform({
+    @Parameter(title: 'Scene Name', example: 'Scene') required String sceneName,
+    @Parameter(title: 'Scene Item ID') required int sceneItemId,
+  }) async {
+    final response = await _obs.sceneItems.getSceneItemTransform(
+      sceneName: sceneName,
+      sceneItemId: sceneItemId,
+    );
+    return response;
   }
 
   // ---------------------------------------------------------------------------
@@ -1173,8 +1744,7 @@ class ObsMcpServer {
   /// Returns the list of canvases configured in OBS.
   @Tool(
     name: 'canvases_list',
-    description:
-        'Return the list of all canvases configured in OBS (v5.7.0+).',
+    description: 'Return the list of all canvases configured in OBS (v5.7.0+).',
   )
   Future<Map<String, dynamic>> canvasesList() async =>
       (await _obs.canvas.getCanvasList()).toJson();
@@ -1204,8 +1774,9 @@ class ObsMcpServer {
     name: 'filters_default_settings',
     description: 'Return the default settings for a given filter kind.',
   )
-  Future<Map<String, dynamic>> filtersDefaultSettings(String filterKind) async =>
-      await _obs.filters.getSourceFilterDefaultSettings(filterKind);
+  Future<Map<String, dynamic>> filtersDefaultSettings(
+    String filterKind,
+  ) async => await _obs.filters.getSourceFilterDefaultSettings(filterKind);
 
   /// Creates a new filter on a source.
   @Tool(
@@ -1231,10 +1802,7 @@ class ObsMcpServer {
   }
 
   /// Removes a filter from a source.
-  @Tool(
-    name: 'filters_remove',
-    description: 'Remove a filter from a source.',
-  )
+  @Tool(name: 'filters_remove', description: 'Remove a filter from a source.')
   Future<Map<String, dynamic>> filtersRemove({
     @Parameter(title: 'Source Name') required String sourceName,
     @Parameter(title: 'Filter Name') required String filterName,
@@ -1247,10 +1815,7 @@ class ObsMcpServer {
   }
 
   /// Renames a filter on a source.
-  @Tool(
-    name: 'filters_rename',
-    description: 'Rename a filter on a source.',
-  )
+  @Tool(name: 'filters_rename', description: 'Rename a filter on a source.')
   Future<Map<String, dynamic>> filtersRename({
     @Parameter(title: 'Source Name') required String sourceName,
     @Parameter(title: 'Current Filter Name') required String filterName,
@@ -1497,21 +2062,26 @@ class ObsMcpServer {
     )
     required int monitorType,
   }) async {
-    final type = switch (monitorType) {
-      0 => ObsMonitoringType.none,
-      1 => ObsMonitoringType.monitorOnly,
-      2 => ObsMonitoringType.monitorAndOutput,
-      _ => throw ArgumentError(
-          'Invalid monitor type: $monitorType. Must be 0, 1, or 2.',
-        ),
-    };
-    
+    final type = _parseMonitorType(monitorType);
+
     await _obs.inputs.setInputAudioMonitorType(
       inputName: inputName,
       inputUuid: inputUuid,
       monitorType: type,
     );
     return _ok;
+  }
+
+  /// Parses an integer monitor type value into ObsMonitoringType enum.
+  static ObsMonitoringType _parseMonitorType(int value) {
+    return switch (value) {
+      0 => ObsMonitoringType.none,
+      1 => ObsMonitoringType.monitorOnly,
+      2 => ObsMonitoringType.monitorAndOutput,
+      _ => throw ArgumentError(
+        'Invalid monitor type: $value. Must be 0 (none), 1 (monitor only), or 2 (monitor and output).',
+      ),
+    };
   }
 
   /// Returns the audio tracks of an input.
@@ -1615,6 +2185,7 @@ class ObsMcpServer {
       sceneUuid: sceneUuid,
       sceneItemId: sceneItemId,
     );
+    // Returns Map<String, dynamic> directly from the library (no .toJson() needed)
     return response;
   }
 
@@ -1633,6 +2204,7 @@ class ObsMcpServer {
       sceneUuid: sceneUuid,
       sceneItemId: sceneItemId,
     );
+    // Returns Map<String, dynamic> directly from the library (no .toJson() needed)
     return response;
   }
 

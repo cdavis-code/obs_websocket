@@ -6,6 +6,8 @@ A standalone MCP (Model Context Protocol) server for controlling OBS Studio via 
 
 This release adds comprehensive support for OBS WebSocket v5.7.0 features:
 
+**Note:** Some features (Canvases, Scene Item private settings) require OBS with obs-websocket v5.7.0 or later.
+
 - **Canvases**: New `canvases_list` tool to list all configured canvases
 - **Input Audio Properties**: Full control over audio balance, sync offset, monitor type, and audio tracks
 - **Input Properties Dialog**: Access to list property items and button presses
@@ -16,19 +18,37 @@ This release adds comprehensive support for OBS WebSocket v5.7.0 features:
 
 ## Quick Start
 
+The MCP server entry point (`bin/obs_mcp_server.dart`) is pre-built and ready to run. The generated dispatcher is already included in the package, so you don't need to run `build_runner` unless you're modifying the source code.
+
+### Option 1: Global Activation (Recommended)
+
 ```bash
 # Install dependencies from the workspace root
 dart pub get
-
-# Generate the MCP dispatcher
-cd packages/obs_mcp
-dart run build_runner build --delete-conflicting-outputs
 
 # Set connection details (or use a .env file)
 export OBS_WEBSOCKET_URL=ws://localhost:4455
 export OBS_WEBSOCKET_PASSWORD=your-password
 
+# Activate the package globally (makes the 'obs_mcp' command available)
+dart pub global activate obs_mcp
+
 # Run the server
+obs_mcp
+```
+
+### Option 2: Run from Source
+
+```bash
+# Install dependencies
+dart pub get
+
+# Set connection details (or use a .env file)
+export OBS_WEBSOCKET_URL=ws://localhost:4455
+export OBS_WEBSOCKET_PASSWORD=your-password
+
+# Run directly from the bin/ directory
+cd packages/obs_mcp
 dart run bin/obs_mcp_server.dart
 ```
 
@@ -73,15 +93,19 @@ Environment variables can be set via the shell or a `.env` file. The server sear
 - Dart SDK >= 3.8.0
 - OBS Studio with obs-websocket v5.x (bundled with OBS 28+)
 
-### Code Generation
+### Development Setup
 
-The MCP dispatcher is generated with `build_runner`. Run these steps from the workspace root:
+The MCP dispatcher (`lib/src/obs_mcp_server.mcp.dart`) is pre-generated and committed to the repository. You only need to run `build_runner` if you're modifying the `ObsMcpServer` class or adding new tools.
+
+**For normal usage:** Skip code generation entirely. The package is ready to activate and run.
+
+**For development:** If you modify `lib/src/obs_mcp_server.dart`, regenerate the dispatcher:
 
 ```bash
 dart pub get
 
 cd packages/obs_mcp
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 This produces `lib/src/obs_mcp_server.mcp.dart`, which wires up all tool handlers.
@@ -109,6 +133,12 @@ The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) (`@modelc
    ```bash
    cd packages/obs_mcp
    npx @modelcontextprotocol/inspector dart run bin/obs_mcp_server.dart
+   ```
+
+   Or if you've activated the package globally:
+
+   ```bash
+   npx @modelcontextprotocol/inspector obs_mcp
    ```
 
 3. **Browse and invoke tools** in the web UI that opens automatically. You can inspect request/response payloads for each tool call.

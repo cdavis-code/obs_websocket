@@ -2,3 +2,5 @@ include: package:lints/recommended.yaml
 analyzer:
   language:
     strict-casts: false
+  exclude:
+    - lib/src/obs_mcp_server.mcp.dart
