@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.7.1
+
+* **Fix**: Include generated `obs_mcp_server.mcp.dart` file in published package, which was previously excluded by `.pubignore`, causing `dart pub global activate obs_mcp` to fail with "No such file or directory" build error.
+
 ## 5.7.0
 
 * Added comprehensive support for OBS WebSocket v5.7.0 features
