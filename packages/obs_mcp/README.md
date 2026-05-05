@@ -1,6 +1,36 @@
 # obs_mcp
 
+![obs_mcp banner](docs/banner.svg)
+
+<p align="center">
+  <strong>MCP Server for OBS Studio</strong><br/>
+  Control OBS Studio via the Model Context Protocol • Built with Dart • WebSocket v5.x
+</p>
+
+<p align="center">
+  <a href="https://pub.dev/packages/obs_mcp"><img src="https://img.shields.io/pub/v/obs_mcp.svg?label=pub.dev&labelColor=333940&logo=dart&logoColor=fff" alt="Pub"></a>
+  <a href="https://github.com/cdavis-code/obs_websocket"><img src="https://img.shields.io/github/stars/cdavis-code/obs_websocket?label=stars&logo=github&labelColor=333940" alt="GitHub stars"></a>
+  <a href="https://pub.dev/packages/skills"><img src="https://img.shields.io/badge/AI%20Agent%20Skill-included-00b4ab?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDE1IDIyTDEyIDE4Ljc3TDkgMjJMMSAuOTkgMTcuNzRMNSAxNUwtMiA5TDUgOC4yNkwxMiAyWiIvPjwvc3ZnPg==" alt="AI Agent Skill"></a>
+</p>
+
+---
+
 A standalone MCP (Model Context Protocol) server for controlling OBS Studio via the obs-websocket v5.x protocol. Built on top of the [`obs_websocket`](https://pub.dev/packages/obs_websocket) Dart library, it exposes OBS operations as MCP tools over stdio transport.
+
+## Table of Contents
+
+- [What's New in v5.7.0](#whats-new-in-v570)
+- [Quick Start](#quick-start)
+- [Features](#features)
+- [AI Agent Skill](#ai-agent-skill)
+- [Configuration](#configuration)
+- [Building](#building)
+- [Testing with MCP Inspector](#testing-with-mcp-inspector)
+- [MCP Host Configuration](#mcp-host-configuration)
+  - [Claude Desktop](#claude-desktop)
+  - [VS Code](#vs-code)
+  - [OpenCode](#opencode)
+- [License](#license)
 
 ## What's New in v5.7.0
 
@@ -52,6 +82,19 @@ cd packages/obs_mcp
 dart run bin/obs_mcp_server.dart
 ```
 
+### What Can You Do?
+
+Once connected, AI agents can control OBS through 60+ tools:
+
+```javascript
+// Inside execute tool:
+const scenes = await call_tool('obs_scenes_list', {});
+await call_tool('obs_scenes_set_current_program', { sceneName: 'Live Scene' });
+await call_tool('obs_record_start', {});
+```
+
+See [Features](#features) for the complete tool catalog.
+
 ## Features
 
 All tools are prefixed with `obs_` and organized into the following groups:
@@ -75,6 +118,24 @@ All tools are prefixed with `obs_` and organized into the following groups:
 | **Canvases** | `canvases_list` | List canvases configured in OBS (v5.7.0+) |
 
 Code mode is enabled, providing sandbox execution via a search/execute tool pair.
+
+## AI Agent Skill
+
+This package includes an **obs-mcp** skill for AI agents (Qoder, Claude, etc.) in the `skills/obs-mcp/` directory. The skill teaches agents how to:
+- Invoke OBS tools via the `execute` + JavaScript pattern
+- Discover available tools using `search`
+- Run common workflows (connection checks, source transforms, animations, recording)
+- Avoid common pitfalls (server-side vs client-side timing, transform payload shapes)
+
+Agents can install the skill by running `skills get` after adding this package as a dependency. See [pub.dev/packages/skills](https://pub.dev/packages/skills) for details.
+
+**Example agent workflow:** The skill teaches agents to:
+1. Verify connection: `await call_tool('obs_is_connected', {})`
+2. Discover tools: `search({ query: "scene items", detail_level: "detailed" })`
+3. Execute operations via JavaScript in the `execute` tool
+4. Handle errors with `try/finally` and restore state
+
+See the [skill documentation](skills/obs-mcp/SKILL.md) for complete workflows and best practices.
 
 ## Configuration
 
@@ -189,7 +250,45 @@ Add to `.vscode/mcp.json`:
 }
 ```
 
+### OpenCode
+
+Add an `opencode.jsonc` file to your project root:
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "obs-websocket": {
+      "type": "local",
+      "command": [
+        "dart",
+        "run",
+        "/path/to/obs_websocket_workspace/packages/obs_mcp/bin/obs_mcp_server.dart",
+      ],
+      "enabled": true,
+      "environment": {
+        "OBS_WEBSOCKET_URL": "ws://localhost:4455",
+        "OBS_WEBSOCKET_PASSWORD": "your-password",
+        "OBS_WEBSOCKET_TIMEOUT": "120",
+      },
+    },
+  },
+}
+```
+
 Replace `/path/to/obs_websocket_workspace` with the actual path to your workspace, and set `OBS_WEBSOCKET_PASSWORD` to your OBS WebSocket password (or remove it for anonymous connections).
+
+## Contributing
+
+Contributions are welcome! This package is part of the [obs_websocket workspace](https://github.com/cdavis-code/obs_websocket).
+
+**Before submitting a PR:**
+1. Make changes to `lib/src/obs_mcp_server.dart` (add `@Tool` annotated methods)
+2. Regenerate the dispatcher: `dart run build_runner build`
+3. Run tests: `dart test`
+4. Format code: `dart format .`
+
+See the [workspace README](../../README.md) for development setup.
 
 ## License
 
