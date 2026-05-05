@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f3460;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#e94560;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="128" cy="128" r="120" fill="url(#bg)"/>
+  
+  <!-- Camera icon -->
+  <g transform="translate(58, 68)" filter="url(#glow)">
+    <rect x="0" y="30" width="100" height="60" rx="10" fill="url(#accent)"/>
+    <polygon points="100,45 140,30 140,90 100,75" fill="url(#accent)"/>
+    <circle cx="50" cy="60" r="18" fill="white" opacity="0.9"/>
+    <circle cx="50" cy="60" r="10" fill="#1a1a2e"/>
+  </g>
+  
+  <!-- Connection dots -->
+  <circle cx="48" cy="190" r="4" fill="#e94560"/>
+  <circle cx="208" cy="190" r="4" fill="#e94560"/>
+  <line x1="48" y1="190" x2="128" y2="150" stroke="#e94560" stroke-width="2" opacity="0.6"/>
+  <line x1="208" y1="190" x2="128" y2="150" stroke="#e94560" stroke-width="2" opacity="0.6"/>
+  <circle cx="128" cy="150" r="4" fill="#e94560"/>
+</svg>
