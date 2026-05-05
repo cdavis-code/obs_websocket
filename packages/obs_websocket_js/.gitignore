@@ -1,0 +1,15 @@
+# Dart
+.dart_tool/
+.packages
+pubspec.lock
+
+# dart2js output
+build/
+
+# npm / tsup
+node_modules/
+dist/
+
+# Editor
+.DS_Store
+*.log

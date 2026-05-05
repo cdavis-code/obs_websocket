@@ -1,0 +1,7 @@
+# This package is published to npm, not pub.dev. Keep pub-publish surface
+# minimal so an accidental `dart pub publish` fails loudly.
+build/
+dist/
+node_modules/
+test/
+*.log

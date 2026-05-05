@@ -21,6 +21,12 @@ This project supports multiple package managers for easy installation.
 - **Install**: `dart pub global activate obs_cli`
 - **Files**: See `packages/obs_cli/` directory
 
+### npm (JavaScript / TypeScript)
+- **Package**: `obs_websocket_js` on npm
+- **Install**: `npm install obs_websocket_js`
+- **Universal**: works in browsers and Node.js 18+ via dual `exports` entrypoints
+- **Files**: See `packages/obs_websocket_js/` directory
+
 ## Directory Structure
 
 ```
@@ -63,6 +69,12 @@ obs_websocket/
 1. Update version in `pubspec.yaml`
 2. Run `dart pub publish`
 3. Package available on pub.dev
+
+### npm (obs_websocket_js)
+1. Update version in `packages/obs_websocket_js/package.json`
+2. Run `npm install && npm run build && npm test` inside the package
+3. Run `npm publish --access public`
+4. Package available on npmjs.com
 
 ## Adding New Package Managers
 

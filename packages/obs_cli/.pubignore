@@ -1,0 +1,23 @@
+# OS files
+.DS_Store
+
+# Environment files (contain secrets)
+.env
+bin/.env
+
+# Development tools
+.dart_tool/
+tool/
+
+# Generated documentation (available on pub.dev)
+doc/
+
+# IDE files
+.idea/
+.vscode/
+
+# Test coverage
+coverage/
+
+# Melos files
+melos_*.iml

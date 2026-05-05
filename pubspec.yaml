@@ -8,9 +8,10 @@ workspace:
   - packages/obs_websocket
   - packages/obs_cli
   - packages/obs_mcp
+  - packages/obs_websocket_js
 
 dev_dependencies:
-  melos: ^7.5.1
+  melos: ^7.6.0
 
 melos:
   name: obs_websocket_workspace

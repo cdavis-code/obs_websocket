@@ -1,0 +1,76 @@
+{
+  "name": "obs_websocket_js",
+  "version": "5.7.0",
+  "description": "JavaScript/TypeScript bindings for the obs_websocket Dart package. Universal (browser + Node.js) client for the OBS Studio obs-websocket v5 plugin.",
+  "license": "MIT",
+  "author": "Chris Davis",
+  "homepage": "https://github.com/cdavis-code/obs_websocket/tree/main/packages/obs_websocket_js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cdavis-code/obs_websocket.git",
+    "directory": "packages/obs_websocket_js"
+  },
+  "bugs": {
+    "url": "https://github.com/cdavis-code/obs_websocket/issues"
+  },
+  "keywords": [
+    "obs",
+    "obs-studio",
+    "obs-websocket",
+    "streaming",
+    "broadcasting",
+    "websocket"
+  ],
+  "type": "module",
+  "main": "./dist/node.cjs",
+  "module": "./dist/node.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "browser": "./dist/browser.js",
+      "import": "./dist/node.js",
+      "require": "./dist/node.cjs",
+      "default": "./dist/browser.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "import": "./dist/browser.js",
+      "default": "./dist/browser.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js",
+      "require": "./dist/node.cjs",
+      "default": "./dist/node.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "eventemitter3": "^5.0.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.0",
+    "@types/ws": "^8.5.12",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0",
+    "happy-dom": "^15.7.0"
+  },
+  "scripts": {
+    "build:dart": "bash scripts/build.sh",
+    "build:ts": "tsup",
+    "build": "npm run build:dart && npm run build:ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf build dist"
+  }
+}

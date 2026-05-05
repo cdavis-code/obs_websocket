@@ -42,3 +42,29 @@ jobs:
 
       - name: Run tests
         run: melos run test
+
+  obs_websocket_js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Melos
+        run: dart pub global activate melos
+      - name: Bootstrap Dart workspace
+        run: melos bootstrap
+      - name: Install npm deps
+        working-directory: packages/obs_websocket_js
+        run: npm install
+      - name: Build (dart2js + tsup)
+        working-directory: packages/obs_websocket_js
+        run: npm run build
+      - name: Type-check
+        working-directory: packages/obs_websocket_js
+        run: npm run typecheck
+      - name: Test
+        working-directory: packages/obs_websocket_js
+        run: npm test
+
