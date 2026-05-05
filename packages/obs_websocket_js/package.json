@@ -63,7 +63,7 @@
     "tsup": "^8.3.0",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0",
-    "happy-dom": "^15.7.0"
+    "happy-dom": "^20.9.0"
   },
   "scripts": {
     "build:dart": "bash scripts/build.sh",
