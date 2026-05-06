@@ -61,3 +61,5 @@ melos:
       exec: dart test
       packageFilters:
         dirExists: test
+        ignore:
+          - obs_websocket_js

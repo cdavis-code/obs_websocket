@@ -7,6 +7,32 @@ description: Control a running OBS Studio instance through the obs-mcp-stdio MCP
 
 Agent guide for controlling OBS Studio via the `obs-mcp-stdio` MCP server. The server wraps the [obs_mcp](../../packages/obs_mcp) Dart package and speaks OBS WebSocket v5.x to a locally running OBS instance.
 
+## Quick Start
+
+```javascript
+// 1. Check connection
+const status = await call_tool('obs_is_connected', {});
+
+// 2. Connect if needed
+if (!status?.connected) {
+  await call_tool('obs_connect', { host: 'localhost', port: 4455 });
+}
+
+// 3. Get current scene info
+const scenes = await call_tool('obs_scenes_list', {});
+return { current: scenes.currentProgramSceneName, total: scenes.scenes.length };
+```
+
+## Key Concepts
+
+- **Scene Collection**: A complete project configuration containing all scenes, sources, filters, and settings
+- **Scene**: A composition of multiple sources that can be switched between during streaming/recording
+- **Source**: An individual element (video, audio, image, text, browser, etc.) placed within a scene
+- **Scene Item**: A source's instance within a specific scene (has transform, visibility, and positioning data)
+- **Filter**: An effect applied to a source (video processing, audio effects, chroma key, etc.)
+- **Transition**: Visual effect used when switching between scenes (cut, fade, swipe, etc.)
+- **Input**: OBS v5 terminology for sources that produce media (cameras, capture cards, audio devices, media files)
+
 ## When to Use
 
 Use this skill whenever the user wants to:
@@ -59,6 +85,27 @@ All names below are invoked as `call_tool('<name>', {...})` inside `execute`.
 - `obs_disconnect` — close the connection.
 - `obs_is_connected` — returns `{ connected: bool }`.
 - `obs_send_raw` — send a raw OBS WebSocket request by op code/type.
+
+### Source Types Reference
+
+When creating or configuring sources with `obs_inputs_create` or `obs_scene_items_create`, common source types include:
+
+| Type | Description | Common Use Case |
+| --- | --- | --- |
+| `video_capture_device` | Webcam/capture card | Camera input |
+| `display_capture` | Full screen capture | Desktop/screen sharing |
+| `window_capture` | Single window capture | Application-specific capture |
+| `image_source` | Static image file | Logos, overlays, backgrounds |
+| `ffmpeg_source` / `media_source` | Video/audio file | Pre-recorded media |
+| `browser_source` | Web page source | Browser-based overlays, alerts |
+| `text_ft2_source_v2` / `text_gdiplus_v2` | Text overlay | Titles, lower thirds |
+| `color_source_v3` | Solid color | Backgrounds, mattes |
+| `audio_input_capture` | Microphone | Voice input |
+| `audio_output_capture` | Desktop audio | System audio capture |
+| `group` | Source group | Organize multiple sources |
+| `scene` | Nested scene | Scene-within-scene compositions |
+
+> Note: Source type availability may vary by platform (macOS/Windows/Linux). Use `obs_inputs_get_kind_list` to discover available types at runtime.
 
 ### General
 - `obs_general_version` — OBS/websocket/platform versions.
@@ -119,6 +166,31 @@ All names below are invoked as `call_tool('<name>', {...})` inside `execute`.
 - `obs_filters_list`, `obs_filters_get_default_settings`, `obs_filters_get_kind_list`.
 - `obs_filters_create`, `obs_filters_remove`, `obs_filters_set_name`, `obs_filters_set_index`.
 - `obs_filters_get`, `obs_filters_set_settings`, `obs_filters_set_enabled`.
+
+### Filter Types Reference
+
+Common filter types available for sources:
+
+**Video Filters:**
+- `color_correction_v3` — Adjust gamma, contrast, brightness, saturation, hue
+- `chroma_key_filter` — Green/blue screen removal with spill reduction
+- `color_key_filter` — Key on specific color (alternative to chroma key)
+- `lut_filter` — Apply color LUT (Look-Up Table) file
+- `crop_to_filter` — Crop edges of source
+- `scroll_filter` — Scrolling/panning effect
+- `sharpness_filter_v2` — Image sharpening
+- `scale_filter` — Resize source
+
+**Audio Filters:**
+- `noise_suppress_filter_v2` — Noise suppression (RNNoise/Speex algorithms)
+- `gain_filter` — Volume gain/amplification
+- `compressor_filter_v2` — Dynamic range compression
+- `noise_gate_filter_v2` — Silence detection gate
+- `limiter_filter` — Prevent audio clipping
+- `expander_filter` — Expand dynamic range
+- `vst_filter` — VST plugin host (platform-dependent)
+
+> Use `obs_filters_get_kind_list` to discover all available filter types for a specific source.
 
 ### Outputs
 - `obs_outputs_list`, `obs_outputs_get_status`, `obs_outputs_toggle`.
@@ -281,4 +353,3 @@ Reusable templates the agent can copy into `execute`:
 
 - Server package: [packages/obs_mcp](../../packages/obs_mcp)
 - OBS WebSocket v5 protocol: <https://github.com/obsproject/obs-websocket/blob/master/docs/generated/protocol.md>
-- Anthropic skill best practices: <https://docs.claude.com/en/agents-and-tools/agent-skills/best-practices>
