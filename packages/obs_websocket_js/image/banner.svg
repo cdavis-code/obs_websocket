@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#16213e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f3460;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f7df1e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3178c6;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  
+  <!-- Grid pattern -->
+  <g opacity="0.1">
+    <line x1="0" y1="0" x2="1280" y2="640" stroke="white" stroke-width="1"/>
+    <line x1="1280" y1="0" x2="0" y2="640" stroke="white" stroke-width="1"/>
+    <line x1="640" y1="0" x2="640" y2="640" stroke="white" stroke-width="1"/>
+    <line x1="0" y1="320" x2="1280" y2="320" stroke="white" stroke-width="1"/>
+  </g>
+  
+  <!-- OBS-style camera icon with JS/TS theme -->
+  <g transform="translate(540, 120)" filter="url(#glow)">
+    <rect x="0" y="30" width="200" height="120" rx="20" fill="url(#accent)"/>
+    <polygon points="200,60 260,30 260,150 200,120" fill="url(#accent)"/>
+    <circle cx="100" cy="90" r="35" fill="white" opacity="0.9"/>
+    <circle cx="100" cy="90" r="20" fill="url(#bg)"/>
+    <!-- JS symbol -->
+    <text x="100" y="98" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="url(#accent)" text-anchor="middle">JS</text>
+  </g>
+  
+  <!-- Connection nodes -->
+  <g opacity="0.6">
+    <circle cx="200" cy="200" r="8" fill="#f7df1e"/>
+    <circle cx="1080" cy="200" r="8" fill="#3178c6"/>
+    <circle cx="200" cy="440" r="8" fill="#f7df1e"/>
+    <circle cx="1080" cy="440" r="8" fill="#3178c6"/>
+    <line x1="200" y1="200" x2="540" y2="180" stroke="#f7df1e" stroke-width="2" opacity="0.5"/>
+    <line x1="1080" y1="200" x2="800" y2="180" stroke="#3178c6" stroke-width="2" opacity="0.5"/>
+    <line x1="200" y1="440" x2="540" y2="280" stroke="#f7df1e" stroke-width="2" opacity="0.5"/>
+    <line x1="1080" y1="440" x2="800" y2="280" stroke="#3178c6" stroke-width="2" opacity="0.5"/>
+  </g>
+  
+  <!-- Title -->
+  <text x="640" y="380" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">
+    obs_websocket_js
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="640" y="430" font-family="Arial, sans-serif" font-size="28" fill="#f7df1e" text-anchor="middle">
+    Universal JavaScript/TypeScript Client for OBS Studio
+  </text>
+  
+  <!-- Description -->
+  <text x="640" y="480" font-family="Arial, sans-serif" font-size="20" fill="#cccccc" text-anchor="middle">
+    Type-safe OBS control from Node.js and browsers
+  </text>
+  
+  <!-- Version badge -->
+  <g transform="translate(520, 510)">
+    <rect x="0" y="0" width="70" height="28" rx="14" fill="#0f3460"/>
+    <text x="35" y="19" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">v5.7.0</text>
+  </g>
+  
+  <!-- npm badge -->
+  <g transform="translate(610, 510)">
+    <rect x="0" y="0" width="55" height="28" rx="14" fill="#cb3837"/>
+    <text x="27" y="19" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">npm</text>
+  </g>
+  
+  <!-- TypeScript badge -->
+  <g transform="translate(685, 510)">
+    <rect x="0" y="0" width="95" height="28" rx="14" fill="#3178c6"/>
+    <text x="47" y="19" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">TypeScript</text>
+  </g>
+  
+  <!-- Feature icons at bottom -->
+  <g transform="translate(160, 560)" opacity="0.7">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="16" fill="#f7df1e" text-anchor="middle">⚡ Typed API</text>
+    <text x="192" y="0" font-family="Arial, sans-serif" font-size="16" fill="#3178c6" text-anchor="middle">🌐 Browser</text>
+    <text x="384" y="0" font-family="Arial, sans-serif" font-size="16" fill="#f7df1e" text-anchor="middle">🖥️ Node.js</text>
+    <text x="576" y="0" font-family="Arial, sans-serif" font-size="16" fill="#3178c6" text-anchor="middle">🎬 Scenes</text>
+    <text x="768" y="0" font-family="Arial, sans-serif" font-size="16" fill="#f7df1e" text-anchor="middle">🔌 Events</text>
+    <text x="960" y="0" font-family="Arial, sans-serif" font-size="16" fill="#3178c6" text-anchor="middle">📦 Universal</text>
+  </g>
+</svg>
