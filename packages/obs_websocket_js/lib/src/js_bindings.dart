@@ -64,10 +64,7 @@ LogOptions _parseLogLevel(String? level) {
     case 'error':
       return const LogOptions(LogLevel.error);
     default:
-      return const LogOptions(
-        LogLevel.error,
-        stackTraceLevel: LogLevel.off,
-      );
+      return const LogOptions(LogLevel.error, stackTraceLevel: LogLevel.off);
   }
 }
 
@@ -130,8 +127,7 @@ JSObject _wrap(ObsWebSocket obs) {
     ((JSArray<JSObject> requests) {
       final dartRequests = <Request>[];
       for (final item in requests.toDart) {
-        final type =
-            (item.getProperty<JSString>('requestType'.toJS)).toDart;
+        final type = (item.getProperty<JSString>('requestType'.toJS)).toDart;
         final data = item.getProperty<JSAny?>('requestData'.toJS);
         final dataMap = (data == null || data.isUndefinedOrNull)
             ? null

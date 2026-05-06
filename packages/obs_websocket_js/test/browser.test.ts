@@ -2,6 +2,8 @@
  * Browser environment smoke test — verifies the facade works under happy-dom
  * with the same stubbed handle as the Node tests. Real browser E2E needs a
  * dart2js build step and is covered manually in CI.
+ *
+ * @vitest-environment happy-dom
  */
 
 import { describe, expect, it, vi } from 'vitest';

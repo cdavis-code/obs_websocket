@@ -10,12 +10,20 @@ import { EventEmitter } from 'eventemitter3';
 import type { DartRuntimeLoader } from './runtime.js';
 import { getRuntime } from './runtime.js';
 import {
-  ScenesApi,
-  SceneItemsApi,
-  InputsApi,
-  StreamApi,
-  RecordApi,
+  CanvasesApi,
+  ConfigApi,
+  FiltersApi,
   GeneralApi,
+  InputsApi,
+  MediaInputsApi,
+  OutputsApi,
+  RecordApi,
+  SceneItemsApi,
+  ScenesApi,
+  SourcesApi,
+  StreamApi,
+  TransitionsApi,
+  UiApi,
 } from './apis.js';
 import type {
   BatchRequest,
@@ -27,24 +35,55 @@ import type {
 } from './types.js';
 
 export * from './types.js';
-export { ScenesApi, SceneItemsApi, InputsApi, StreamApi, RecordApi, GeneralApi };
+export {
+  CanvasesApi,
+  ConfigApi,
+  FiltersApi,
+  GeneralApi,
+  InputsApi,
+  MediaInputsApi,
+  OutputsApi,
+  RecordApi,
+  SceneItemsApi,
+  ScenesApi,
+  SourcesApi,
+  StreamApi,
+  TransitionsApi,
+  UiApi,
+};
 
 export class ObsWebSocket extends EventEmitter {
+  readonly canvases: CanvasesApi;
+  readonly config: ConfigApi;
+  readonly filters: FiltersApi;
   readonly scenes: ScenesApi;
   readonly sceneItems: SceneItemsApi;
   readonly inputs: InputsApi;
+  readonly mediaInputs: MediaInputsApi;
+  readonly outputs: OutputsApi;
   readonly stream: StreamApi;
   readonly record: RecordApi;
   readonly general: GeneralApi;
+  readonly sources: SourcesApi;
+  readonly transitions: TransitionsApi;
+  readonly ui: UiApi;
 
   protected constructor(private readonly handle: ObsJsHandle) {
     super();
+    this.canvases = new CanvasesApi(handle);
+    this.config = new ConfigApi(handle);
+    this.filters = new FiltersApi(handle);
     this.scenes = new ScenesApi(handle);
     this.sceneItems = new SceneItemsApi(handle);
     this.inputs = new InputsApi(handle);
+    this.mediaInputs = new MediaInputsApi(handle);
+    this.outputs = new OutputsApi(handle);
     this.stream = new StreamApi(handle);
     this.record = new RecordApi(handle);
     this.general = new GeneralApi(handle);
+    this.sources = new SourcesApi(handle);
+    this.transitions = new TransitionsApi(handle);
+    this.ui = new UiApi(handle);
 
     // Forward every Dart event through the EventEmitter.
     handle.onAny((event: ObsEvent) => {

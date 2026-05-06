@@ -1,5 +1,5 @@
 {
-  "name": "obs_websocket_js",
+  "name": "@unngh/obs-websocket-js",
   "version": "5.7.0",
   "description": "JavaScript/TypeScript bindings for the obs_websocket Dart package. Universal (browser + Node.js) client for the OBS Studio obs-websocket v5 plugin.",
   "license": "MIT",
@@ -60,10 +60,10 @@
   "devDependencies": {
     "@types/node": "^20.12.0",
     "@types/ws": "^8.5.12",
+    "happy-dom": "^20.9.0",
     "tsup": "^8.3.0",
     "typescript": "^5.6.0",
-    "vitest": "^2.1.0",
-    "happy-dom": "^15.7.0"
+    "vitest": "^4.1.5"
   },
   "scripts": {
     "build:dart": "bash scripts/build.sh",

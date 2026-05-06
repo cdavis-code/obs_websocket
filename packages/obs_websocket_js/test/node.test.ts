@@ -71,17 +71,17 @@ describe('ObsWebSocket facade (node)', () => {
     expect(handle.send).toHaveBeenCalledWith('GetVersion', undefined);
   });
 
-  it('scenes.list() issues GetSceneList', async () => {
+  it('scenes.getSceneList() issues GetSceneList', async () => {
     const handle = makeStubHandle();
     const obs = TestableObs.fromHandle(handle);
-    await obs.scenes.list();
+    await obs.scenes.getSceneList();
     expect(handle.send).toHaveBeenCalledWith('GetSceneList', undefined);
   });
 
-  it('inputs.setMute(name, true) issues SetInputMute', async () => {
+  it('inputs.setInputMute(name, true) issues SetInputMute', async () => {
     const handle = makeStubHandle();
     const obs = TestableObs.fromHandle(handle);
-    await obs.inputs.setMute('Mic', true);
+    await obs.inputs.setInputMute(true, 'Mic');
     expect(handle.send).toHaveBeenCalledWith('SetInputMute', {
       inputName: 'Mic',
       inputMuted: true,
