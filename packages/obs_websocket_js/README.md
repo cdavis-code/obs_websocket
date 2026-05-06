@@ -57,7 +57,7 @@ yarn add @unngh/obs-websocket-js
 ### Basic Usage (Node.js / TypeScript)
 
 ```typescript
-import { ObsWebSocket, EventSubscription } from '@unngh/obs-websocket-js/node';
+import { ObsWebSocket, EventSubscription } from '@unngh/obs-websocket-js';
 
 // Connect to OBS
 const obs = await ObsWebSocket.connect('ws://localhost:4455', {
@@ -93,7 +93,7 @@ await obs.disconnect();
 Perfect for local development and CI/CD:
 
 ```typescript
-import { ObsWebSocket } from '@unngh/obs-websocket-js/node';
+import { ObsWebSocket } from '@unngh/obs-websocket-js';
 
 // Reads OBS_WEBSOCKET_URL, OBS_WEBSOCKET_PASSWORD, OBS_WEBSOCKET_TIMEOUT
 const obs = await ObsWebSocket.connectFromEnv();
@@ -124,6 +124,19 @@ await obs.stream.startStream();
 ```
 
 > **Note:** Browsers cannot use `connectFromEnv()` — always pass credentials explicitly.
+
+### Choosing an Import Path
+
+This package supports both Node.js and browser environments. Use the appropriate import for your target:
+
+| Import Path | Environment | WebSocket | Typical Use Case |
+|---|---|---|---|
+| `@unngh/obs-websocket-js` | **Node.js** (default) | Native (Node 22+) or `ws` polyfill (Node 18-21) | Streaming bots, automation scripts, server integrations, CLI tools |
+| `@unngh/obs-websocket-js/browser` | **Browser** | Native `WebSocket` | Web dashboards, browser extensions, OBS remote control UIs |
+
+**When in doubt, use `@unngh/obs-websocket-js`** — Node.js is the primary use case for OBS WebSocket automation. Only use the `/browser` subpath if you're building a web application that runs directly in a browser.
+
+> **Browser caveat:** Connecting from a browser requires OBS to accept WebSocket connections from arbitrary origins. OBS does not send CORS headers by default, so you may need to run a local proxy or use a browser extension to bypass CORS restrictions.
 
 ## API Reference
 
@@ -255,8 +268,8 @@ The package provides dual entrypoints optimized for different environments:
 
 | Build | Import Path | WebSocket Implementation | Use Case |
 |-------|-------------|-------------------------|----------|
-| **Node.js (ESM)** | `@unngh/obs-websocket-js/node` | Native (Node 22+) or `ws` polyfill (Node 18-21) | Server-side apps, CLI tools |
-| **Node.js (CommonJS)** | `require('@unngh/obs-websocket-js/node')` | Same as above | Legacy Node.js projects |
+| **Node.js (ESM)** | `@unngh/obs-websocket-js` *(default)* | Native (Node 22+) or `ws` polyfill (Node 18-21) | Server-side apps, CLI tools |
+| **Node.js (CommonJS)** | `require('@unngh/obs-websocket-js')` | Same as above | Legacy Node.js projects |
 | **Browser** | `@unngh/obs-websocket-js/browser` | Native `WebSocket` | Web apps, browser extensions |
 
 ### Automatic WebSocket Selection
@@ -294,7 +307,7 @@ interface ConnectOptions {
 ### Complete Streaming Workflow
 
 ```typescript
-import { ObsWebSocket, EventSubscription } from '@unngh/obs-websocket-js/node';
+import { ObsWebSocket, EventSubscription } from '@unngh/obs-websocket-js';
 
 const obs = await ObsWebSocket.connectFromEnv();
 if (!obs) throw new Error('Set OBS_WEBSOCKET_URL in environment');
