@@ -7,11 +7,11 @@ name: Dart
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     tags:
       - 'obs_websocket_js-v*'
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   pana:

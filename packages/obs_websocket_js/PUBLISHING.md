@@ -58,7 +58,7 @@ cd packages/obs_websocket_js
 ./scripts/publish-npm.sh major
 
 # Then push to trigger GitHub Action
-git push origin master --tags
+git push origin main --tags
 ```
 
 ### Option 2: Manual Process
@@ -79,7 +79,7 @@ git commit -m "chore: release v5.8.0"
 git tag -a obs_websocket_js-v5.8.0 -m "Release v5.8.0"
 
 # 5. Push to trigger
-git push origin master --tags
+git push origin main --tags
 ```
 
 ## Workflow Behavior
@@ -107,7 +107,7 @@ After publishing, verify:
 
 ### Workflow doesn't trigger
 - Check tag format: must be `obs_websocket_js-vX.Y.Z`
-- Verify workflow file is on the `master` branch
+- Verify workflow file is on the `main` branch
 
 ### Publish fails with authentication error
 - Verify `NPM_TOKEN` secret is set in GitHub

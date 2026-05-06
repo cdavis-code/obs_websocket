@@ -9,6 +9,7 @@ import 'dart:js_interop_unsafe';
 
 import 'package:loggy/loggy.dart';
 import 'package:obs_websocket/obs_websocket.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 @JS('globalThis')
 external JSObject get _globalThis;
@@ -27,6 +28,12 @@ void install() {
 /// JS signature:
 ///   `ObsWebSocketJs.connect(url, password?, timeoutSeconds?, logLevel?)`
 /// Returns: `Promise<JsObsWebSocket>`.
+///
+/// Note: We bypass `ObsWebSocket.connect()` because its conditional import
+/// (`dart.library.html`) no longer resolves in Dart 3.x dart2js.
+/// Instead, we use `WebSocketChannel.connect()` directly (which uses the
+/// browser's native WebSocket via `package:web` under the hood in dart2js)
+/// and then construct `ObsWebSocket` with the resulting channel.
 JSPromise<JSObject> _connect(
   JSString url,
   JSString? password,
@@ -38,12 +45,23 @@ JSPromise<JSObject> _connect(
     final pwd = password?.toDart;
     final timeout = Duration(seconds: timeoutSeconds?.toDartInt ?? 120);
 
-    final obs = await ObsWebSocket.connect(
-      url.toDart,
-      password: (pwd == null || pwd.isEmpty) ? null : pwd,
-      timeout: timeout,
+    Loggy.initLoggy(
+      logPrinter: const PrettyPrinter(showColors: false),
       logOptions: logOpts,
     );
+
+    final connectUrl = _normalizeUrl(url.toDart);
+
+    final webSocketChannel = WebSocketChannel.connect(Uri.parse(connectUrl));
+
+    await webSocketChannel.ready.timeout(timeout);
+
+    final obs = ObsWebSocket(
+      webSocketChannel,
+      password: (pwd == null || pwd.isEmpty) ? null : pwd,
+    );
+
+    await obs.init();
 
     return _wrap(obs);
   }();
@@ -66,6 +84,23 @@ LogOptions _parseLogLevel(String? level) {
     default:
       return const LogOptions(LogLevel.error, stackTraceLevel: LogLevel.off);
   }
+}
+
+/// Normalizes a WebSocket URL: adds `ws://` if no scheme is present.
+String _normalizeUrl(String input) {
+  final parsed = Uri.tryParse(input);
+  if (parsed == null) {
+    throw ArgumentError('Invalid WebSocket URL: $input');
+  }
+  if (parsed.scheme.isEmpty) {
+    return 'ws://$input';
+  }
+  if (parsed.scheme != 'ws' && parsed.scheme != 'wss') {
+    throw ArgumentError(
+      'Only ws:// and wss:// schemes are supported, got ${parsed.scheme}://',
+    );
+  }
+  return input;
 }
 
 /// Wraps an [ObsWebSocket] in an opaque JS object exposing only the methods

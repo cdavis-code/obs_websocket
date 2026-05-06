@@ -18,7 +18,6 @@ mkdir -p build/dart
 echo "==> Compiling Dart -> JavaScript (dart2js -O4)"
 dart compile js \
   -O4 \
-  --server-mode \
   -o build/dart/obs_websocket.js \
   lib/obs_websocket_js.dart
 

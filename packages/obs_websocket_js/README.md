@@ -34,7 +34,7 @@ Built on the battle-tested [`obs_websocket`](https://pub.dev/packages/obs_websoc
 
 ### Key Advantages
 
-✨ **Typed API Namespaces** — No more guessing request types. IntelliSense guides you with `obs.scenes.list()`, `obs.inputs.setMute()`, etc.
+✨ **Typed API Namespaces** — No more guessing request types. IntelliSense guides you with `obs.scenes.getSceneList()`, `obs.inputs.setInputMute()`, etc.
 
 🔒 **Type-Safe Events** — Get full autocomplete on event names and payloads: `obs.on('SceneCreated', (e) => ...)`.
 
@@ -66,7 +66,7 @@ const obs = await ObsWebSocket.connect('ws://localhost:4455', {
 });
 
 // List scenes
-const { scenes, currentProgramSceneName } = await obs.scenes.list();
+const { scenes, currentProgramSceneName } = await obs.scenes.getSceneList();
 console.log('Current scene:', currentProgramSceneName);
 console.log('All scenes:', scenes.map((s) => s.sceneName));
 
@@ -78,8 +78,8 @@ obs.on('SceneCreated', (event) => {
 });
 
 // Control inputs
-await obs.inputs.setMute('Mic/Aux', true);
-await obs.inputs.setVolume('Mic/Aux', -6.0);
+await obs.inputs.setInputMute(true, 'Mic/Aux');
+await obs.inputs.setInputVolume(-6.0, 'Mic/Aux');
 
 // Switch scenes
 await obs.scenes.setCurrentProgramScene('Gameplay');
@@ -120,7 +120,7 @@ const obs = await ObsWebSocket.connect('ws://localhost:4455', {
 
 // Control OBS from your web app
 await obs.scenes.setCurrentProgramScene('Live Scene');
-await obs.stream.start();
+await obs.stream.startStream();
 ```
 
 > **Note:** Browsers cannot use `connectFromEnv()` — always pass credentials explicitly.
@@ -140,18 +140,18 @@ await obs.stream.start();
 #### Scenes (`obs.scenes`)
 
 ```typescript
-const { scenes, currentProgramSceneName } = await obs.scenes.list();
+const { scenes, currentProgramSceneName } = await obs.scenes.getSceneList();
 await obs.scenes.setCurrentProgramScene('Scene Name');
-await obs.scenes.create('New Scene');
-await obs.scenes.remove('Old Scene');
+await obs.scenes.createScene('New Scene');
+await obs.scenes.removeScene('Old Scene');
 ```
 
 #### Scene Items (`obs.sceneItems`)
 
 ```typescript
-const items = await obs.sceneItems.list('Scene Name');
-await obs.sceneItems.setEnabled('Scene', itemId, true);
-await obs.sceneItems.setTransform('Scene', itemId, {
+const { sceneItems } = await obs.sceneItems.getSceneItemList('Scene Name');
+await obs.sceneItems.setSceneItemEnabled('Scene', itemId, true);
+await obs.sceneItems.setSceneItemTransform('Scene', itemId, {
   positionX: 100,
   positionY: 200,
   rotation: 0,
@@ -161,32 +161,32 @@ await obs.sceneItems.setTransform('Scene', itemId, {
 #### Inputs (`obs.inputs`)
 
 ```typescript
-const inputs = await obs.inputs.list();
-await obs.inputs.setMute('Mic', true);
-await obs.inputs.setVolume('Mic', -6.0);
-const settings = await obs.inputs.getSettings('Camera');
-await obs.inputs.setSettings('Camera', { ...settings, brightness: 0.5 });
+const { inputs } = await obs.inputs.getInputList();
+await obs.inputs.setInputMute(true, 'Mic');
+await obs.inputs.setInputVolume(-6.0, 'Mic');
+const { inputSettings } = await obs.inputs.getInputSettings('Camera');
+await obs.inputs.setInputSettings({ ...inputSettings, brightness: 0.5 }, 'Camera');
 ```
 
 #### Streaming (`obs.stream`)
 
 ```typescript
-const status = await obs.stream.getStatus();
-await obs.stream.start();
-await obs.stream.stop();
-await obs.stream.toggle();
-await obs.stream.sendCaption('Live caption text');
+const status = await obs.stream.getStreamStatus();
+await obs.stream.startStream();
+await obs.stream.stopStream();
+await obs.stream.toggleStream();
+await obs.stream.sendStreamCaption('Live caption text');
 ```
 
 #### Recording (`obs.record`)
 
 ```typescript
-const status = await obs.record.getStatus();
-await obs.record.start();
-await obs.record.stop();
-await obs.record.pause();
-await obs.record.resume();
-await obs.record.togglePause();
+const status = await obs.record.getRecordStatus();
+await obs.record.startRecord();
+await obs.record.stopRecord();
+await obs.record.pauseRecord();
+await obs.record.resumeRecord();
+await obs.record.toggleRecordPause();
 ```
 
 #### General (`obs.general`)
@@ -194,7 +194,7 @@ await obs.record.togglePause();
 ```typescript
 const version = await obs.general.getVersion();
 const stats = await obs.general.getStats();
-await obs.general.triggerHotkey('OBSBasic.StartRecording');
+await obs.general.triggerHotkeyByName('OBSBasic.StartRecording');
 await obs.general.broadcastCustomEvent({ custom: 'data' });
 ```
 
@@ -274,9 +274,8 @@ On Node.js, the package automatically chooses the best WebSocket implementation:
 ```typescript
 interface ConnectOptions {
   password?: string;        // OBS WebSocket password (if required)
-  logLevel?: 'debug' | 'info' | 'warning' | 'error' | 'off';  // Logging verbosity
-  eventSubscriptions?: EventSubscription;  // Event categories to subscribe
-  rpcVersion?: number;      // Force specific RPC version (usually auto-negotiated)
+  timeout?: number;         // Connection timeout in seconds (default 120)
+  logLevel?: 'all' | 'debug' | 'info' | 'warning' | 'error';  // Logging verbosity
 }
 ```
 
@@ -298,19 +297,20 @@ interface ConnectOptions {
 import { ObsWebSocket, EventSubscription } from '@unngh/obs-websocket-js/node';
 
 const obs = await ObsWebSocket.connectFromEnv();
+if (!obs) throw new Error('Set OBS_WEBSOCKET_URL in environment');
 
 // Check OBS version
 const { obsVersion } = await obs.general.getVersion();
 console.log(`Connected to OBS ${obsVersion}`);
 
 // Get current scene and switch
-const { currentProgramSceneName } = await obs.scenes.list();
+const { currentProgramSceneName } = await obs.scenes.getSceneList();
 console.log(`Currently on: ${currentProgramSceneName}`);
 
 await obs.scenes.setCurrentProgramScene('Live Scene');
 
 // Start streaming
-await obs.stream.start();
+await obs.stream.startStream();
 console.log('Stream started!');
 
 // Listen for stream events
@@ -324,7 +324,7 @@ obs.on('StreamStateChanged', (event) => {
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
-  await obs.stream.stop();
+  await obs.stream.stopStream();
   await obs.disconnect();
   process.exit(0);
 });
@@ -334,12 +334,15 @@ process.on('SIGINT', async () => {
 
 ```typescript
 // Smooth scene switching with transition
-await obs.scenes.setTransitionOverride('My Scene', 'Fade', 1000);
+await obs.scenes.setSceneSceneTransitionOverride('My Scene', {
+  transitionName: 'Fade',
+  transitionDuration: 1000,
+});
 await obs.scenes.setCurrentProgramScene('My Scene');
 
 // Or use global transition
-await obs.transitions.setCurrent('Stinger');
-await obs.transitions.setDuration(500);
+await obs.transitions.setCurrentSceneTransition('Stinger');
+await obs.transitions.setCurrentSceneTransitionDuration(500);
 ```
 
 ---
@@ -464,7 +467,7 @@ npm publish --access=public
 Push the tag to trigger automated publishing:
 
 ```bash
-git push origin master --tags
+git push origin main --tags
 ```
 
 The workflow will:
