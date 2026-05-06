@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:loggy/loggy.dart';
@@ -8,10 +9,25 @@ import 'package:universal_io/io.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-class ObsWebSocket with UiLoggy {
-  final WebSocketChannel websocketChannel;
+/// Connection lifecycle states emitted by [ObsWebSocket.onConnectionStateChanged].
+enum ObsConnectionState {
+  /// Initial state before any connection attempt completes.
+  disconnected,
 
-  final Stream<dynamic> broadcastStream;
+  /// Authentication handshake has finished and the socket is usable.
+  connected,
+
+  /// The socket dropped and a reconnect attempt is in progress.
+  reconnecting,
+
+  /// All reconnect attempts failed; the client is no longer usable.
+  failed,
+}
+
+class ObsWebSocket with UiLoggy {
+  WebSocketChannel websocketChannel;
+
+  Stream<dynamic> broadcastStream;
 
   final String? password;
 
@@ -22,6 +38,33 @@ class ObsWebSocket with UiLoggy {
   final eventHandlers = <String, List<Function>>{};
 
   final fromJsonSingleton = FromJsonSingleton();
+
+  /// When non-null, [_attemptReconnect] will recreate the underlying
+  /// WebSocket using these credentials after the broadcast stream closes.
+  /// The password is reused from [password] on this same instance, so the
+  /// reconnect path only needs to remember the URL and timeout.
+  String? _reconnectUrl;
+  Duration _reconnectTimeout = const Duration(seconds: 120);
+  bool _autoReconnect = false;
+  bool _reconnecting = false;
+  bool _userClosed = false;
+  int _reconnectAttempt = 0;
+
+  /// Maximum reconnect attempts before emitting [ObsConnectionState.failed].
+  static const int maxReconnectAttempts = 5;
+
+  final StreamController<ObsConnectionState> _connectionStateController =
+      StreamController<ObsConnectionState>.broadcast();
+
+  ObsConnectionState _connectionState = ObsConnectionState.disconnected;
+
+  /// Latest [ObsConnectionState] observed by the client.
+  ObsConnectionState get connectionState => _connectionState;
+
+  /// Broadcast stream of [ObsConnectionState] transitions. Useful for UIs
+  /// or MCP servers that want to react when OBS goes offline and recovers.
+  Stream<ObsConnectionState> get onConnectionStateChanged =>
+      _connectionStateController.stream;
 
   request.Config? _config;
 
@@ -144,6 +187,7 @@ class ObsWebSocket with UiLoggy {
     Duration timeout = const Duration(seconds: 120),
     void Function()? onDone,
     Function? fallbackEventHandler,
+    bool autoReconnect = false,
     LogOptions logOptions = const LogOptions(
       LogLevel.error,
       stackTraceLevel: LogLevel.off,
@@ -168,9 +212,16 @@ class ObsWebSocket with UiLoggy {
       fallbackEventHandler: fallbackEventHandler,
     );
 
+    if (autoReconnect) {
+      obsWebSocket._autoReconnect = true;
+      obsWebSocket._reconnectUrl = connectUrl;
+      obsWebSocket._reconnectTimeout = timeout;
+    }
+
     logDebug('connected');
 
     await obsWebSocket.init();
+    obsWebSocket._setConnectionState(ObsConnectionState.connected);
 
     return obsWebSocket;
   }
@@ -314,19 +365,159 @@ class ObsWebSocket with UiLoggy {
   }
 
   Future<void> init() async {
-    broadcastStream.listen((message) {
-      final opcode = Opcode.fromJson(json.decode(message));
+    broadcastStream.listen(
+      (message) {
+        final opcode = Opcode.fromJson(json.decode(message));
 
-      if (opcode.op == WebSocketOpCode.event.code) {
-        final event = Event.fromJson(opcode.d);
+        if (opcode.op == WebSocketOpCode.event.code) {
+          final event = Event.fromJson(opcode.d);
 
-        loggy.debug('event: $event');
+          loggy.debug('event: $event');
 
-        _handleEvent(event);
-      }
-    });
+          _handleEvent(event);
+        }
+      },
+      onDone: _handleStreamClosed,
+      onError: (Object error, StackTrace st) {
+        loggy.warning('broadcastStream error: $error');
+        _handleStreamClosed();
+      },
+      cancelOnError: false,
+    );
 
     await authenticate();
+  }
+
+  /// Sends `GetVersion` and returns the parsed [VersionResponse]. A cheap
+  /// liveness probe that doubles as a feature-flag query.
+  Future<VersionResponse> ping() async {
+    return general.getVersion();
+  }
+
+  /// Awaits the first OBS event whose `eventType` equals [eventType] and
+  /// (optionally) satisfies [predicate]. Throws [TimeoutException] if no
+  /// matching event arrives before [timeout].
+  ///
+  /// Returns the raw [Event] object. Callers may downcast or look up the
+  /// concrete event class via [FromJsonSingleton].
+  Future<Event> waitForEvent({
+    required String eventType,
+    bool Function(Event event)? predicate,
+    Duration? timeout,
+  }) {
+    final completer = Completer<Event>();
+
+    void handler(Event event) {
+      if (event.eventType != eventType) return;
+      if (predicate != null && !predicate(event)) return;
+      if (!completer.isCompleted) completer.complete(event);
+    }
+
+    addFallbackListener(handler);
+
+    Future<Event> resultFuture = completer.future;
+    if (timeout != null) {
+      resultFuture = resultFuture.timeout(timeout);
+    }
+
+    return resultFuture.whenComplete(() => removeFallbackListener(handler));
+  }
+
+  /// Typed convenience wrapper around [waitForEvent].
+  ///
+  /// Awaits the first event whose `eventType` equals [eventType], optionally
+  /// passes the decoded class through [predicate], and returns the typed
+  /// instance produced by [FromJsonSingleton].
+  ///
+  /// Example:
+  /// ```dart
+  /// final ev = await obs.waitForTypedEvent<RecordStateChanged>(
+  ///   eventType: 'RecordStateChanged',
+  ///   predicate: (e) => e.outputActive == true,
+  ///   timeout: const Duration(seconds: 5),
+  /// );
+  /// ```
+  Future<T> waitForTypedEvent<T>({
+    required String eventType,
+    bool Function(T event)? predicate,
+    Duration? timeout,
+  }) async {
+    final factory = fromJsonSingleton.factories[eventType];
+    if (factory == null) {
+      throw ObsArgumentException(
+        'No FromJsonSingleton factory registered for eventType="$eventType"',
+      );
+    }
+
+    final raw = await waitForEvent(
+      eventType: eventType,
+      predicate: predicate == null
+          ? null
+          : (event) {
+              final typed = factory(event.eventData ?? {}) as T;
+              return predicate(typed);
+            },
+      timeout: timeout,
+    );
+
+    return factory(raw.eventData ?? {}) as T;
+  }
+
+  /// Called whenever the underlying broadcast stream closes (network drop,
+  /// OBS restart, or normal `close()`). Triggers a reconnect when
+  /// [_autoReconnect] is enabled and the user did not call [close].
+  void _handleStreamClosed() {
+    handshakeComplete = false;
+    if (_userClosed || !_autoReconnect || _reconnecting) {
+      _setConnectionState(ObsConnectionState.disconnected);
+      return;
+    }
+    unawaited(_attemptReconnect());
+  }
+
+  Future<void> _attemptReconnect() async {
+    final url = _reconnectUrl;
+    if (url == null) return;
+
+    _reconnecting = true;
+    _setConnectionState(ObsConnectionState.reconnecting);
+
+    while (_reconnectAttempt < maxReconnectAttempts) {
+      _reconnectAttempt++;
+      final backoffMs = (200 * (1 << (_reconnectAttempt - 1))).clamp(200, 5000);
+      loggy.warning(
+        'OBS WebSocket disconnected. Reconnect attempt '
+        '$_reconnectAttempt/$maxReconnectAttempts in ${backoffMs}ms',
+      );
+      await Future<void>.delayed(Duration(milliseconds: backoffMs));
+
+      try {
+        final newChannel = await Connect().connect(
+          connectUrl: url,
+          timeout: _reconnectTimeout,
+        );
+        websocketChannel = newChannel;
+        broadcastStream = newChannel.stream.asBroadcastStream();
+        await init();
+        _reconnectAttempt = 0;
+        _reconnecting = false;
+        _setConnectionState(ObsConnectionState.connected);
+        return;
+      } catch (error, st) {
+        loggy.warning('Reconnect attempt failed: $error', error, st);
+      }
+    }
+
+    _reconnecting = false;
+    _setConnectionState(ObsConnectionState.failed);
+  }
+
+  void _setConnectionState(ObsConnectionState state) {
+    if (_connectionState == state) return;
+    _connectionState = state;
+    if (!_connectionStateController.isClosed) {
+      _connectionStateController.add(state);
+    }
   }
 
   Future<void> authenticate() async {
@@ -458,9 +649,14 @@ class ObsWebSocket with UiLoggy {
 
   ///Before execution finished the websocket needs to be closed
   Future<void> close() async {
+    _userClosed = true;
     if (onDone != null) onDone!();
 
     await websocketChannel.sink.close(status.normalClosure);
+    _setConnectionState(ObsConnectionState.disconnected);
+    if (!_connectionStateController.isClosed) {
+      await _connectionStateController.close();
+    }
   }
 
   ///Add an event handler for the event type [T]

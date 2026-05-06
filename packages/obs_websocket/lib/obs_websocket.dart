@@ -3,6 +3,8 @@
 /// Hamilton, with new commands specific to OBS Studio.
 library;
 
+export 'src/enum/obs_alignment.dart';
+export 'src/enum/obs_bounds_type.dart';
 export 'src/enum/obs_deinterlace_field_order.dart';
 export 'src/enum/obs_deinterlace_mode.dart';
 export 'src/enum/obs_media_input_action.dart';
@@ -73,6 +75,7 @@ export 'src/model/shared/monitor.dart';
 export 'src/model/shared/scene_item.dart';
 export 'src/model/shared/scene_item_detail.dart';
 export 'src/model/shared/scene.dart';
+export 'src/model/shared/scene_item_transform.dart';
 export 'src/model/shared/transform.dart';
 
 export 'src/util/enum.dart';

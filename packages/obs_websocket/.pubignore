@@ -1,2 +1,6 @@
 .DS_Store
 test/
+*.iml
+.idea/
+doc/
+.env

@@ -349,20 +349,63 @@ class SceneItems {
   /// - Complexity Rating: 3/5
   /// - Latest Supported RPC Version: 1
   /// - Added in v5.0.0
+  ///
+  /// The [sceneItemTransform] map is validated against
+  /// [SceneItemTransform.knownKeys]; unknown keys throw
+  /// [ObsArgumentException] so typos surface client-side instead of being
+  /// silently dropped by OBS. Pass [validateKeys] = `false` to opt out
+  /// (e.g. when sending future protocol fields not yet recognised by
+  /// this package).
   Future<void> setSceneItemTransform({
     required String sceneName,
     required int sceneItemId,
     required Map<String, dynamic> sceneItemTransform,
-  }) async => await obsWebSocket.sendRequest(
-    Request(
-      'SetSceneItemTransform',
-      requestData: {
-        'sceneName': sceneName,
-        'sceneItemId': sceneItemId,
-        'sceneItemTransform': sceneItemTransform,
-      },
-    ),
+    bool validateKeys = true,
+  }) async {
+    if (validateKeys) {
+      SceneItemTransform.validate(sceneItemTransform);
+    }
+    await obsWebSocket.sendRequest(
+      Request(
+        'SetSceneItemTransform',
+        requestData: {
+          'sceneName': sceneName,
+          'sceneItemId': sceneItemId,
+          'sceneItemTransform': sceneItemTransform,
+        },
+      ),
+    );
+  }
+
+  /// Strongly-typed companion to [setSceneItemTransform]. Only the
+  /// non-null fields of [transform] are forwarded to OBS.
+  Future<void> setSceneItemTransformTyped({
+    required String sceneName,
+    required int sceneItemId,
+    required SceneItemTransform transform,
+  }) async => setSceneItemTransform(
+    sceneName: sceneName,
+    sceneItemId: sceneItemId,
+    sceneItemTransform: transform.toJson(),
+    validateKeys: false,
   );
+
+  /// Strongly-typed companion to [getSceneItemTransform]. Returns the
+  /// transform parsed into a [SceneItemTransform].
+  Future<SceneItemTransform> getSceneItemTransformTyped({
+    required String sceneName,
+    required int sceneItemId,
+  }) async {
+    final raw = await getSceneItemTransform(
+      sceneName: sceneName,
+      sceneItemId: sceneItemId,
+    );
+    final nested = raw['sceneItemTransform'];
+    if (nested is Map<String, dynamic>) {
+      return SceneItemTransform.fromJson(nested);
+    }
+    return SceneItemTransform.fromJson(raw);
+  }
 
   /// Creates a new scene item using a source.
   ///

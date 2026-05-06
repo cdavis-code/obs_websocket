@@ -1,5 +1,21 @@
 # Changelog
 
+## 5.7.0+3
+
+* **New typed transform model**
+  * Added `SceneItemTransform` model with named fields, `fromJson`/`toJson`, `copyWith`, and `merge`
+  * Added `ObsAlignment` enum (top-left, top-center, top-right, center-left, center, center-right, bottom-left, bottom-center, bottom-right) with OBS bit-flag values
+  * Added `ObsBoundsType` enum (`OBS_BOUNDS_NONE`, `OBS_BOUNDS_STRETCH`, `OBS_BOUNDS_SCALE_INNER`, `OBS_BOUNDS_SCALE_OUTER`, `OBS_BOUNDS_SCALE_TO_WIDTH`, `OBS_BOUNDS_SCALE_TO_HEIGHT`, `OBS_BOUNDS_MAX_ONLY`)
+  * `setSceneItemTransform` now validates keys and rejects unknown fields
+* **Connection resilience**
+  * Added `autoReconnect` constructor flag with exponential backoff (200 ms → 5 s, max 5 attempts)
+  * Added `Stream<ObsConnectionState> onConnectionStateChanged` for reactive connection monitoring
+  * Added lightweight `ping()` helper using `GetVersion` for heartbeat checks
+* **Event awaitable helpers**
+  * Added `waitForEvent({eventType, predicate?, timeout?})` for polling-free event waiting
+  * Added `waitForTypedEvent<T>({eventType, predicate?, timeout?})` for typed events
+* Exported new symbols from the main library entry point
+
 ## 5.7.0+1
 
 * Removed `envied` dependency for compile-time `.env` loading
