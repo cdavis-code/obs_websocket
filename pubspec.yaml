@@ -17,7 +17,6 @@ melos:
   name: obs_websocket_workspace
   packages:
     - packages/**
-    - apps/**
     - '!packages/**/example'
 
   command:
