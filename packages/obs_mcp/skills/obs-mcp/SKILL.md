@@ -55,10 +55,20 @@ Use `search` when:
 All names below are invoked as `call_tool('<name>', {...})` inside `execute`.
 
 ### Connection
-- `obs_connect` — connect to OBS WebSocket (host, port, password).
+- `obs_connect` — connect to OBS WebSocket (`url`, `password`, `timeoutSeconds`, `autoReconnect` — defaults to `true`).
 - `obs_disconnect` — close the connection.
-- `obs_is_connected` — returns `{ connected: bool }`.
+- `obs_is_connected` — returns `bool`.
+- `obs_connection_status` — `{ connected, state, negotiatedRpcVersion }` where `state ∈ disconnected | connecting | connected | reconnecting | failed`.
+- `obs_connection_ping` — round-trip `GetVersion` and report latency in ms.
 - `obs_send_raw` — send a raw OBS WebSocket request by op code/type.
+
+### Events (subscribe + wait)
+- `obs_events_subscribe` — set the active subscription mask. Pass either `mask` (int bitmask) or `subscriptions` (list of names: `general`, `config`, `scenes`, `inputs`, `transitions`, `filters`, `outputs`, `sceneItems`, `mediaInputs`, `vendors`, `ui`, `canvases`, `all`, `inputVolumeMeters`, `inputActiveStateChanged`, `inputShowStateChanged`, `sceneItemTransformChanged`).
+- `obs_wait_for_event` — block until the next event whose `eventType` matches (e.g. `RecordStateChanged`, `SceneItemTransformChanged`). Times out after `timeoutMs` (default 30000). You **must** subscribe first.
+
+### Timing
+- `obs_client_sleep` — server-side sleep (1–25000 ms). **Prefer this over `setTimeout` inside `execute`** so the JS sandbox subprocess stays idle while the MCP host owns the wall clock (the sandbox has a hard 30 s timeout).
+- `obs_general_sleep` — legacy server-side sleep. Use `obs_client_sleep` for new code.
 
 ### General
 - `obs_general_version` — OBS/websocket/platform versions.
@@ -81,7 +91,9 @@ All names below are invoked as `call_tool('<name>', {...})` inside `execute`.
 ### Scene Items
 - `obs_scene_items_list` — list items in a scene (names, IDs, transforms).
 - `obs_scene_items_get_id` — resolve `sceneItemId` by source name.
-- `obs_scene_items_get_transform`, `obs_scene_items_set_transform` — position, scale, rotation, crop, bounds.
+- `obs_scene_items_get_transform` — returns the **flat** transform shape (same field names as `set_transform`). Includes `positionX/Y`, `scaleX/Y`, `rotation`, `cropLeft/Top/Right/Bottom`, `alignment`, `boundsType`, `boundsAlignment`, `boundsWidth/Height`, plus read-only `sourceWidth/Height` and `width/height`.
+- `obs_scene_items_set_transform` — full set: `positionX/Y`, `scaleX/Y`, `rotation`, `cropLeft/Top/Right/Bottom`, **`alignment`**, **`boundsType`**, **`boundsAlignment`**, **`boundsWidth/Height`**. Returns the canonical post-set transform.
+- `obs_scene_items_animate_transform` — server-side animation from current → target over `durationMs` at `frameRate` fps (1–60). Easings: `linear`, `easeIn`, `easeOut`, `easeInOut`, `easeOutBounce`. Optional `restoreOnComplete` for transient "bump" animations. Survives reconnects and is not bound by the JS sandbox 30 s timeout.
 - `obs_scene_items_set_enabled`, `obs_scene_items_get_enabled`.
 - `obs_scene_items_set_locked`, `obs_scene_items_get_locked`.
 - `obs_scene_items_set_index`, `obs_scene_items_get_index` — z-order.
@@ -166,9 +178,12 @@ All names below are invoked as `call_tool('<name>', {...})` inside `execute`.
 
 ### 1. Verify connection before any work
 ```javascript
-const status = await call_tool('obs_is_connected', {});
+const status = await call_tool('obs_connection_status', {});
 if (!status?.connected) {
-  await call_tool('obs_connect', { host: 'localhost', port: 4455 });
+  await call_tool('obs_connect', {
+    url: 'ws://localhost:4455',
+    autoReconnect: true,
+  });
 }
 return await call_tool('obs_general_version', {});
 ```
@@ -187,10 +202,11 @@ const sceneName = (await call_tool('obs_scenes_list', {})).currentProgramSceneNa
 const { sceneItemId } = await call_tool('obs_scene_items_get_id', {
   sceneName, sourceName: 'Follow Test'
 });
-const { sceneItemTransform } = await call_tool('obs_scene_items_get_transform', {
+// get_transform now returns the flat shape (same field names as set_transform).
+const transform = await call_tool('obs_scene_items_get_transform', {
   sceneName, sceneItemId
 });
-return { sceneItemId, transform: sceneItemTransform };
+return { sceneItemId, transform };
 ```
 
 ### 4. Transform a source (position / rotation / scale)
@@ -198,29 +214,49 @@ return { sceneItemId, transform: sceneItemTransform };
 await call_tool('obs_scene_items_set_transform', {
   sceneName: 'Scene',
   sceneItemId: 4,
-  sceneItemTransform: { positionX: 100, positionY: 100, rotation: 0 }
+  positionX: 100,
+  positionY: 100,
+  rotation: 0
 });
 ```
 Always save the original transform first so you can restore it.
 
-### 5. Animate a source (client-paced, with easing)
-See [scripts/animate-source.js](scripts/animate-source.js) for a reusable template with `easeOutBounce` and a corner-tour example.
+### 5. Animate a source
+**Preferred (server-side, survives the 30 s sandbox timeout, supports easing):**
+```javascript
+await call_tool('obs_scene_items_animate_transform', {
+  sceneName: 'Scene',
+  sceneItemId: 4,
+  durationMs: 1500,
+  targetPositionX: 1820,
+  targetPositionY: 980,
+  frameRate: 60,
+  easing: 'easeOutBounce',
+  restoreOnComplete: true,
+});
+```
+See [scripts/animate-source.js](scripts/animate-source.js) for the legacy client-paced template (still useful when you need per-frame logic that the server-side tool can't express).
 
-Key requirements:
-- Pace frames with `await new Promise(r => setTimeout(r, 16))` (~60 fps). Never use `obs_general_sleep` for client-side animation.
+Key requirements when client-pacing:
+- Pace frames with `await call_tool('obs_client_sleep', { ms: 16 })` (~60 fps). `obs_client_sleep` does **not** keep the sandbox subprocess busy the way `setTimeout` does, so it is safe under the 30 s sandbox timeout.
 - Interpolate `positionX`/`positionY` only. Keep rotation/scale fixed unless animating them too.
-- When the user says "move the mid-point of the source to X", compute `posX = X - width/2`, `posY = Y - height/2` using the width/height from `sceneItemTransform`.
-- Restore the original transform at the end.
+- When the user says "move the mid-point of the source to X", compute `posX = X - width/2`, `posY = Y - height/2` from `width`/`height` on the flat transform.
+- Restore the original transform at the end (or pass `restoreOnComplete: true` to the server-side animator).
 
 ### 6. Record a clip with lead-in / lead-out
 See [scripts/record-with-leadin.js](scripts/record-with-leadin.js).
 
-Pattern:
+**Recommended pattern** (uses `obs_client_sleep` so the sandbox stays idle, and waits for the actual `RecordStateChanged` event instead of polling):
 ```javascript
+await call_tool('obs_events_subscribe', { subscriptions: ['outputs'] });
 await call_tool('obs_record_start', {});
-await new Promise(r => setTimeout(r, leadInMs));
+await call_tool('obs_wait_for_event', {
+  eventType: 'RecordStateChanged',
+  timeoutMs: 5000,
+});
+await call_tool('obs_client_sleep', { ms: leadInMs });
 await runAnimation();
-await new Promise(r => setTimeout(r, leadOutMs));
+await call_tool('obs_client_sleep', { ms: leadOutMs });
 const { outputPath } = await call_tool('obs_record_stop', {});
 return outputPath;
 ```
@@ -256,18 +292,32 @@ const { hotkeys } = await call_tool('obs_general_hotkeys', {});
 await call_tool('obs_general_trigger_hotkey', { hotkeyName: 'OBSBasic.StartRecording' });
 ```
 
+## Execute Environment Limitations
+
+1. **Keep scripts short and simple.** Accessing nested properties from tool call results (e.g., `items[0].sceneItemTransform.width`) frequently causes silent errors. Complex scripts with multiple tool calls and control flow often fail. Split operations into multiple small `execute` calls rather than one large script.
+
+2. **Source names are case-sensitive.** `inputName: 'Input'` and `inputName: 'input'` are different sources. Always verify the exact source name via `obs_inputs_list` or `obs_scene_items_list`.
+
+3. **Reading dimensions after text/settings changes requires a separate call.** After updating text via `obs_inputs_set_settings`, the source dimensions change. You must call `obs_scene_items_list` again in a **separate** `execute` invocation to get the updated width/height. Doing it in the same script often returns stale or null values.
+
+4. **The JS sandbox has a hard 30 s subprocess timeout.** Any animation, lead-in, or wait that approaches 30 s should run via `obs_scene_items_animate_transform`, `obs_client_sleep`, or `obs_wait_for_event` so the work happens on the MCP host instead of inside the Node.js subprocess.
+
 ## Gotchas & Best Practices
 
-1. **`obs_general_sleep` is server-side.** It pauses the Dart server, not your JS execution. For client-paced timing use `await new Promise(r => setTimeout(r, ms))`.
-2. **Snapshot before you mutate.** Call `obs_scene_items_get_transform` and store the result before animating so you can restore exactly.
+1. **Prefer `obs_client_sleep` over `setTimeout`.** `obs_general_sleep` and `obs_client_sleep` both pause server-side; the JS sandbox's `setTimeout` keeps the Node.js subprocess busy and competes with the 30 s sandbox timeout. For new code use `obs_client_sleep`.
+2. **Snapshot before you mutate.** Call `obs_scene_items_get_transform` and store the result before animating so you can restore exactly. The shape now matches `set_transform` (flat fields), so `Object.assign({}, transform)` round-trips cleanly.
 3. **Use UUIDs when ambiguous.** `sceneUuid` and `sourceUuid` are safer than names if the user might rename things mid-session.
 4. **Canvas size matters for positioning.** Read `obs_canvas_get_video_settings` to get `baseWidth`/`baseHeight` — don't hard-code 1920×1080.
 5. **Minimize round-trips.** Parallelize independent reads with `Promise.all([...])`.
-6. **Transform payload shape.** `obs_scene_items_set_transform` takes `{ sceneName, sceneItemId, sceneItemTransform: { ...fields } }` — transform fields are nested, not top-level.
-7. **Animations swallow errors silently.** Wrap loops in `try/finally` and always restore the original transform in `finally`.
-8. **Recording and streaming are asynchronous.** After `obs_record_stop`, the file path may not be available until the output flushes; poll `obs_record_status` if needed.
+6. **Transform fields are now symmetric.** Both `obs_scene_items_get_transform` and `obs_scene_items_set_transform` use the same flat field names: `positionX`, `positionY`, `scaleX`, `scaleY`, `rotation`, `cropLeft`, `cropTop`, `cropRight`, `cropBottom`, `alignment`, `boundsType`, `boundsAlignment`, `boundsWidth`, `boundsHeight`. The legacy nested `{ sceneItemTransform: {...} }` shape is no longer returned.
+7. **Animations swallow errors silently.** Wrap loops in `try/finally` and always restore the original transform in `finally` (or use `restoreOnComplete: true` on `obs_scene_items_animate_transform`).
+8. **Recording and streaming are asynchronous.** After `obs_record_stop`, the file path may not be available until the output flushes; subscribe to `outputs` and `obs_wait_for_event` on `RecordStateChanged` instead of polling `obs_record_status`.
 9. **Don't call tools concurrently on the same scene item.** Serialize writes to avoid race conditions in OBS.
-10. **Verify connection first.** Every workflow should begin with `obs_is_connected` — OBS may have closed the WebSocket between calls.
+10. **Auto-reconnect is on by default.** `obs_connect` enables exponential-backoff reconnect (200 ms → 5 s, max 5 attempts). Use `obs_connection_status` to read the current `state` (`connected | reconnecting | failed`) instead of assuming the link is alive after a tool error.
+11. **`obs_scene_items_set_transform` accepts the full transform.** `alignment`, `boundsType`, `boundsAlignment`, `boundsWidth`, and `boundsHeight` are all settable directly — no need to fall back to `obs_send_raw`.
+12. **Alignment affects position interpretation.** Alignment 5 = center anchor (positionX/Y is the center of the source). Alignment 0 = top-left anchor (positionX/Y is the top-left corner). Always read the current alignment before calculating positions.
+13. **Centering formula depends on alignment.** With alignment 0 (top-left): `positionX = canvasCenter - (width / 2)`. With alignment 5 (center): `positionX = canvasCenter` directly. Get the alignment from `obs_scene_items_get_transform` or `obs_scene_items_list` first.
+14. **Subscribe before you wait.** `obs_wait_for_event` will hang (and ultimately time out) for events outside the active subscription mask. Call `obs_events_subscribe` first with the relevant group(s).
 
 ## Scripts
 

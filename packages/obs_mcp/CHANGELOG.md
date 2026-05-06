@@ -1,5 +1,25 @@
 # Changelog
 
+## 5.7.1+2
+
+* **Connection helpers**: New first-class tools so agents no longer have to script connection handling via `execute`
+  * `connection_status` — reports current connection state (`connected`, `connecting`, `disconnected`, `reconnecting`, `failed`)
+  * `connection_ping` — lightweight `GetVersion` heartbeat
+* **Event helpers**: New tools that wrap the underlying obs_websocket event stream
+  * `events_subscribe` — reidentify with the requested event subscription mask or named categories
+  * `wait_for_event` — polling-free wait for a specific event with optional timeout and predicate
+* **Server-side animation**: `scene_items_animate_transform` interpolates a scene item transform over time on the server
+  * Built-in easings: `linear`, `easeIn`, `easeOut`, `easeInOut`, `easeOutBounce`
+  * Configurable `durationMs` and `frameRate`; optional restore-on-complete
+  * Accepts target `positionX/Y`, `scaleX/Y`, `rotation`, `cropLeft/Top/Right/Bottom`
+* **Client sleep**: `client_sleep` provides a server-side, non-OBS-blocking pause (1–25000 ms) for use between tool calls
+* **Full transform parameters**: `scene_items_set_transform` now accepts `alignment`, `boundsAlignment`, `boundsType`, `boundsWidth`, `boundsHeight`
+* **Auto-reconnect bootstrap**: MCP server constructs `ObsWebSocket` with `autoReconnect: true` so transient disconnects recover transparently
+* **Refactor**: Extracted easing / lerp / transform interpolation / event-subscription parsing into `lib/src/animation_helpers.dart` for testability
+* **Tests**: Added 14 unit tests covering animation helpers and event-subscription parsing
+* **Skills**: Updated SKILL.md tool catalog, workflows, and gotchas to document the new tools
+* **Dependency**: Requires `obs_websocket: ^5.7.0+3` for the new typed transform model and connection helpers
+
 ## 5.7.1+1
 
 * **Documentation**: Improved README structure and clarity

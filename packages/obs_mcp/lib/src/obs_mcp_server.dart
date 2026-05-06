@@ -17,10 +17,13 @@
 /// raw `void`.
 library;
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:easy_api_annotations/mcp_annotations.dart';
+import 'package:obs_mcp/src/animation_helpers.dart';
 import 'package:obs_websocket/event.dart';
 import 'package:obs_websocket/obs_websocket.dart';
 
@@ -111,6 +114,7 @@ class ObsMcpServer {
         url,
         password: password,
         timeout: Duration(seconds: timeoutSeconds),
+        autoReconnect: true,
       );
       _bootstrapError = null; // Clear any previous error on success
     } on ObsAuthenticationException catch (error) {
@@ -219,16 +223,25 @@ class ObsMcpServer {
       example: 120,
     )
     int? timeoutSeconds,
+    @Parameter(
+      title: 'Auto Reconnect',
+      description:
+          'Automatically reconnect with exponential backoff if the OBS '
+          'WebSocket drops (default true).',
+    )
+    bool? autoReconnect,
   }) async {
     await _client?.close();
     _client = await ObsWebSocket.connect(
       url,
       password: password,
       timeout: Duration(seconds: timeoutSeconds ?? 120),
+      autoReconnect: autoReconnect ?? true,
     );
     return <String, dynamic>{
       'connected': true,
       'negotiatedRpcVersion': _obs.negotiatedRpcVersion,
+      'autoReconnect': autoReconnect ?? true,
     };
   }
 
@@ -531,12 +544,15 @@ class ObsMcpServer {
     return _ok;
   }
 
-  /// Sets the transform (position, scale, rotation, crop) for a scene item.
+  /// Sets the transform (position, scale, rotation, crop, alignment, bounds)
+  /// for a scene item. Every field is optional — only the supplied fields are
+  /// forwarded to OBS.
   @Tool(
     name: 'scene_items_set_transform',
     description:
-        'Set the transform properties (position, scale, rotation, crop) for a '
-        'scene item. Only provide the fields you want to change.',
+        'Set the transform properties (position, scale, rotation, crop, '
+        'alignment, bounds) for a scene item. Only provide the fields you want '
+        'to change. Returns the new transform as a flat object.',
   )
   Future<Map<String, dynamic>> sceneItemsSetTransform({
     @Parameter(title: 'Scene Name', example: 'Scene') required String sceneName,
@@ -580,24 +596,69 @@ class ObsMcpServer {
       description: 'Pixels to crop from the bottom edge.',
     )
     int? cropBottom,
+    @Parameter(
+      title: 'Alignment',
+      description:
+          'OBS alignment bit-flag. 0=center, 1=left, 2=right, 4=top, '
+          '5=topLeft, 6=topRight, 8=bottom, 9=bottomLeft, 10=bottomRight.',
+      example: 5,
+    )
+    int? alignment,
+    @Parameter(
+      title: 'Bounds Type',
+      description:
+          'OBS bounds type protocol string. One of: OBS_BOUNDS_NONE, '
+          'OBS_BOUNDS_STRETCH, OBS_BOUNDS_SCALE_INNER, OBS_BOUNDS_SCALE_OUTER, '
+          'OBS_BOUNDS_SCALE_TO_WIDTH, OBS_BOUNDS_SCALE_TO_HEIGHT, '
+          'OBS_BOUNDS_MAX_ONLY.',
+      example: 'OBS_BOUNDS_NONE',
+    )
+    String? boundsType,
+    @Parameter(
+      title: 'Bounds Alignment',
+      description: 'Alignment of the source within its bounding box.',
+    )
+    int? boundsAlignment,
+    @Parameter(
+      title: 'Bounds Width',
+      description: 'Width of the bounding box in pixels.',
+    )
+    num? boundsWidth,
+    @Parameter(
+      title: 'Bounds Height',
+      description: 'Height of the bounding box in pixels.',
+    )
+    num? boundsHeight,
   }) async {
-    final transform = <String, dynamic>{};
-    if (positionX != null) transform['positionX'] = positionX;
-    if (positionY != null) transform['positionY'] = positionY;
-    if (scaleX != null) transform['scaleX'] = scaleX;
-    if (scaleY != null) transform['scaleY'] = scaleY;
-    if (rotation != null) transform['rotation'] = rotation;
-    if (cropLeft != null) transform['cropLeft'] = cropLeft;
-    if (cropTop != null) transform['cropTop'] = cropTop;
-    if (cropRight != null) transform['cropRight'] = cropRight;
-    if (cropBottom != null) transform['cropBottom'] = cropBottom;
+    final transform = SceneItemTransform(
+      positionX: positionX?.toDouble(),
+      positionY: positionY?.toDouble(),
+      scaleX: scaleX?.toDouble(),
+      scaleY: scaleY?.toDouble(),
+      rotation: rotation?.toDouble(),
+      cropLeft: cropLeft,
+      cropTop: cropTop,
+      cropRight: cropRight,
+      cropBottom: cropBottom,
+      alignment: alignment,
+      boundsAlignment: boundsAlignment,
+      boundsType: boundsType,
+      boundsWidth: boundsWidth?.toDouble(),
+      boundsHeight: boundsHeight?.toDouble(),
+    );
 
-    await _obs.sceneItems.setSceneItemTransform(
+    await _obs.sceneItems.setSceneItemTransformTyped(
       sceneName: sceneName,
       sceneItemId: sceneItemId,
-      sceneItemTransform: transform,
+      transform: transform,
     );
-    return _ok;
+
+    // Re-read so the agent gets the canonical, flattened result.
+    final updated = await _obs.sceneItems.getSceneItemTransformTyped(
+      sceneName: sceneName,
+      sceneItemId: sceneItemId,
+    );
+    return updated.toJson();
   }
 
   // ---------------------------------------------------------------------------
@@ -1720,21 +1781,28 @@ class ObsMcpServer {
     return _ok;
   }
 
-  /// Gets the transform of a scene item.
+  /// Gets the transform of a scene item. Returned as a flat JSON object so
+  /// the shape is symmetric with [sceneItemsSetTransform] (the legacy nested
+  /// `{sceneItemTransform: {...}}` payload is also included for callers that
+  /// still rely on it).
   @Tool(
     name: 'scene_items_get_transform',
     description:
-        'Return the transform properties (position, scale, rotation, crop) of a scene item.',
+        'Return the transform properties of a scene item as flat top-level '
+        'fields (positionX, positionY, scaleX, scaleY, rotation, cropLeft, '
+        'cropTop, cropRight, cropBottom, alignment, boundsType, '
+        'boundsAlignment, boundsWidth, boundsHeight, sourceWidth, '
+        'sourceHeight, width, height). Symmetric with set_transform.',
   )
   Future<Map<String, dynamic>> sceneItemsGetTransform({
     @Parameter(title: 'Scene Name', example: 'Scene') required String sceneName,
     @Parameter(title: 'Scene Item ID') required int sceneItemId,
   }) async {
-    final response = await _obs.sceneItems.getSceneItemTransform(
+    final transform = await _obs.sceneItems.getSceneItemTransformTyped(
       sceneName: sceneName,
       sceneItemId: sceneItemId,
     );
-    return response;
+    return transform.toJson();
   }
 
   // ---------------------------------------------------------------------------
@@ -2228,4 +2296,269 @@ class ObsMcpServer {
     );
     return _ok;
   }
+
+  // ---------------------------------------------------------------------------
+  // Reliability / lifecycle convenience tools
+  // ---------------------------------------------------------------------------
+
+  /// Returns a snapshot of the live connection state.
+  @Tool(
+    name: 'connection_status',
+    description:
+        'Return the current OBS WebSocket connection state '
+        '(disconnected | connecting | connected | reconnecting | failed) '
+        'plus the negotiated RPC version when available.',
+  )
+  Map<String, dynamic> connectionStatus() {
+    final client = _client;
+    if (client == null) {
+      return <String, dynamic>{
+        'connected': false,
+        'state': 'disconnected',
+        if (_bootstrapError != null) 'bootstrapError': _bootstrapError,
+      };
+    }
+    return <String, dynamic>{
+      'connected': client.connectionState == ObsConnectionState.connected,
+      'state': client.connectionState.name,
+      'negotiatedRpcVersion': client.negotiatedRpcVersion,
+    };
+  }
+
+  /// Round-trips a `GetVersion` request to verify the connection is alive.
+  @Tool(
+    name: 'connection_ping',
+    description:
+        'Round-trip a GetVersion request and return latency in ms. Use this '
+        'as a cheap liveness probe before issuing batched commands.',
+  )
+  Future<Map<String, dynamic>> connectionPing() async {
+    final start = DateTime.now();
+    final version = await _obs.ping();
+    final elapsed = DateTime.now().difference(start);
+    return <String, dynamic>{
+      'ok': true,
+      'latencyMs': elapsed.inMilliseconds,
+      'obsVersion': version.obsVersion,
+      'obsWebSocketVersion': version.obsWebSocketVersion,
+      'rpcVersion': version.rpcVersion,
+    };
+  }
+
+  /// Updates the active event subscription mask.
+  @Tool(
+    name: 'events_subscribe',
+    description:
+        'Update the active OBS event subscription mask. Accepts either an '
+        'integer bitmask or a list of subscription names '
+        '(general, config, scenes, inputs, transitions, filters, outputs, '
+        'sceneItems, mediaInputs, vendors, ui, canvases, all, '
+        'inputVolumeMeters, inputActiveStateChanged, inputShowStateChanged, '
+        'sceneItemTransformChanged). Required before wait_for_event for any '
+        'event type that is not in the default subscription set.',
+  )
+  Future<Map<String, dynamic>> eventsSubscribe({
+    @Parameter(
+      title: 'Subscription Mask',
+      description:
+          'Combined integer bitmask. Mutually exclusive with subscriptions.',
+    )
+    int? mask,
+    @Parameter(
+      title: 'Subscriptions',
+      description:
+          'List of EventSubscription names to OR together. Mutually exclusive '
+          'with mask.',
+    )
+    List<String>? subscriptions,
+  }) async {
+    final resolved = parseEventSubscription(mask, subscriptions);
+    await _obs.listenForMask(resolved);
+    return <String, dynamic>{'ok': true, 'mask': resolved};
+  }
+
+  /// Awaits the next OBS event matching the given type.
+  @Tool(
+    name: 'wait_for_event',
+    description:
+        'Wait for the next OBS event whose eventType matches the given name '
+        '(e.g. RecordStateChanged, SceneItemTransformChanged). Times out '
+        'after timeoutMs (default 30000). The caller MUST have subscribed to '
+        'the relevant event group first via events_subscribe.',
+  )
+  Future<Map<String, dynamic>> waitForEvent({
+    @Parameter(
+      title: 'Event Type',
+      description: 'OBS event name, e.g. RecordStateChanged.',
+      example: 'RecordStateChanged',
+    )
+    required String eventType,
+    @Parameter(
+      title: 'Timeout (ms)',
+      description: 'Maximum time to wait before throwing TimeoutException.',
+      example: 30000,
+    )
+    int? timeoutMs,
+  }) async {
+    final event = await _obs.waitForEvent(
+      eventType: eventType,
+      timeout: Duration(milliseconds: timeoutMs ?? 30000),
+    );
+    return <String, dynamic>{
+      'eventType': event.eventType,
+      'eventIntent': event.eventIntent,
+      'eventData': event.eventData ?? <String, dynamic>{},
+    };
+  }
+
+  /// Server-side sleep so JS code inside the execute() sandbox does not need
+  /// to keep the Node.js subprocess alive with setTimeout (which competes
+  /// with the 30s sandbox timeout). The wait happens on the MCP host where
+  /// the live OBS connection lives.
+  @Tool(
+    name: 'client_sleep',
+    description:
+        'Pause server-side for the requested number of milliseconds. Prefer '
+        'this over setTimeout/Promise inside execute() JS so the sandbox '
+        'subprocess stays idle while the MCP host holds the wall clock. '
+        'Maximum 25000ms per call to leave headroom under the sandbox '
+        'timeout.',
+  )
+  Future<Map<String, dynamic>> clientSleep({
+    @Parameter(
+      title: 'Milliseconds',
+      description: 'Sleep duration in milliseconds (1..25000).',
+      example: 500,
+    )
+    required int ms,
+  }) async {
+    if (ms < 1 || ms > 25000) {
+      throw ArgumentError(
+        'client_sleep ms must be between 1 and 25000 (got $ms).',
+      );
+    }
+    final start = DateTime.now();
+    await Future.delayed(Duration(milliseconds: ms));
+    return <String, dynamic>{
+      'ok': true,
+      'requestedMs': ms,
+      'actualMs': DateTime.now().difference(start).inMilliseconds,
+    };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Server-side animation
+  // ---------------------------------------------------------------------------
+
+  /// Animates a scene item transform server-side over a fixed duration so the
+  /// caller does not need to spawn a sleep loop inside the execute() sandbox
+  /// (which is bound by the 30s subprocess timeout and cannot survive a
+  /// reconnect).
+  @Tool(
+    name: 'scene_items_animate_transform',
+    description:
+        'Smoothly animate a scene item transform from its current state to '
+        'the supplied target over durationMs. Runs server-side at frameRate '
+        'fps (clamped 1-60). Fields omitted from the target hold steady. '
+        'Easing options: linear, easeIn, easeOut, easeInOut, easeOutBounce.',
+  )
+  Future<Map<String, dynamic>> sceneItemsAnimateTransform({
+    @Parameter(title: 'Scene Name', example: 'Scene') required String sceneName,
+    @Parameter(title: 'Scene Item ID', example: 4) required int sceneItemId,
+    @Parameter(title: 'Duration (ms)', example: 1000) required int durationMs,
+    @Parameter(title: 'Target Position X') num? targetPositionX,
+    @Parameter(title: 'Target Position Y') num? targetPositionY,
+    @Parameter(title: 'Target Scale X') num? targetScaleX,
+    @Parameter(title: 'Target Scale Y') num? targetScaleY,
+    @Parameter(title: 'Target Rotation') num? targetRotation,
+    @Parameter(title: 'Target Crop Left') int? targetCropLeft,
+    @Parameter(title: 'Target Crop Top') int? targetCropTop,
+    @Parameter(title: 'Target Crop Right') int? targetCropRight,
+    @Parameter(title: 'Target Crop Bottom') int? targetCropBottom,
+    @Parameter(
+      title: 'Frame Rate',
+      description: 'Frames per second to render. Clamped to 1..60.',
+      example: 30,
+    )
+    int? frameRate,
+    @Parameter(
+      title: 'Easing',
+      description:
+          'linear | easeIn | easeOut | easeInOut | easeOutBounce. '
+          'Defaults to linear.',
+    )
+    String? easing,
+    @Parameter(
+      title: 'Restore On Complete',
+      description:
+          'When true the original transform is reapplied after the animation '
+          'finishes. Useful for transient "bump" animations.',
+    )
+    bool? restoreOnComplete,
+  }) async {
+    final fps = (frameRate ?? 30).clamp(1, 60);
+    final ease = resolveEasing(easing);
+    final start = await _obs.sceneItems.getSceneItemTransformTyped(
+      sceneName: sceneName,
+      sceneItemId: sceneItemId,
+    );
+    final target = SceneItemTransform(
+      positionX: targetPositionX?.toDouble() ?? start.positionX,
+      positionY: targetPositionY?.toDouble() ?? start.positionY,
+      scaleX: targetScaleX?.toDouble() ?? start.scaleX,
+      scaleY: targetScaleY?.toDouble() ?? start.scaleY,
+      rotation: targetRotation?.toDouble() ?? start.rotation,
+      cropLeft: targetCropLeft ?? start.cropLeft,
+      cropTop: targetCropTop ?? start.cropTop,
+      cropRight: targetCropRight ?? start.cropRight,
+      cropBottom: targetCropBottom ?? start.cropBottom,
+      alignment: start.alignment,
+      boundsType: start.boundsType,
+      boundsAlignment: start.boundsAlignment,
+      boundsWidth: start.boundsWidth,
+      boundsHeight: start.boundsHeight,
+    );
+    final totalFrames = math.max(1, (durationMs * fps / 1000).round());
+    final frameInterval = Duration(microseconds: (1000000 / fps).round());
+    final stopwatch = Stopwatch()..start();
+    var framesRendered = 0;
+    for (var i = 1; i <= totalFrames; i++) {
+      final t = ease(i / totalFrames);
+      final isLast = i == totalFrames;
+      final frame = isLast ? target : interpolateTransform(start, target, t);
+      await _obs.sceneItems.setSceneItemTransformTyped(
+        sceneName: sceneName,
+        sceneItemId: sceneItemId,
+        transform: frame,
+      );
+      framesRendered++;
+      if (!isLast) {
+        await Future.delayed(frameInterval);
+      }
+    }
+    if (restoreOnComplete == true) {
+      await _obs.sceneItems.setSceneItemTransformTyped(
+        sceneName: sceneName,
+        sceneItemId: sceneItemId,
+        transform: start,
+      );
+    }
+    stopwatch.stop();
+    return <String, dynamic>{
+      'ok': true,
+      'framesRendered': framesRendered,
+      'frameRate': fps,
+      'durationMs': durationMs,
+      'elapsedMs': stopwatch.elapsedMilliseconds,
+      'easing': easing ?? 'linear',
+      'restored': restoreOnComplete == true,
+    };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Internal helpers (not exposed as MCP tools)
+  // ---------------------------------------------------------------------------
+
+  // Animation/easing helpers live in `animation_helpers.dart` so they can be
+  // unit-tested without spinning up an MCP server or OBS connection.
 }

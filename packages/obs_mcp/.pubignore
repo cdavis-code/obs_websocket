@@ -6,5 +6,11 @@ TESTING.md
 run_tests.sh
 analysis_options.yaml
 
+# IDE / editor files
+*.iml
+.idea/
+.vscode/
+.DS_Store
+
 # Local config
 .env
