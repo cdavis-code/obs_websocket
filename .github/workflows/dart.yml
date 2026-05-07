@@ -53,7 +53,7 @@ jobs:
       - uses: dart-lang/setup-dart@v1
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
       - name: Install Melos
         run: dart pub global activate melos
       - name: Bootstrap Dart workspace
@@ -78,7 +78,7 @@ jobs:
       - uses: dart-lang/setup-dart@v1
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
       - name: Install Melos
         run: dart pub global activate melos
       - name: Bootstrap Dart workspace
@@ -105,7 +105,7 @@ jobs:
       - uses: dart-lang/setup-dart@v1
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
       - name: Install Melos
         run: dart pub global activate melos
@@ -132,7 +132,7 @@ jobs:
       - uses: dart-lang/setup-dart@v1
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
       - name: Install Melos
         run: dart pub global activate melos
