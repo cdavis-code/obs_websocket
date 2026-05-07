@@ -17,6 +17,81 @@ Use this skill whenever the user wants to:
 - Animate a source on-canvas or script a timed sequence.
 - Trigger a hotkey, a vendor request, or a raw WebSocket request.
 
+## Prerequisites
+
+Before using this skill, ensure:
+
+1. **OBS Studio is installed** — Download from [obsproject.com](https://obsproject.com). OBS 28+ includes obs-websocket v5.x by default.
+2. **OBS is running** — The WebSocket server only accepts connections when OBS Studio is actively running.
+3. **WebSocket server is enabled** — In OBS: Tools → obs-websocket Settings → Enable WebSocket server (note the port and password).
+
+**Quick health check** — Run this before any OBS operations:
+```javascript
+const status = await call_tool('obs_connection_status', {});
+if (!status?.connected) {
+  return 'OBS is not connected. Ensure OBS Studio is running and the WebSocket server is enabled.';
+}
+```
+
+**If connection fails repeatedly**, OBS may not be running. Check your system's process list:
+- **macOS/Linux**: `ps aux | grep -i 'OBS\|obs64'`
+- **Windows**: `tasklist /fi "imagename eq obs64.exe"`
+
+If no OBS process is found, return actionable guidance: *"OBS Studio is not running. Please launch OBS Studio first."*
+
+If the process is running but WebSocket connection fails, prompt the user to verify obs-websocket settings in OBS: **Tools → obs-websocket Settings**.
+
+## MCP Server Availability
+
+This skill requires the `obs-mcp-stdio` server to be registered with the host agent. If `search`/`execute` tool calls fail with "tool not found" or similar errors, the server is not installed or configured.
+
+**Install one of the following distributions:**
+
+| Distribution | Install Command | Package |
+|---|---|---|
+| Dart (recommended) | `dart pub global activate obs_mcp` | [pub.dev/packages/obs_mcp](https://pub.dev/packages/obs_mcp) |
+| npm | `npx @unngh/obs-mcp` (no install) | [npmjs.com/package/@unngh/obs-mcp](https://www.npmjs.com/package/@unngh/obs-mcp) |
+
+**Runtime verification** — If tool discovery works but OBS calls fail, confirm the server responds:
+```javascript
+try {
+  return await call_tool('obs_general_version', {});
+} catch (e) {
+  return { error: 'MCP server unreachable. See README for install/config.' };
+}
+```
+
+**Host configuration examples** (place in the agent's MCP config, e.g. `mcp.json`):
+```json
+{
+  "mcpServers": {
+    "obs": {
+      "command": "obs_mcp",
+      "env": {
+        "OBS_WEBSOCKET_URL": "ws://localhost:4455",
+        "OBS_WEBSOCKET_PASSWORD": "your-password"
+      }
+    }
+  }
+}
+```
+```json
+{
+  "mcpServers": {
+    "obs": {
+      "command": "npx",
+      "args": ["@unngh/obs-mcp"],
+      "env": {
+        "OBS_WEBSOCKET_URL": "ws://localhost:4455",
+        "OBS_WEBSOCKET_PASSWORD": "your-password"
+      }
+    }
+  }
+}
+```
+
+For full host-specific setup (Qoder, Claude Desktop, VS Code, OpenCode), see the [obs_mcp README](../../README.md).
+
 ## Critical Invocation Pattern
 
 The server exposes only **two** top-level tools: `search` and `execute`. All 60+ OBS operations are invoked **inside JavaScript** passed to `execute`.
@@ -180,10 +255,24 @@ All names below are invoked as `call_tool('<name>', {...})` inside `execute`.
 ```javascript
 const status = await call_tool('obs_connection_status', {});
 if (!status?.connected) {
-  await call_tool('obs_connect', {
+  // Attempt to connect (credentials from env/.env or explicit params)
+  const result = await call_tool('obs_connect', {
     url: 'ws://localhost:4455',
     autoReconnect: true,
   });
+  
+  // Verify connection succeeded
+  const afterStatus = await call_tool('obs_connection_status', {});
+  if (!afterStatus?.connected) {
+    return {
+      error: 'Failed to connect to OBS',
+      troubleshooting: [
+        'Ensure OBS Studio is running (check process list)',
+        'Verify WebSocket server is enabled: Tools → obs-websocket Settings',
+        'Check URL and password are correct'
+      ]
+    };
+  }
 }
 return await call_tool('obs_general_version', {});
 ```
@@ -304,6 +393,7 @@ await call_tool('obs_general_trigger_hotkey', { hotkeyName: 'OBSBasic.StartRecor
 
 ## Gotchas & Best Practices
 
+0. **OBS must be running first.** WebSocket connection timeouts usually mean OBS Studio isn't launched or the WebSocket server isn't enabled. Check the process list before debugging connection issues (see [Prerequisites](#prerequisites)).
 1. **Prefer `obs_client_sleep` over `setTimeout`.** `obs_general_sleep` and `obs_client_sleep` both pause server-side; the JS sandbox's `setTimeout` keeps the Node.js subprocess busy and competes with the 30 s sandbox timeout. For new code use `obs_client_sleep`.
 2. **Snapshot before you mutate.** Call `obs_scene_items_get_transform` and store the result before animating so you can restore exactly. The shape now matches `set_transform` (flat fields), so `Object.assign({}, transform)` round-trips cleanly.
 3. **Use UUIDs when ambiguous.** `sceneUuid` and `sourceUuid` are safer than names if the user might rename things mid-session.

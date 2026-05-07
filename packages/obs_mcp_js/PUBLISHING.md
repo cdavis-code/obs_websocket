@@ -20,6 +20,35 @@
 - **Package name**: `@unngh/obs-mcp`
 - **Entry point**: `bin/obs-mcp-server.js` (loads `dist/obs_mcp_server.runtime.js`)
 - **Build**: Dart compiled to JavaScript via `dart compile js` (not TypeScript)
+- **Repository**: Links to GitHub for automatic README display
+- **Files array**: Includes `README.md`, `LICENSE`, `bin/`, `dist/`
+
+## Package Metadata for npm
+
+The `package.json` includes these important fields for npm:
+
+```json
+{
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cdavis-code/obs_websocket_workspace.git",
+    "directory": "packages/obs_mcp_js"
+  },
+  "homepage": "https://github.com/cdavis-code/obs_websocket_workspace/tree/main/packages/obs_mcp_js#readme",
+  "files": [
+    "bin/",
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ]
+}
+```
+
+- **repository**: Points to the monorepo root with the package subdirectory
+- **homepage**: Direct link to the README on GitHub
+- **files**: Ensures README.md and LICENSE are included in the published package
+
+npm will automatically fetch the README from GitHub if it's missing from the tarball, using the repository URL.
 
 ## Architecture
 
@@ -104,10 +133,25 @@ git push origin main --tags
 Before publishing, verify these files exist and are correct:
 
 - [ ] `dist/obs_mcp_server.runtime.js` — compiled dart2js output
-- [ ] `README.md` — package documentation
+- [ ] `README.md` — package documentation (MUST exist at package root)
 - [ ] `CHANGELOG.md` — version history
 - [ ] `LICENSE` — MIT license file
 - [ ] `package.json` — version is bumped correctly
+- [ ] `package.json` — `repository` field points to GitHub
+- [ ] `package.json` — `files` array includes `README.md`
+
+### Verifying README Will Be Included
+
+Before publishing, run this to see what files will be packaged:
+
+```bash
+npm pack --dry-run
+```
+
+You should see `README.md` in the file list. If not, check:
+1. README.md exists at the package root (not in a subdirectory)
+2. `files` array in package.json includes `"README.md"`
+3. No `.npmignore` file is excluding it
 
 ## Workflow Behavior
 
@@ -152,3 +196,30 @@ After publishing, verify:
 ### Runtime error: Cannot find module '../dist/obs_mcp_server.runtime.js'
 - The build step failed or was skipped
 - Run `npm run build` and verify `dist/obs_mcp_server.runtime.js` exists
+
+### npm shows "This package does not have a README"
+This can happen even when README.md is correctly configured. To fix:
+
+1. **Verify README is in the published package**:
+   ```bash
+   # Download the published package
+   npm pack @unngh/obs-mcp
+   
+   # Extract and check
+   tar -tzf unngh-obs-mcp-*.tgz | grep README
+   ```
+   
+2. **Check package.json has repository field**:
+   - npm uses the `repository` field to fetch README from GitHub as fallback
+   - Ensure `repository.url` points to the correct GitHub repo
+   - Ensure `repository.directory` specifies the package subdirectory
+   
+3. **Bump version and republish**:
+   - npm doesn't update README for existing versions
+   - You must publish a new version (e.g., 5.7.1 → 5.7.2)
+   - Use: `./scripts/publish-npm.sh patch`
+   
+4. **Verify after republishing**:
+   - Check npm page: https://www.npmjs.com/package/@unngh/obs-mcp
+   - README should appear within a few minutes
+   - If still missing, npm will use GitHub README via repository URL
