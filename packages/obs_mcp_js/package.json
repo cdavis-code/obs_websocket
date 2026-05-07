@@ -1,6 +1,6 @@
 {
   "name": "@unngh/obs-mcp",
-  "version": "5.7.1",
+  "version": "5.7.2",
   "description": "MCP server for controlling OBS Studio via obs-websocket v5.x protocol. Compiled from Dart to JavaScript.",
   "type": "module",
   "bin": {
@@ -24,6 +24,12 @@
   ],
   "author": "Chris Davis",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cdavis-code/obs_websocket_workspace.git",
+    "directory": "packages/obs_mcp_js"
+  },
+  "homepage": "https://github.com/cdavis-code/obs_websocket_workspace/tree/main/packages/obs_mcp_js#readme",
   "engines": {
     "node": ">=18"
   },
