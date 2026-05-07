@@ -1,0 +1,39 @@
+{
+  "name": "@unngh/obs-mcp",
+  "version": "5.7.1",
+  "description": "MCP server for controlling OBS Studio via obs-websocket v5.x protocol. Compiled from Dart to JavaScript.",
+  "type": "module",
+  "bin": {
+    "obs-mcp": "./bin/obs-mcp-server.js"
+  },
+  "scripts": {
+    "build:dart": "bash scripts/build.sh",
+    "build": "npm run build:dart",
+    "clean": "rm -rf build dist",
+    "typecheck": "echo 'No TypeScript sources — skipping typecheck'",
+    "test": "echo 'No tests defined yet'",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "obs",
+    "obs-studio",
+    "obs-websocket",
+    "mcp",
+    "model-context-protocol",
+    "ai"
+  ],
+  "author": "Chris Davis",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ]
+}
