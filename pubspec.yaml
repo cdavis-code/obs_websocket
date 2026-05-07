@@ -9,6 +9,7 @@ workspace:
   - packages/obs_cli
   - packages/obs_mcp
   - packages/obs_websocket_js
+  - packages/obs_mcp_js
 
 dev_dependencies:
   melos: ^7.6.0
@@ -63,3 +64,4 @@ melos:
         dirExists: test
         ignore:
           - obs_websocket_js
+          - obs_mcp_js

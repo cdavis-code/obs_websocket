@@ -3,8 +3,8 @@
 A comprehensive Dart monorepo providing SDK and CLI implementations for controlling OBS Studio via the obs-websocket protocol.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Dart](https://github.com/faithoflifedev/easy_obs_websocket/workflows/Dart/badge.svg)](https://github.com/faithoflifedev/easy_obs_websocket/actions)
-[![GitHub last commit](https://shields.io/github/last-commit/faithoflifedev/obs_websocket)](https://shields.io/github/last-commit/faithoflifedev/obs_websocket)
+[![Dart](https://github.com/cdavis-code/obs_websocket_workspace/workflows/Dart/badge.svg)](https://github.com/cdavis-code/obs_websocket_workspace/actions)
+[![GitHub last commit](https://shields.io/github/last-commit/cdavis-code/obs_websocket_workspace)](https://shields.io/github/last-commit/cdavis-code/obs_websocket_workspace)
 
 ---
 
@@ -12,8 +12,8 @@ A comprehensive Dart monorepo providing SDK and CLI implementations for controll
 
 ```sh
 # Clone the repository
-git clone https://github.com/faithoflifedev/easy_obs_websocket.git
-cd easy_obs_websocket
+git clone https://github.com/cdavis-code/obs_websocket_workspace.git
+cd obs_websocket_workspace
 
 # Install Melos (workspace manager)
 dart pub global activate melos
@@ -117,7 +117,7 @@ Control OBS Studio directly from your terminal with intuitive subcommands.
 dart pub global activate obs_websocket
 
 # Via Homebrew (macOS)
-brew tap faithoflifedev/obs_websocket
+brew tap cdavis-code/obs_websocket_workspace
 brew install obs
 ```
 

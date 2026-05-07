@@ -4,14 +4,14 @@
   "description": "JavaScript/TypeScript bindings for the obs_websocket Dart package. Universal (browser + Node.js) client for the OBS Studio obs-websocket v5 plugin.",
   "license": "MIT",
   "author": "Chris Davis",
-  "homepage": "https://github.com/cdavis-code/obs_websocket/tree/main/packages/obs_websocket_js",
+  "homepage": "https://github.com/cdavis-code/obs_websocket_workspace/tree/main/packages/obs_websocket_js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cdavis-code/obs_websocket.git",
+    "url": "git+https://github.com/cdavis-code/obs_websocket_workspace.git",
     "directory": "packages/obs_websocket_js"
   },
   "bugs": {
-    "url": "https://github.com/cdavis-code/obs_websocket/issues"
+    "url": "https://github.com/cdavis-code/obs_websocket_workspace/issues"
   },
   "keywords": [
     "obs",

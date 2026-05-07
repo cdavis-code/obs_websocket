@@ -1,6 +1,6 @@
 # obs_websocket_js
 
-![obs_websocket_js Banner](https://raw.githubusercontent.com/cdavis-code/obs_websocket/main/packages/obs_websocket_js/image/banner.svg)
+![obs_websocket_js Banner](https://raw.githubusercontent.com/cdavis-code/obs_websocket_workspace/main/packages/obs_websocket_js/image/banner.svg)
 
 **Universal JavaScript/TypeScript client for OBS Studio** — Connect to OBS from Node.js or browsers with full protocol support, type safety, and zero compromises.
 
@@ -430,7 +430,7 @@ obs_cli (CLI tool)
 
 ## Contributing
 
-Contributions welcome! This package is part of the [`obs_websocket`](https://github.com/cdavis-code/obs_websocket) monorepo.
+Contributions welcome! This package is part of the [`obs_websocket`](https://github.com/cdavis-code/obs_websocket_workspace) monorepo.
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/my-feature`
@@ -505,4 +505,4 @@ MIT License — see [LICENSE](./LICENSE).
 - **[Dart SDK (obs_websocket)](https://pub.dev/packages/obs_websocket)**
 - **[MCP Server (obs_mcp)](../obs_mcp)**
 - **[CLI Tool (obs_cli)](../obs_cli)**
-- **[GitHub Repository](https://github.com/cdavis-code/obs_websocket)**
+- **[GitHub Repository](https://github.com/cdavis-code/obs_websocket_workspace)**

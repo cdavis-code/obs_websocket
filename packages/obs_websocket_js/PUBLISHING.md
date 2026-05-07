@@ -35,7 +35,7 @@
    - Set permissions to "Publish"
 
 2. Add the token to GitHub:
-   - Go to: https://github.com/cdavis-code/obs_websocket/settings/secrets/actions
+   - Go to: https://github.com/cdavis-code/obs_websocket_workspace/settings/secrets/actions
    - Click "New repository secret"
    - Name: `NPM_TOKEN`
    - Value: Paste your npm token
@@ -100,7 +100,7 @@ When you push a tag like `obs_websocket_js-v5.8.0`:
 
 After publishing, verify:
 - ✅ npm: https://www.npmjs.com/package/@unngh/obs-websocket-js
-- ✅ GitHub Actions: https://github.com/cdavis-code/obs_websocket/actions
+- ✅ GitHub Actions: https://github.com/cdavis-code/obs_websocket_workspace/actions
 - ✅ Install test: `npm install @unngh/obs-websocket-js`
 
 ## Troubleshooting

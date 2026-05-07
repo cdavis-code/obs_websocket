@@ -27,6 +27,12 @@ This project supports multiple package managers for easy installation.
 - **Universal**: works in browsers and Node.js 18+ via dual `exports` entrypoints
 - **Files**: See `packages/obs_websocket_js/` directory
 
+### npm - MCP Server (JavaScript)
+- **Package**: `@unngh/obs-mcp` on npm
+- **Install**: `npx @unngh/obs-mcp` (no install required)
+- **Description**: JavaScript-compiled version of the obs_mcp MCP server; controls OBS Studio via obs-websocket v5.x protocol. Runs via npx without requiring Dart runtime.
+- **Files**: See `packages/obs_mcp_js/` directory
+
 ## Directory Structure
 
 ```
@@ -75,6 +81,12 @@ obs_websocket/
 2. Run `npm install && npm run build && npm test` inside the package
 3. Run `npm publish --access public`
 4. Package available on npmjs.com
+
+### npm (@unngh/obs-mcp)
+1. Update version in `packages/obs_mcp_js/package.json`
+2. Run `npm install && npm run build && npm test` inside the package
+3. Run `npm publish --access public`
+4. Package available on npmjs.com as `@unngh/obs-mcp`
 
 ## Adding New Package Managers
 

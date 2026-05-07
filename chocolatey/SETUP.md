@@ -19,7 +19,7 @@ This guide will help you set up Chocolatey package publishing for obs-cli.
 
 Add your Chocolatey API key as a GitHub repository secret:
 
-1. Go to your repository: https://github.com/cdavis-code/obs_websocket
+1. Go to your repository: https://github.com/cdavis-code/obs_websocket_workspace
 2. Click on **Settings** tab
 3. Click on **Secrets and variables** → **Actions** in the left sidebar
 4. Click **New repository secret**
@@ -67,7 +67,7 @@ gh release create v5.7.0 \
 
 ### Option B: Using GitHub Web Interface
 
-1. Go to https://github.com/cdavis-code/obs_websocket/releases
+1. Go to https://github.com/cdavis-code/obs_websocket_workspace/releases
 2. Click **Draft a new release**
 3. Click **Choose a tag** and enter `v5.7.0`
 4. Click **Create new tag: v5.7.0 on publish**

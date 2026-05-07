@@ -162,7 +162,7 @@
   * GetInputList
   * GetInputKindList
 * README Correction
-* Issue [#28](https:&#x2F;&#x2F;github.com&#x2F;faithoflifedev&#x2F;obs_websocket&#x2F;issues&#x2F;28)
+* Issue [#28](https:&#x2F;&#x2F;github.com&#x2F;cdavis-code&#x2F;obs_websocket_workspace&#x2F;issues&#x2F;28)
 * Inputs features are now available in the CLI
 
 ## 5.1.0+7

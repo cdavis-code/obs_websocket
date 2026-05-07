@@ -1,6 +1,6 @@
 # obs_mcp
 
-![obs_mcp banner](https://raw.githubusercontent.com/cdavis-code/obs_websocket/main/packages/obs_mcp/image/banner.svg)
+![obs_mcp banner](https://raw.githubusercontent.com/cdavis-code/obs_websocket_workspace/main/packages/obs_mcp/image/banner.svg)
 
 <p align="center">
   <strong>MCP Server for OBS Studio</strong><br/>
@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://pub.dev/packages/obs_mcp"><img src="https://img.shields.io/pub/v/obs_mcp.svg?label=pub.dev&labelColor=333940&logo=dart&logoColor=fff" alt="Pub"></a>
-  <a href="https://github.com/cdavis-code/obs_websocket"><img src="https://img.shields.io/github/stars/cdavis-code/obs_websocket?label=stars&logo=github&labelColor=333940" alt="GitHub stars"></a>
+  <a href="https://github.com/cdavis-code/obs_websocket_workspace"><img src="https://img.shields.io/github/stars/cdavis-code/obs_websocket_workspace?label=stars&logo=github&labelColor=333940" alt="GitHub stars"></a>
   <a href="https://pub.dev/packages/skills"><img src="https://img.shields.io/badge/AI%20Agent%20Skill-included-00b4ab?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDE1IDIyTDEyIDE4Ljc3TDkgMjJMMSAuOTkgMTcuNzRMNSAxNUwtMiA5TDUgOC4yNkwxMiAyWiIvPjwvc3ZnPg==" alt="AI Agent Skill"></a>
 </p>
 
@@ -210,7 +210,7 @@ The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) (`@modelc
 
 ## Contributing
 
-Contributions are welcome! This package is part of the [obs_websocket workspace](https://github.com/cdavis-code/obs_websocket).
+Contributions are welcome! This package is part of the [obs_websocket workspace](https://github.com/cdavis-code/obs_websocket_workspace).
 
 **Before submitting a PR:**
 1. Make changes to `lib/src/obs_mcp_server.dart` (add `@Tool` annotated methods)

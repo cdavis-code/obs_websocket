@@ -30,7 +30,7 @@ This package gives access to all of the methods and events outlined by the [obs-
   - [Contributing](#contributing)
 
 
-[![Build Status](https://github.com/faithoflifedev/obs_websocket/workflows/Dart/badge.svg)](https://github.com/faithoflifedev/obs_websocket/actions) [![github last commit](https://shields.io/github/last-commit/faithoflifedev/obs_websocket)](https://shields.io/github/last-commit/faithoflifedev/obs_websocket) [![github build](https://img.shields.io/github/actions/workflow/status/faithoflifedev/obs_websocket/dart.yml?branch=main)](https://shields.io/github/workflow/status/faithoflifedev/obs_websocket/Dart) [![github issues](https://shields.io/github/issues/faithoflifedev/obs_websocket)](https://shields.io/github/issues/faithoflifedev/obs_websocket)
+[![Build Status](https://github.com/cdavis-code/obs_websocket_workspace/workflows/Dart/badge.svg)](https://github.com/cdavis-code/obs_websocket_workspace/actions) [![github last commit](https://shields.io/github/last-commit/cdavis-code/obs_websocket_workspace)](https://shields.io/github/last-commit/cdavis-code/obs_websocket_workspace) [![github build](https://img.shields.io/github/actions/workflow/status/cdavis-code/obs_websocket_workspace/dart.yml?branch=main)](https://shields.io/github/workflow/status/cdavis-code/obs_websocket_workspace/Dart) [![github issues](https://shields.io/github/issues/cdavis-code/obs_websocket_workspace)](https://shields.io/github/issues/cdavis-code/obs_websocket_workspace)
 
 [![Buy me a coffee](https://www.buymeacoffee.com/assets/img/guidelines/download-assets-1.svg)](https://www.buymeacoffee.com/faithoflif2)
 
@@ -539,7 +539,7 @@ obsWebSocket.close();
 
 A command line interface for controlling an OBS with cli commands
 
-Please see the cli documentation [README.md](https://github.com/faithoflifedev/obs_websocket/blob/protocol_5/bin/) for more detailed usage information.
+Please see the cli documentation [README.md](https://github.com/cdavis-code/obs_websocket_workspace/blob/main/packages/obs_cli/bin/) for more detailed usage information.
 
 Install using `dart pub`:
 

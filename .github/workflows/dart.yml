@@ -10,6 +10,7 @@ on:
     branches: [main]
     tags:
       - 'obs_websocket_js-v*'
+      - 'obs_mcp_js-v*'
   pull_request:
     branches: [main]
 
@@ -70,6 +71,31 @@ jobs:
         working-directory: packages/obs_websocket_js
         run: npm test
 
+  obs_mcp_js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Melos
+        run: dart pub global activate melos
+      - name: Bootstrap Dart workspace
+        run: melos bootstrap
+      - name: Install npm deps
+        working-directory: packages/obs_mcp_js
+        run: npm install
+      - name: Build (dart2js + tsup)
+        working-directory: packages/obs_mcp_js
+        run: npm run build
+      - name: Type-check
+        working-directory: packages/obs_mcp_js
+        run: npm run typecheck
+      - name: Test
+        working-directory: packages/obs_mcp_js
+        run: npm test
+
   publish-npm:
     needs: [obs_websocket_js]
     runs-on: ubuntu-latest
@@ -97,3 +123,29 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+  publish-npm-mcp:
+    needs: [obs_mcp_js]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/obs_mcp_js-v')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install Melos
+        run: dart pub global activate melos
+      - name: Bootstrap Dart workspace
+        run: melos bootstrap
+      - name: Install npm deps
+        working-directory: packages/obs_mcp_js
+        run: npm install
+      - name: Build (dart2js + tsup)
+        working-directory: packages/obs_mcp_js
+        run: npm run build
+      - name: Publish to npm
+        working-directory: packages/obs_mcp_js
+        run: npm publish --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
