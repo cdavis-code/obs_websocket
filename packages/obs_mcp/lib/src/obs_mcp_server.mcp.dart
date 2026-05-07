@@ -8,7 +8,6 @@ import 'dart:io' as io;
 import 'package:dart_mcp/server.dart';
 import 'package:dart_mcp/stdio.dart';
 
-
 import 'package:obs_mcp/src/obs_mcp_server.dart' as obs_mcp_server;
 
 Future<void> main() async {
@@ -23,23 +22,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
 
   MCPServerWithTools(super.channel)
     : super.fromStreamChannel(
-        implementation: Implementation(
-          name: 'mcp-server',
-          version: '1.0.0',
-        ),
+        implementation: Implementation(name: 'mcp-server', version: '1.0.0'),
         instructions: 'Auto-generated MCP server',
       ) {
     registerTool(
       Tool(
         name: 'search',
-        description: 'Search for available tools by name or description. Returns matching tools with their parameter information. Use this to discover available tools before calling execute.',
+        description:
+            'Search for available tools by name or description. Returns matching tools with their parameter information. Use this to discover available tools before calling execute.',
         inputSchema: Schema.object(
           properties: {
             'query': Schema.string(
-              description: 'Search terms. Space-separated terms are AND-matched against tool names and descriptions (case-insensitive).',
+              description:
+                  'Search terms. Space-separated terms are AND-matched against tool names and descriptions (case-insensitive).',
             ),
             'detail_level': UntitledSingleSelectEnumSchema(
-              description: 'Level of detail: "brief" (name + description), "detailed" (+ parameter names/types/required), "full" (+ complete parameter schemas).',
+              description:
+                  'Level of detail: "brief" (name + description), "detailed" (+ parameter names/types/required), "full" (+ complete parameter schemas).',
               values: ['brief', 'detailed', 'full'],
             ),
           },
@@ -51,12 +50,11 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
     registerTool(
       Tool(
         name: 'execute',
-        description: 'Execute JavaScript code with access to MCP tool functions. Use call_tool(name, params) to call any tool by name, or use external_<toolName>(args) convenience wrappers. Use the search tool first to discover available tools and their signatures. All calls are async - use await for sequential calls and Promise.all() for parallel calls. Return a value to include it in the result.',
+        description:
+            'Execute JavaScript code with access to MCP tool functions. Use call_tool(name, params) to call any tool by name, or use external_<toolName>(args) convenience wrappers. Use the search tool first to discover available tools and their signatures. All calls are async - use await for sequential calls and Promise.all() for parallel calls. Return a value to include it in the result.',
         inputSchema: Schema.object(
           properties: {
-            'code': Schema.string(
-              description: 'JavaScript code to execute.',
-            ),
+            'code': Schema.string(description: 'JavaScript code to execute.'),
           },
           required: ['code'],
         ),
@@ -67,12 +65,17 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
 
   FutureOr<CallToolResult> _obs_connect(CallToolRequest request) async {
     try {
-    final url = request.arguments!['url'] as String;
-    final password = request.arguments?['password'] as String?;
-    final timeoutSeconds = request.arguments?['timeoutSeconds'] as int?;
-    final autoReconnect = request.arguments?['autoReconnect'] as bool?;
+      final url = request.arguments!['url'] as String;
+      final password = request.arguments?['password'] as String?;
+      final timeoutSeconds = request.arguments?['timeoutSeconds'] as int?;
+      final autoReconnect = request.arguments?['autoReconnect'] as bool?;
 
-      final result = await obs_mcp_server.ObsMcpServer().connect(url: url, password: password, timeoutSeconds: timeoutSeconds, autoReconnect: autoReconnect);
+      final result = await obs_mcp_server.ObsMcpServer().connect(
+        url: url,
+        password: password,
+        timeoutSeconds: timeoutSeconds,
+        autoReconnect: autoReconnect,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -83,15 +86,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_disconnect(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().disconnect();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -103,15 +107,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_is_connected(CallToolRequest request) async {
     try {
-
-
       final result = obs_mcp_server.ObsMcpServer().isConnected();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -123,17 +128,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_send_raw(CallToolRequest request) async {
     try {
-    final requestType = request.arguments!['requestType'] as String;
-    final requestData = request.arguments?['requestData'] as dynamic?;
+      final requestType = request.arguments!['requestType'] as String;
+      final requestData = request.arguments?['requestData'] as dynamic?;
 
-      final result = await obs_mcp_server.ObsMcpServer().sendRaw(requestType: requestType, requestData: requestData);
+      final result = await obs_mcp_server.ObsMcpServer().sendRaw(
+        requestType: requestType,
+        requestData: requestData,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -144,15 +155,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_general_version(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().generalVersion();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -164,15 +176,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_general_stats(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().generalStats();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -184,15 +197,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_general_hotkeys(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().generalHotkeys();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -204,16 +218,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_general_trigger_hotkey(CallToolRequest request) async {
-    try {
-    final hotkeyName = request.arguments!['hotkeyName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().generalTriggerHotkey(hotkeyName);
+  FutureOr<CallToolResult> _obs_general_trigger_hotkey(
+    CallToolRequest request,
+  ) async {
+    try {
+      final hotkeyName = request.arguments!['hotkeyName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().generalTriggerHotkey(
+        hotkeyName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -224,17 +245,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_general_sleep(CallToolRequest request) async {
     try {
-    final sleepMillis = request.arguments?['sleepMillis'] as int?;
-    final sleepFrames = request.arguments?['sleepFrames'] as int?;
+      final sleepMillis = request.arguments?['sleepMillis'] as int?;
+      final sleepFrames = request.arguments?['sleepFrames'] as int?;
 
-      final result = await obs_mcp_server.ObsMcpServer().generalSleep(sleepMillis: sleepMillis, sleepFrames: sleepFrames);
+      final result = await obs_mcp_server.ObsMcpServer().generalSleep(
+        sleepMillis: sleepMillis,
+        sleepFrames: sleepFrames,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -245,16 +272,22 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_general_broadcast_custom_event(CallToolRequest request) async {
-    try {
-    final eventData = request.arguments!['eventData'] as dynamic;
 
-      final result = await obs_mcp_server.ObsMcpServer().generalBroadcastCustomEvent(eventData);
+  FutureOr<CallToolResult> _obs_general_broadcast_custom_event(
+    CallToolRequest request,
+  ) async {
+    try {
+      final eventData = request.arguments!['eventData'] as dynamic;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .generalBroadcastCustomEvent(eventData);
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -265,15 +298,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_scenes_list(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().scenesList();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -285,15 +319,18 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scenes_group_list(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_scenes_group_list(
+    CallToolRequest request,
+  ) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().scenesGroupList();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -305,16 +342,20 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scenes_get_current_program(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_scenes_get_current_program(
+    CallToolRequest request,
+  ) async {
     try {
-
-
-      final result = await obs_mcp_server.ObsMcpServer().scenesGetCurrentProgram();
+      final result = await obs_mcp_server.ObsMcpServer()
+          .scenesGetCurrentProgram();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -325,16 +366,22 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scenes_set_current_program(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().scenesSetCurrentProgram(sceneName);
+  FutureOr<CallToolResult> _obs_scenes_set_current_program(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .scenesSetCurrentProgram(sceneName);
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -345,16 +392,20 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scenes_get_current_preview(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_scenes_get_current_preview(
+    CallToolRequest request,
+  ) async {
     try {
-
-
-      final result = await obs_mcp_server.ObsMcpServer().scenesGetCurrentPreview();
+      final result = await obs_mcp_server.ObsMcpServer()
+          .scenesGetCurrentPreview();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -365,16 +416,22 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scenes_set_current_preview(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().scenesSetCurrentPreview(sceneName);
+  FutureOr<CallToolResult> _obs_scenes_set_current_preview(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .scenesSetCurrentPreview(sceneName);
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -385,16 +442,21 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_scenes_create(CallToolRequest request) async {
     try {
-    final sceneName = request.arguments!['sceneName'] as String;
+      final sceneName = request.arguments!['sceneName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().scenesCreate(sceneName);
+      final result = await obs_mcp_server.ObsMcpServer().scenesCreate(
+        sceneName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -405,16 +467,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_list(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsList(sceneName);
+  FutureOr<CallToolResult> _obs_scene_items_list(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsList(
+        sceneName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -425,16 +494,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_group_list(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGroupList(sceneName);
+  FutureOr<CallToolResult> _obs_scene_items_group_list(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGroupList(
+        sceneName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -445,17 +521,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_get_id(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
-    final sourceName = request.arguments!['sourceName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetId(sceneName: sceneName, sourceName: sourceName);
+  FutureOr<CallToolResult> _obs_scene_items_get_id(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+      final sourceName = request.arguments!['sourceName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetId(
+        sceneName: sceneName,
+        sourceName: sourceName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -466,17 +550,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_get_enabled(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
-    final sceneItemId = request.arguments!['sceneItemId'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetEnabled(sceneName: sceneName, sceneItemId: sceneItemId);
+  FutureOr<CallToolResult> _obs_scene_items_get_enabled(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+      final sceneItemId = request.arguments!['sceneItemId'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetEnabled(
+        sceneName: sceneName,
+        sceneItemId: sceneItemId,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -487,18 +579,27 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_set_enabled(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
-    final sceneItemId = request.arguments!['sceneItemId'] as int;
-    final sceneItemEnabled = request.arguments!['sceneItemEnabled'] as bool;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsSetEnabled(sceneName: sceneName, sceneItemId: sceneItemId, sceneItemEnabled: sceneItemEnabled);
+  FutureOr<CallToolResult> _obs_scene_items_set_enabled(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+      final sceneItemId = request.arguments!['sceneItemId'] as int;
+      final sceneItemEnabled = request.arguments!['sceneItemEnabled'] as bool;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsSetEnabled(
+        sceneName: sceneName,
+        sceneItemId: sceneItemId,
+        sceneItemEnabled: sceneItemEnabled,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -509,17 +610,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_get_locked(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
-    final sceneItemId = request.arguments!['sceneItemId'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetLocked(sceneName: sceneName, sceneItemId: sceneItemId);
+  FutureOr<CallToolResult> _obs_scene_items_get_locked(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+      final sceneItemId = request.arguments!['sceneItemId'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetLocked(
+        sceneName: sceneName,
+        sceneItemId: sceneItemId,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -530,18 +639,27 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_set_locked(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
-    final sceneItemId = request.arguments!['sceneItemId'] as int;
-    final sceneItemLocked = request.arguments!['sceneItemLocked'] as bool;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsSetLocked(sceneName: sceneName, sceneItemId: sceneItemId, sceneItemLocked: sceneItemLocked);
+  FutureOr<CallToolResult> _obs_scene_items_set_locked(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+      final sceneItemId = request.arguments!['sceneItemId'] as int;
+      final sceneItemLocked = request.arguments!['sceneItemLocked'] as bool;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsSetLocked(
+        sceneName: sceneName,
+        sceneItemId: sceneItemId,
+        sceneItemLocked: sceneItemLocked,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -552,31 +670,53 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_set_transform(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
-    final sceneItemId = request.arguments!['sceneItemId'] as int;
-    final positionX = request.arguments?['positionX'] as dynamic?;
-    final positionY = request.arguments?['positionY'] as dynamic?;
-    final scaleX = request.arguments?['scaleX'] as dynamic?;
-    final scaleY = request.arguments?['scaleY'] as dynamic?;
-    final rotation = request.arguments?['rotation'] as dynamic?;
-    final cropLeft = request.arguments?['cropLeft'] as int?;
-    final cropTop = request.arguments?['cropTop'] as int?;
-    final cropRight = request.arguments?['cropRight'] as int?;
-    final cropBottom = request.arguments?['cropBottom'] as int?;
-    final alignment = request.arguments?['alignment'] as int?;
-    final boundsType = request.arguments?['boundsType'] as String?;
-    final boundsAlignment = request.arguments?['boundsAlignment'] as int?;
-    final boundsWidth = request.arguments?['boundsWidth'] as dynamic?;
-    final boundsHeight = request.arguments?['boundsHeight'] as dynamic?;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsSetTransform(sceneName: sceneName, sceneItemId: sceneItemId, positionX: positionX, positionY: positionY, scaleX: scaleX, scaleY: scaleY, rotation: rotation, cropLeft: cropLeft, cropTop: cropTop, cropRight: cropRight, cropBottom: cropBottom, alignment: alignment, boundsType: boundsType, boundsAlignment: boundsAlignment, boundsWidth: boundsWidth, boundsHeight: boundsHeight);
+  FutureOr<CallToolResult> _obs_scene_items_set_transform(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+      final sceneItemId = request.arguments!['sceneItemId'] as int;
+      final positionX = request.arguments?['positionX'] as dynamic?;
+      final positionY = request.arguments?['positionY'] as dynamic?;
+      final scaleX = request.arguments?['scaleX'] as dynamic?;
+      final scaleY = request.arguments?['scaleY'] as dynamic?;
+      final rotation = request.arguments?['rotation'] as dynamic?;
+      final cropLeft = request.arguments?['cropLeft'] as int?;
+      final cropTop = request.arguments?['cropTop'] as int?;
+      final cropRight = request.arguments?['cropRight'] as int?;
+      final cropBottom = request.arguments?['cropBottom'] as int?;
+      final alignment = request.arguments?['alignment'] as int?;
+      final boundsType = request.arguments?['boundsType'] as String?;
+      final boundsAlignment = request.arguments?['boundsAlignment'] as int?;
+      final boundsWidth = request.arguments?['boundsWidth'] as dynamic?;
+      final boundsHeight = request.arguments?['boundsHeight'] as dynamic?;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsSetTransform(
+        sceneName: sceneName,
+        sceneItemId: sceneItemId,
+        positionX: positionX,
+        positionY: positionY,
+        scaleX: scaleX,
+        scaleY: scaleY,
+        rotation: rotation,
+        cropLeft: cropLeft,
+        cropTop: cropTop,
+        cropRight: cropRight,
+        cropBottom: cropBottom,
+        alignment: alignment,
+        boundsType: boundsType,
+        boundsAlignment: boundsAlignment,
+        boundsWidth: boundsWidth,
+        boundsHeight: boundsHeight,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -587,16 +727,21 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_inputs_list(CallToolRequest request) async {
     try {
-    final inputKind = request.arguments?['inputKind'] as String?;
+      final inputKind = request.arguments?['inputKind'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsList(inputKind: inputKind);
+      final result = await obs_mcp_server.ObsMcpServer().inputsList(
+        inputKind: inputKind,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -607,16 +752,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_kind_list(CallToolRequest request) async {
-    try {
-    final unversioned = request.arguments?['unversioned'] as bool?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsKindList(unversioned: unversioned);
+  FutureOr<CallToolResult> _obs_inputs_kind_list(
+    CallToolRequest request,
+  ) async {
+    try {
+      final unversioned = request.arguments?['unversioned'] as bool?;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsKindList(
+        unversioned: unversioned,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -627,15 +779,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_inputs_special(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().inputsSpecial();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -647,16 +800,21 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_inputs_get_mute(CallToolRequest request) async {
     try {
-    final inputName = request.arguments!['inputName'] as String;
+      final inputName = request.arguments!['inputName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsGetMute(inputName);
+      final result = await obs_mcp_server.ObsMcpServer().inputsGetMute(
+        inputName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -667,18 +825,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_inputs_set_mute(CallToolRequest request) async {
     try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final inputMuted = request.arguments!['inputMuted'] as bool;
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final inputMuted = request.arguments!['inputMuted'] as bool;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsSetMute(inputName: inputName, inputUuid: inputUuid, inputMuted: inputMuted);
+      final result = await obs_mcp_server.ObsMcpServer().inputsSetMute(
+        inputName: inputName,
+        inputUuid: inputUuid,
+        inputMuted: inputMuted,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -689,17 +854,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_toggle_mute(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsToggleMute(inputName: inputName, inputUuid: inputUuid);
+  FutureOr<CallToolResult> _obs_inputs_toggle_mute(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsToggleMute(
+        inputName: inputName,
+        inputUuid: inputUuid,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -710,17 +883,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_get_volume(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsGetVolume(inputName: inputName, inputUuid: inputUuid);
+  FutureOr<CallToolResult> _obs_inputs_get_volume(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsGetVolume(
+        inputName: inputName,
+        inputUuid: inputUuid,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -731,17 +912,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_get_settings(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsGetSettings(inputName: inputName, inputUuid: inputUuid);
+  FutureOr<CallToolResult> _obs_inputs_get_settings(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsGetSettings(
+        inputName: inputName,
+        inputUuid: inputUuid,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -752,19 +941,29 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_set_settings(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final inputSettings = request.arguments!['inputSettings'] as dynamic;
-    final overlay = request.arguments?['overlay'] as bool?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsSetSettings(inputName: inputName, inputUuid: inputUuid, inputSettings: inputSettings, overlay: overlay);
+  FutureOr<CallToolResult> _obs_inputs_set_settings(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final inputSettings = request.arguments!['inputSettings'] as dynamic;
+      final overlay = request.arguments?['overlay'] as bool?;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsSetSettings(
+        inputName: inputName,
+        inputUuid: inputUuid,
+        inputSettings: inputSettings,
+        overlay: overlay,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -775,18 +974,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_inputs_set_name(CallToolRequest request) async {
     try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final newInputName = request.arguments!['newInputName'] as String;
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final newInputName = request.arguments!['newInputName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsSetName(inputName: inputName, inputUuid: inputUuid, newInputName: newInputName);
+      final result = await obs_mcp_server.ObsMcpServer().inputsSetName(
+        inputName: inputName,
+        inputUuid: inputUuid,
+        newInputName: newInputName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -797,21 +1003,31 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_inputs_create(CallToolRequest request) async {
     try {
-    final sceneName = request.arguments?['sceneName'] as String?;
-    final sceneUuid = request.arguments?['sceneUuid'] as String?;
-    final inputName = request.arguments!['inputName'] as String;
-    final inputKind = request.arguments!['inputKind'] as String;
-    final inputSettings = request.arguments?['inputSettings'] as dynamic?;
-    final sceneItemEnabled = request.arguments?['sceneItemEnabled'] as bool?;
+      final sceneName = request.arguments?['sceneName'] as String?;
+      final sceneUuid = request.arguments?['sceneUuid'] as String?;
+      final inputName = request.arguments!['inputName'] as String;
+      final inputKind = request.arguments!['inputKind'] as String;
+      final inputSettings = request.arguments?['inputSettings'] as dynamic?;
+      final sceneItemEnabled = request.arguments?['sceneItemEnabled'] as bool?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsCreate(sceneName: sceneName, sceneUuid: sceneUuid, inputName: inputName, inputKind: inputKind, inputSettings: inputSettings, sceneItemEnabled: sceneItemEnabled);
+      final result = await obs_mcp_server.ObsMcpServer().inputsCreate(
+        sceneName: sceneName,
+        sceneUuid: sceneUuid,
+        inputName: inputName,
+        inputKind: inputKind,
+        inputSettings: inputSettings,
+        sceneItemEnabled: sceneItemEnabled,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -822,17 +1038,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_inputs_remove(CallToolRequest request) async {
     try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsRemove(inputName: inputName, inputUuid: inputUuid);
+      final result = await obs_mcp_server.ObsMcpServer().inputsRemove(
+        inputName: inputName,
+        inputUuid: inputUuid,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -843,15 +1065,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_stream_status(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().streamStatus();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -863,15 +1086,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_stream_start(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().streamStart();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -883,15 +1107,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_stream_stop(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().streamStop();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -903,15 +1128,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_stream_toggle(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().streamToggle();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -923,16 +1149,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_stream_send_caption(CallToolRequest request) async {
-    try {
-    final captionText = request.arguments!['captionText'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().streamSendCaption(captionText);
+  FutureOr<CallToolResult> _obs_stream_send_caption(
+    CallToolRequest request,
+  ) async {
+    try {
+      final captionText = request.arguments!['captionText'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().streamSendCaption(
+        captionText,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -943,15 +1176,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_record_status(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().recordStatus();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -963,15 +1197,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_record_start(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().recordStart();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -983,15 +1218,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_record_stop(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().recordStop();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -1003,15 +1239,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_record_toggle(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().recordToggle();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -1023,15 +1260,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_record_pause(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().recordPause();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -1043,15 +1281,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_record_resume(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().recordResume();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -1063,15 +1302,18 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_record_toggle_pause(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_record_toggle_pause(
+    CallToolRequest request,
+  ) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().recordTogglePause();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -1083,16 +1325,20 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_outputs_virtual_cam_status(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_outputs_virtual_cam_status(
+    CallToolRequest request,
+  ) async {
     try {
-
-
-      final result = await obs_mcp_server.ObsMcpServer().outputsVirtualCamStatus();
+      final result = await obs_mcp_server.ObsMcpServer()
+          .outputsVirtualCamStatus();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1103,16 +1349,20 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_outputs_virtual_cam_toggle(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_outputs_virtual_cam_toggle(
+    CallToolRequest request,
+  ) async {
     try {
-
-
-      final result = await obs_mcp_server.ObsMcpServer().outputsVirtualCamToggle();
+      final result = await obs_mcp_server.ObsMcpServer()
+          .outputsVirtualCamToggle();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1123,16 +1373,20 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_outputs_virtual_cam_start(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_outputs_virtual_cam_start(
+    CallToolRequest request,
+  ) async {
     try {
-
-
-      final result = await obs_mcp_server.ObsMcpServer().outputsVirtualCamStart();
+      final result = await obs_mcp_server.ObsMcpServer()
+          .outputsVirtualCamStart();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1143,16 +1397,20 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_outputs_virtual_cam_stop(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_outputs_virtual_cam_stop(
+    CallToolRequest request,
+  ) async {
     try {
-
-
-      final result = await obs_mcp_server.ObsMcpServer().outputsVirtualCamStop();
+      final result = await obs_mcp_server.ObsMcpServer()
+          .outputsVirtualCamStop();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1163,16 +1421,20 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_outputs_replay_buffer_status(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_outputs_replay_buffer_status(
+    CallToolRequest request,
+  ) async {
     try {
-
-
-      final result = await obs_mcp_server.ObsMcpServer().outputsReplayBufferStatus();
+      final result = await obs_mcp_server.ObsMcpServer()
+          .outputsReplayBufferStatus();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1183,16 +1445,20 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_outputs_replay_buffer_toggle(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_outputs_replay_buffer_toggle(
+    CallToolRequest request,
+  ) async {
     try {
-
-
-      final result = await obs_mcp_server.ObsMcpServer().outputsReplayBufferToggle();
+      final result = await obs_mcp_server.ObsMcpServer()
+          .outputsReplayBufferToggle();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1203,16 +1469,22 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_outputs_replay_buffer_start(CallToolRequest request) async {
-    try {
-    final outputName = request.arguments?['outputName'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().outputsReplayBufferStart(outputName: outputName);
+  FutureOr<CallToolResult> _obs_outputs_replay_buffer_start(
+    CallToolRequest request,
+  ) async {
+    try {
+      final outputName = request.arguments?['outputName'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .outputsReplayBufferStart(outputName: outputName);
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1223,16 +1495,22 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_outputs_replay_buffer_stop(CallToolRequest request) async {
-    try {
-    final outputName = request.arguments?['outputName'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().outputsReplayBufferStop(outputName: outputName);
+  FutureOr<CallToolResult> _obs_outputs_replay_buffer_stop(
+    CallToolRequest request,
+  ) async {
+    try {
+      final outputName = request.arguments?['outputName'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .outputsReplayBufferStop(outputName: outputName);
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1243,16 +1521,22 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_outputs_replay_buffer_save(CallToolRequest request) async {
-    try {
-    final outputName = request.arguments?['outputName'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().outputsReplayBufferSave(outputName: outputName);
+  FutureOr<CallToolResult> _obs_outputs_replay_buffer_save(
+    CallToolRequest request,
+  ) async {
+    try {
+      final outputName = request.arguments?['outputName'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .outputsReplayBufferSave(outputName: outputName);
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1263,16 +1547,21 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_outputs_toggle(CallToolRequest request) async {
     try {
-    final outputName = request.arguments!['outputName'] as String;
+      final outputName = request.arguments!['outputName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().outputsToggle(outputName);
+      final result = await obs_mcp_server.ObsMcpServer().outputsToggle(
+        outputName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1283,16 +1572,21 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_outputs_start(CallToolRequest request) async {
     try {
-    final outputName = request.arguments!['outputName'] as String;
+      final outputName = request.arguments!['outputName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().outputsStart(outputName);
+      final result = await obs_mcp_server.ObsMcpServer().outputsStart(
+        outputName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1303,16 +1597,21 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_outputs_stop(CallToolRequest request) async {
     try {
-    final outputName = request.arguments!['outputName'] as String;
+      final outputName = request.arguments!['outputName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().outputsStop(outputName);
+      final result = await obs_mcp_server.ObsMcpServer().outputsStop(
+        outputName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1323,16 +1622,20 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_config_record_directory(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_config_record_directory(
+    CallToolRequest request,
+  ) async {
     try {
-
-
-      final result = await obs_mcp_server.ObsMcpServer().configRecordDirectory();
+      final result = await obs_mcp_server.ObsMcpServer()
+          .configRecordDirectory();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1343,16 +1646,20 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_config_stream_service_settings(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_config_stream_service_settings(
+    CallToolRequest request,
+  ) async {
     try {
-
-
-      final result = await obs_mcp_server.ObsMcpServer().configStreamServiceSettings();
+      final result = await obs_mcp_server.ObsMcpServer()
+          .configStreamServiceSettings();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1363,15 +1670,18 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_ui_studio_mode_enabled(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_ui_studio_mode_enabled(
+    CallToolRequest request,
+  ) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().uiStudioModeEnabled();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -1383,16 +1693,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_ui_set_studio_mode(CallToolRequest request) async {
-    try {
-    final enabled = request.arguments!['enabled'] as bool;
 
-      final result = await obs_mcp_server.ObsMcpServer().uiSetStudioMode(enabled);
+  FutureOr<CallToolResult> _obs_ui_set_studio_mode(
+    CallToolRequest request,
+  ) async {
+    try {
+      final enabled = request.arguments!['enabled'] as bool;
+
+      final result = await obs_mcp_server.ObsMcpServer().uiSetStudioMode(
+        enabled,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1403,16 +1720,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_ui_open_input_properties(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments!['inputName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().uiOpenInputProperties(inputName);
+  FutureOr<CallToolResult> _obs_ui_open_input_properties(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments!['inputName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().uiOpenInputProperties(
+        inputName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1423,16 +1747,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_ui_open_input_filters(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments!['inputName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().uiOpenInputFilters(inputName);
+  FutureOr<CallToolResult> _obs_ui_open_input_filters(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments!['inputName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().uiOpenInputFilters(
+        inputName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1443,16 +1774,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_ui_open_input_interact(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments!['inputName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().uiOpenInputInteract(inputName);
+  FutureOr<CallToolResult> _obs_ui_open_input_interact(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments!['inputName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().uiOpenInputInteract(
+        inputName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1463,15 +1801,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_ui_monitor_list(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().uiMonitorList();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -1483,16 +1822,20 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_transitions_trigger_studio(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_transitions_trigger_studio(
+    CallToolRequest request,
+  ) async {
     try {
-
-
-      final result = await obs_mcp_server.ObsMcpServer().transitionsTriggerStudio();
+      final result = await obs_mcp_server.ObsMcpServer()
+          .transitionsTriggerStudio();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1503,15 +1846,18 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_transitions_kind_list(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_transitions_kind_list(
+    CallToolRequest request,
+  ) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().transitionsKindList();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -1523,15 +1869,18 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_transitions_scene_list(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_transitions_scene_list(
+    CallToolRequest request,
+  ) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().transitionsSceneList();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -1543,16 +1892,20 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_transitions_get_current(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_transitions_get_current(
+    CallToolRequest request,
+  ) async {
     try {
-
-
-      final result = await obs_mcp_server.ObsMcpServer().transitionsGetCurrent();
+      final result = await obs_mcp_server.ObsMcpServer()
+          .transitionsGetCurrent();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1563,16 +1916,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_transitions_set_current(CallToolRequest request) async {
-    try {
-    final transitionName = request.arguments!['transitionName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().transitionsSetCurrent(transitionName);
+  FutureOr<CallToolResult> _obs_transitions_set_current(
+    CallToolRequest request,
+  ) async {
+    try {
+      final transitionName = request.arguments!['transitionName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().transitionsSetCurrent(
+        transitionName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1583,16 +1943,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_transitions_set_duration(CallToolRequest request) async {
-    try {
-    final duration = request.arguments!['duration'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().transitionsSetDuration(duration);
+  FutureOr<CallToolResult> _obs_transitions_set_duration(
+    CallToolRequest request,
+  ) async {
+    try {
+      final duration = request.arguments!['duration'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().transitionsSetDuration(
+        duration,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1603,17 +1970,26 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_transitions_set_settings(CallToolRequest request) async {
-    try {
-    final transitionSettings = request.arguments!['transitionSettings'] as dynamic;
-    final overlay = request.arguments?['overlay'] as bool?;
 
-      final result = await obs_mcp_server.ObsMcpServer().transitionsSetSettings(transitionSettings: transitionSettings, overlay: overlay);
+  FutureOr<CallToolResult> _obs_transitions_set_settings(
+    CallToolRequest request,
+  ) async {
+    try {
+      final transitionSettings =
+          request.arguments!['transitionSettings'] as dynamic;
+      final overlay = request.arguments?['overlay'] as bool?;
+
+      final result = await obs_mcp_server.ObsMcpServer().transitionsSetSettings(
+        transitionSettings: transitionSettings,
+        overlay: overlay,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1624,15 +2000,18 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_transitions_get_cursor(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_transitions_get_cursor(
+    CallToolRequest request,
+  ) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().transitionsGetCursor();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -1644,17 +2023,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_transitions_set_tbar(CallToolRequest request) async {
-    try {
-    final position = request.arguments!['position'] as double;
-    final release = request.arguments?['release'] as bool?;
 
-      final result = await obs_mcp_server.ObsMcpServer().transitionsSetTBar(position: position, release: release);
+  FutureOr<CallToolResult> _obs_transitions_set_tbar(
+    CallToolRequest request,
+  ) async {
+    try {
+      final position = request.arguments!['position'] as double;
+      final release = request.arguments?['release'] as bool?;
+
+      final result = await obs_mcp_server.ObsMcpServer().transitionsSetTBar(
+        position: position,
+        release: release,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1665,16 +2052,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_sources_get_active(CallToolRequest request) async {
-    try {
-    final sourceName = request.arguments!['sourceName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().sourcesGetActive(sourceName);
+  FutureOr<CallToolResult> _obs_sources_get_active(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sourceName = request.arguments!['sourceName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().sourcesGetActive(
+        sourceName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1685,20 +2079,32 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_sources_get_screenshot(CallToolRequest request) async {
-    try {
-    final sourceName = request.arguments!['sourceName'] as String;
-    final imageFormat = request.arguments!['imageFormat'] as String;
-    final imageWidth = request.arguments?['imageWidth'] as int?;
-    final imageHeight = request.arguments?['imageHeight'] as int?;
-    final compressionQuality = request.arguments?['compressionQuality'] as int?;
 
-      final result = await obs_mcp_server.ObsMcpServer().sourcesGetScreenshot(sourceName: sourceName, imageFormat: imageFormat, imageWidth: imageWidth, imageHeight: imageHeight, compressionQuality: compressionQuality);
+  FutureOr<CallToolResult> _obs_sources_get_screenshot(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sourceName = request.arguments!['sourceName'] as String;
+      final imageFormat = request.arguments!['imageFormat'] as String;
+      final imageWidth = request.arguments?['imageWidth'] as int?;
+      final imageHeight = request.arguments?['imageHeight'] as int?;
+      final compressionQuality =
+          request.arguments?['compressionQuality'] as int?;
+
+      final result = await obs_mcp_server.ObsMcpServer().sourcesGetScreenshot(
+        sourceName: sourceName,
+        imageFormat: imageFormat,
+        imageWidth: imageWidth,
+        imageHeight: imageHeight,
+        compressionQuality: compressionQuality,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1709,21 +2115,34 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_sources_save_screenshot(CallToolRequest request) async {
-    try {
-    final sourceName = request.arguments!['sourceName'] as String;
-    final filePath = request.arguments!['filePath'] as String;
-    final imageFormat = request.arguments!['imageFormat'] as String;
-    final imageWidth = request.arguments?['imageWidth'] as int?;
-    final imageHeight = request.arguments?['imageHeight'] as int?;
-    final compressionQuality = request.arguments?['compressionQuality'] as int?;
 
-      final result = await obs_mcp_server.ObsMcpServer().sourcesSaveScreenshot(sourceName: sourceName, filePath: filePath, imageFormat: imageFormat, imageWidth: imageWidth, imageHeight: imageHeight, compressionQuality: compressionQuality);
+  FutureOr<CallToolResult> _obs_sources_save_screenshot(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sourceName = request.arguments!['sourceName'] as String;
+      final filePath = request.arguments!['filePath'] as String;
+      final imageFormat = request.arguments!['imageFormat'] as String;
+      final imageWidth = request.arguments?['imageWidth'] as int?;
+      final imageHeight = request.arguments?['imageHeight'] as int?;
+      final compressionQuality =
+          request.arguments?['compressionQuality'] as int?;
+
+      final result = await obs_mcp_server.ObsMcpServer().sourcesSaveScreenshot(
+        sourceName: sourceName,
+        filePath: filePath,
+        imageFormat: imageFormat,
+        imageWidth: imageWidth,
+        imageHeight: imageHeight,
+        compressionQuality: compressionQuality,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1734,17 +2153,26 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_sources_get_private_settings(CallToolRequest request) async {
-    try {
-    final sourceName = request.arguments?['sourceName'] as String?;
-    final sourceUuid = request.arguments?['sourceUuid'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().sourcesGetPrivateSettings(sourceName: sourceName, sourceUuid: sourceUuid);
+  FutureOr<CallToolResult> _obs_sources_get_private_settings(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sourceName = request.arguments?['sourceName'] as String?;
+      final sourceUuid = request.arguments?['sourceUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .sourcesGetPrivateSettings(
+            sourceName: sourceName,
+            sourceUuid: sourceUuid,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1755,18 +2183,28 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_sources_set_private_settings(CallToolRequest request) async {
-    try {
-    final sourceName = request.arguments?['sourceName'] as String?;
-    final sourceUuid = request.arguments?['sourceUuid'] as String?;
-    final sourceSettings = request.arguments!['sourceSettings'] as dynamic;
 
-      final result = await obs_mcp_server.ObsMcpServer().sourcesSetPrivateSettings(sourceName: sourceName, sourceUuid: sourceUuid, sourceSettings: sourceSettings);
+  FutureOr<CallToolResult> _obs_sources_set_private_settings(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sourceName = request.arguments?['sourceName'] as String?;
+      final sourceUuid = request.arguments?['sourceUuid'] as String?;
+      final sourceSettings = request.arguments!['sourceSettings'] as dynamic;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .sourcesSetPrivateSettings(
+            sourceName: sourceName,
+            sourceUuid: sourceUuid,
+            sourceSettings: sourceSettings,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1777,17 +2215,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_media_inputs_get_status(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().mediaInputsGetStatus(inputName: inputName, inputUuid: inputUuid);
+  FutureOr<CallToolResult> _obs_media_inputs_get_status(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer().mediaInputsGetStatus(
+        inputName: inputName,
+        inputUuid: inputUuid,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1798,18 +2244,27 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_media_inputs_set_cursor(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final mediaCursor = request.arguments!['mediaCursor'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().mediaInputsSetCursor(inputName: inputName, inputUuid: inputUuid, mediaCursor: mediaCursor);
+  FutureOr<CallToolResult> _obs_media_inputs_set_cursor(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final mediaCursor = request.arguments!['mediaCursor'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().mediaInputsSetCursor(
+        inputName: inputName,
+        inputUuid: inputUuid,
+        mediaCursor: mediaCursor,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1820,18 +2275,28 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_media_inputs_offset_cursor(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final mediaCursorOffset = request.arguments!['mediaCursorOffset'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().mediaInputsOffsetCursor(inputName: inputName, inputUuid: inputUuid, mediaCursorOffset: mediaCursorOffset);
+  FutureOr<CallToolResult> _obs_media_inputs_offset_cursor(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final mediaCursorOffset = request.arguments!['mediaCursorOffset'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .mediaInputsOffsetCursor(
+            inputName: inputName,
+            inputUuid: inputUuid,
+            mediaCursorOffset: mediaCursorOffset,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1842,18 +2307,28 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_media_inputs_trigger_action(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final mediaAction = request.arguments!['mediaAction'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().mediaInputsTriggerAction(inputName: inputName, inputUuid: inputUuid, mediaAction: mediaAction);
+  FutureOr<CallToolResult> _obs_media_inputs_trigger_action(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final mediaAction = request.arguments!['mediaAction'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .mediaInputsTriggerAction(
+            inputName: inputName,
+            inputUuid: inputUuid,
+            mediaAction: mediaAction,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1864,17 +2339,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_get_deinterlace_mode(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsGetDeinterlaceMode(inputName: inputName, inputUuid: inputUuid);
+  FutureOr<CallToolResult> _obs_inputs_get_deinterlace_mode(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .inputsGetDeinterlaceMode(inputName: inputName, inputUuid: inputUuid);
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1885,18 +2366,28 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_set_deinterlace_mode(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final deinterlaceMode = request.arguments!['deinterlaceMode'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsSetDeinterlaceMode(inputName: inputName, inputUuid: inputUuid, deinterlaceMode: deinterlaceMode);
+  FutureOr<CallToolResult> _obs_inputs_set_deinterlace_mode(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final deinterlaceMode = request.arguments!['deinterlaceMode'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .inputsSetDeinterlaceMode(
+            inputName: inputName,
+            inputUuid: inputUuid,
+            deinterlaceMode: deinterlaceMode,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1907,61 +2398,94 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_get_deinterlace_field_order(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsGetDeinterlaceFieldOrder(inputName: inputName, inputUuid: inputUuid);
+  FutureOr<CallToolResult> _obs_inputs_get_deinterlace_field_order(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .inputsGetDeinterlaceFieldOrder(
+            inputName: inputName,
+            inputUuid: inputUuid,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
     } catch (e, st) {
       if (_logErrors) {
-        io.stderr.writeln('[easy_api] obs_inputs_get_deinterlace_field_order: $e');
+        io.stderr.writeln(
+          '[easy_api] obs_inputs_get_deinterlace_field_order: $e',
+        );
         io.stderr.writeln(st);
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_set_deinterlace_field_order(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final deinterlaceFieldOrder = request.arguments!['deinterlaceFieldOrder'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsSetDeinterlaceFieldOrder(inputName: inputName, inputUuid: inputUuid, deinterlaceFieldOrder: deinterlaceFieldOrder);
+  FutureOr<CallToolResult> _obs_inputs_set_deinterlace_field_order(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final deinterlaceFieldOrder =
+          request.arguments!['deinterlaceFieldOrder'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .inputsSetDeinterlaceFieldOrder(
+            inputName: inputName,
+            inputUuid: inputUuid,
+            deinterlaceFieldOrder: deinterlaceFieldOrder,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
     } catch (e, st) {
       if (_logErrors) {
-        io.stderr.writeln('[easy_api] obs_inputs_set_deinterlace_field_order: $e');
+        io.stderr.writeln(
+          '[easy_api] obs_inputs_set_deinterlace_field_order: $e',
+        );
         io.stderr.writeln(st);
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_set_volume(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final inputVolume = request.arguments!['inputVolume'] as double;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsSetVolume(inputName: inputName, inputUuid: inputUuid, inputVolume: inputVolume);
+  FutureOr<CallToolResult> _obs_inputs_set_volume(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final inputVolume = request.arguments!['inputVolume'] as double;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsSetVolume(
+        inputName: inputName,
+        inputUuid: inputUuid,
+        inputVolume: inputVolume,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1972,16 +2496,22 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_get_default_settings(CallToolRequest request) async {
-    try {
-    final inputKind = request.arguments!['inputKind'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsGetDefaultSettings(inputKind: inputKind);
+  FutureOr<CallToolResult> _obs_inputs_get_default_settings(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputKind = request.arguments!['inputKind'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .inputsGetDefaultSettings(inputKind: inputKind);
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -1992,18 +2522,28 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_general_call_vendor_request(CallToolRequest request) async {
-    try {
-    final vendorName = request.arguments!['vendorName'] as String;
-    final requestType = request.arguments!['requestType'] as String;
-    final requestData = request.arguments?['requestData'] as dynamic?;
 
-      final result = await obs_mcp_server.ObsMcpServer().generalCallVendorRequest(vendorName: vendorName, requestType: requestType, requestData: requestData);
+  FutureOr<CallToolResult> _obs_general_call_vendor_request(
+    CallToolRequest request,
+  ) async {
+    try {
+      final vendorName = request.arguments!['vendorName'] as String;
+      final requestType = request.arguments!['requestType'] as String;
+      final requestData = request.arguments?['requestData'] as dynamic?;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .generalCallVendorRequest(
+            vendorName: vendorName,
+            requestType: requestType,
+            requestData: requestData,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2014,20 +2554,33 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_general_trigger_hotkey_by_key(CallToolRequest request) async {
-    try {
-    final keyId = request.arguments!['keyId'] as String;
-    final keyModifiersShift = request.arguments?['keyModifiersShift'] as bool?;
-    final keyModifiersCtrl = request.arguments?['keyModifiersCtrl'] as bool?;
-    final keyModifiersAlt = request.arguments?['keyModifiersAlt'] as bool?;
-    final keyModifiersCmd = request.arguments?['keyModifiersCmd'] as bool?;
 
-      final result = await obs_mcp_server.ObsMcpServer().generalTriggerHotkeyByKey(keyId: keyId, keyModifiersShift: keyModifiersShift, keyModifiersCtrl: keyModifiersCtrl, keyModifiersAlt: keyModifiersAlt, keyModifiersCmd: keyModifiersCmd);
+  FutureOr<CallToolResult> _obs_general_trigger_hotkey_by_key(
+    CallToolRequest request,
+  ) async {
+    try {
+      final keyId = request.arguments!['keyId'] as String;
+      final keyModifiersShift =
+          request.arguments?['keyModifiersShift'] as bool?;
+      final keyModifiersCtrl = request.arguments?['keyModifiersCtrl'] as bool?;
+      final keyModifiersAlt = request.arguments?['keyModifiersAlt'] as bool?;
+      final keyModifiersCmd = request.arguments?['keyModifiersCmd'] as bool?;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .generalTriggerHotkeyByKey(
+            keyId: keyId,
+            keyModifiersShift: keyModifiersShift,
+            keyModifiersCtrl: keyModifiersCtrl,
+            keyModifiersAlt: keyModifiersAlt,
+            keyModifiersCmd: keyModifiersCmd,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2038,18 +2591,27 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_create(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
-    final sourceName = request.arguments!['sourceName'] as String;
-    final sceneItemEnabled = request.arguments?['sceneItemEnabled'] as bool?;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsCreate(sceneName: sceneName, sourceName: sourceName, sceneItemEnabled: sceneItemEnabled);
+  FutureOr<CallToolResult> _obs_scene_items_create(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+      final sourceName = request.arguments!['sourceName'] as String;
+      final sceneItemEnabled = request.arguments?['sceneItemEnabled'] as bool?;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsCreate(
+        sceneName: sceneName,
+        sourceName: sourceName,
+        sceneItemEnabled: sceneItemEnabled,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2060,18 +2622,28 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_duplicate(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
-    final sceneItemId = request.arguments!['sceneItemId'] as int;
-    final destinationSceneName = request.arguments?['destinationSceneName'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsDuplicate(sceneName: sceneName, sceneItemId: sceneItemId, destinationSceneName: destinationSceneName);
+  FutureOr<CallToolResult> _obs_scene_items_duplicate(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+      final sceneItemId = request.arguments!['sceneItemId'] as int;
+      final destinationSceneName =
+          request.arguments?['destinationSceneName'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsDuplicate(
+        sceneName: sceneName,
+        sceneItemId: sceneItemId,
+        destinationSceneName: destinationSceneName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2082,17 +2654,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_remove(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
-    final sceneItemId = request.arguments!['sceneItemId'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsRemove(sceneName: sceneName, sceneItemId: sceneItemId);
+  FutureOr<CallToolResult> _obs_scene_items_remove(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+      final sceneItemId = request.arguments!['sceneItemId'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsRemove(
+        sceneName: sceneName,
+        sceneItemId: sceneItemId,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2103,17 +2683,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_get_transform(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
-    final sceneItemId = request.arguments!['sceneItemId'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetTransform(sceneName: sceneName, sceneItemId: sceneItemId);
+  FutureOr<CallToolResult> _obs_scene_items_get_transform(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+      final sceneItemId = request.arguments!['sceneItemId'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetTransform(
+        sceneName: sceneName,
+        sceneItemId: sceneItemId,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2124,15 +2712,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_canvases_list(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().canvasesList();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -2144,15 +2733,18 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_filters_kind_list(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_filters_kind_list(
+    CallToolRequest request,
+  ) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().filtersKindList();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -2164,16 +2756,21 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_filters_list(CallToolRequest request) async {
     try {
-    final sourceName = request.arguments!['sourceName'] as String;
+      final sourceName = request.arguments!['sourceName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().filtersList(sourceName);
+      final result = await obs_mcp_server.ObsMcpServer().filtersList(
+        sourceName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2184,16 +2781,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_filters_default_settings(CallToolRequest request) async {
-    try {
-    final filterKind = request.arguments!['filterKind'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().filtersDefaultSettings(filterKind);
+  FutureOr<CallToolResult> _obs_filters_default_settings(
+    CallToolRequest request,
+  ) async {
+    try {
+      final filterKind = request.arguments!['filterKind'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersDefaultSettings(
+        filterKind,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2204,19 +2808,27 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_filters_create(CallToolRequest request) async {
     try {
-    final sourceName = request.arguments!['sourceName'] as String;
-    final filterName = request.arguments!['filterName'] as String;
-    final filterKind = request.arguments!['filterKind'] as String;
-    final filterSettings = request.arguments?['filterSettings'] as dynamic?;
+      final sourceName = request.arguments!['sourceName'] as String;
+      final filterName = request.arguments!['filterName'] as String;
+      final filterKind = request.arguments!['filterKind'] as String;
+      final filterSettings = request.arguments?['filterSettings'] as dynamic?;
 
-      final result = await obs_mcp_server.ObsMcpServer().filtersCreate(sourceName: sourceName, filterName: filterName, filterKind: filterKind, filterSettings: filterSettings);
+      final result = await obs_mcp_server.ObsMcpServer().filtersCreate(
+        sourceName: sourceName,
+        filterName: filterName,
+        filterKind: filterKind,
+        filterSettings: filterSettings,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2227,17 +2839,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_filters_remove(CallToolRequest request) async {
     try {
-    final sourceName = request.arguments!['sourceName'] as String;
-    final filterName = request.arguments!['filterName'] as String;
+      final sourceName = request.arguments!['sourceName'] as String;
+      final filterName = request.arguments!['filterName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().filtersRemove(sourceName: sourceName, filterName: filterName);
+      final result = await obs_mcp_server.ObsMcpServer().filtersRemove(
+        sourceName: sourceName,
+        filterName: filterName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2248,18 +2866,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_filters_rename(CallToolRequest request) async {
     try {
-    final sourceName = request.arguments!['sourceName'] as String;
-    final filterName = request.arguments!['filterName'] as String;
-    final newFilterName = request.arguments!['newFilterName'] as String;
+      final sourceName = request.arguments!['sourceName'] as String;
+      final filterName = request.arguments!['filterName'] as String;
+      final newFilterName = request.arguments!['newFilterName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().filtersRename(sourceName: sourceName, filterName: filterName, newFilterName: newFilterName);
+      final result = await obs_mcp_server.ObsMcpServer().filtersRename(
+        sourceName: sourceName,
+        filterName: filterName,
+        newFilterName: newFilterName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2270,17 +2895,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_filters_get(CallToolRequest request) async {
     try {
-    final sourceName = request.arguments!['sourceName'] as String;
-    final filterName = request.arguments!['filterName'] as String;
+      final sourceName = request.arguments!['sourceName'] as String;
+      final filterName = request.arguments!['filterName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().filtersGet(sourceName: sourceName, filterName: filterName);
+      final result = await obs_mcp_server.ObsMcpServer().filtersGet(
+        sourceName: sourceName,
+        filterName: filterName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2291,18 +2922,27 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_filters_set_index(CallToolRequest request) async {
-    try {
-    final sourceName = request.arguments!['sourceName'] as String;
-    final filterName = request.arguments!['filterName'] as String;
-    final filterIndex = request.arguments!['filterIndex'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().filtersSetIndex(sourceName: sourceName, filterName: filterName, filterIndex: filterIndex);
+  FutureOr<CallToolResult> _obs_filters_set_index(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sourceName = request.arguments!['sourceName'] as String;
+      final filterName = request.arguments!['filterName'] as String;
+      final filterIndex = request.arguments!['filterIndex'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersSetIndex(
+        sourceName: sourceName,
+        filterName: filterName,
+        filterIndex: filterIndex,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2313,19 +2953,29 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_filters_set_settings(CallToolRequest request) async {
-    try {
-    final sourceName = request.arguments!['sourceName'] as String;
-    final filterName = request.arguments!['filterName'] as String;
-    final filterSettings = request.arguments!['filterSettings'] as dynamic;
-    final overlay = request.arguments?['overlay'] as bool?;
 
-      final result = await obs_mcp_server.ObsMcpServer().filtersSetSettings(sourceName: sourceName, filterName: filterName, filterSettings: filterSettings, overlay: overlay);
+  FutureOr<CallToolResult> _obs_filters_set_settings(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sourceName = request.arguments!['sourceName'] as String;
+      final filterName = request.arguments!['filterName'] as String;
+      final filterSettings = request.arguments!['filterSettings'] as dynamic;
+      final overlay = request.arguments?['overlay'] as bool?;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersSetSettings(
+        sourceName: sourceName,
+        filterName: filterName,
+        filterSettings: filterSettings,
+        overlay: overlay,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2336,18 +2986,27 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_filters_set_enabled(CallToolRequest request) async {
-    try {
-    final sourceName = request.arguments!['sourceName'] as String;
-    final filterName = request.arguments!['filterName'] as String;
-    final filterEnabled = request.arguments!['filterEnabled'] as bool;
 
-      final result = await obs_mcp_server.ObsMcpServer().filtersSetEnabled(sourceName: sourceName, filterName: filterName, filterEnabled: filterEnabled);
+  FutureOr<CallToolResult> _obs_filters_set_enabled(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sourceName = request.arguments!['sourceName'] as String;
+      final filterName = request.arguments!['filterName'] as String;
+      final filterEnabled = request.arguments!['filterEnabled'] as bool;
+
+      final result = await obs_mcp_server.ObsMcpServer().filtersSetEnabled(
+        sourceName: sourceName,
+        filterName: filterName,
+        filterEnabled: filterEnabled,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2358,15 +3017,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_outputs_list(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().outputsList();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -2378,16 +3038,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_outputs_get_status(CallToolRequest request) async {
-    try {
-    final outputName = request.arguments!['outputName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().outputsGetStatus(outputName);
+  FutureOr<CallToolResult> _obs_outputs_get_status(
+    CallToolRequest request,
+  ) async {
+    try {
+      final outputName = request.arguments!['outputName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().outputsGetStatus(
+        outputName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2398,16 +3065,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_outputs_get_settings(CallToolRequest request) async {
-    try {
-    final outputName = request.arguments!['outputName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().outputsGetSettings(outputName);
+  FutureOr<CallToolResult> _obs_outputs_get_settings(
+    CallToolRequest request,
+  ) async {
+    try {
+      final outputName = request.arguments!['outputName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer().outputsGetSettings(
+        outputName,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2418,17 +3092,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_outputs_set_settings(CallToolRequest request) async {
-    try {
-    final outputName = request.arguments!['outputName'] as String;
-    final outputSettings = request.arguments!['outputSettings'] as dynamic;
 
-      final result = await obs_mcp_server.ObsMcpServer().outputsSetSettings(outputName: outputName, outputSettings: outputSettings);
+  FutureOr<CallToolResult> _obs_outputs_set_settings(
+    CallToolRequest request,
+  ) async {
+    try {
+      final outputName = request.arguments!['outputName'] as String;
+      final outputSettings = request.arguments!['outputSettings'] as dynamic;
+
+      final result = await obs_mcp_server.ObsMcpServer().outputsSetSettings(
+        outputName: outputName,
+        outputSettings: outputSettings,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2439,17 +3121,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_get_audio_balance(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsGetAudioBalance(inputName: inputName, inputUuid: inputUuid);
+  FutureOr<CallToolResult> _obs_inputs_get_audio_balance(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsGetAudioBalance(
+        inputName: inputName,
+        inputUuid: inputUuid,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2460,18 +3150,28 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_set_audio_balance(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final inputAudioBalance = request.arguments!['inputAudioBalance'] as double;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsSetAudioBalance(inputName: inputName, inputUuid: inputUuid, inputAudioBalance: inputAudioBalance);
+  FutureOr<CallToolResult> _obs_inputs_set_audio_balance(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final inputAudioBalance =
+          request.arguments!['inputAudioBalance'] as double;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsSetAudioBalance(
+        inputName: inputName,
+        inputUuid: inputUuid,
+        inputAudioBalance: inputAudioBalance,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2482,17 +3182,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_get_audio_sync_offset(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsGetAudioSyncOffset(inputName: inputName, inputUuid: inputUuid);
+  FutureOr<CallToolResult> _obs_inputs_get_audio_sync_offset(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .inputsGetAudioSyncOffset(inputName: inputName, inputUuid: inputUuid);
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2503,18 +3209,29 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_set_audio_sync_offset(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final inputAudioSyncOffset = request.arguments!['inputAudioSyncOffset'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsSetAudioSyncOffset(inputName: inputName, inputUuid: inputUuid, inputAudioSyncOffset: inputAudioSyncOffset);
+  FutureOr<CallToolResult> _obs_inputs_set_audio_sync_offset(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final inputAudioSyncOffset =
+          request.arguments!['inputAudioSyncOffset'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .inputsSetAudioSyncOffset(
+            inputName: inputName,
+            inputUuid: inputUuid,
+            inputAudioSyncOffset: inputAudioSyncOffset,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2525,17 +3242,26 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_get_audio_monitor_type(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsGetAudioMonitorType(inputName: inputName, inputUuid: inputUuid);
+  FutureOr<CallToolResult> _obs_inputs_get_audio_monitor_type(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .inputsGetAudioMonitorType(
+            inputName: inputName,
+            inputUuid: inputUuid,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2546,18 +3272,28 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_set_audio_monitor_type(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final monitorType = request.arguments!['monitorType'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsSetAudioMonitorType(inputName: inputName, inputUuid: inputUuid, monitorType: monitorType);
+  FutureOr<CallToolResult> _obs_inputs_set_audio_monitor_type(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final monitorType = request.arguments!['monitorType'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .inputsSetAudioMonitorType(
+            inputName: inputName,
+            inputUuid: inputUuid,
+            monitorType: monitorType,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2568,17 +3304,25 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_get_audio_tracks(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsGetAudioTracks(inputName: inputName, inputUuid: inputUuid);
+  FutureOr<CallToolResult> _obs_inputs_get_audio_tracks(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsGetAudioTracks(
+        inputName: inputName,
+        inputUuid: inputUuid,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2589,18 +3333,27 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_set_audio_tracks(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final inputAudioTracks = request.arguments!['inputAudioTracks'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsSetAudioTracks(inputName: inputName, inputUuid: inputUuid, inputAudioTracks: inputAudioTracks);
+  FutureOr<CallToolResult> _obs_inputs_set_audio_tracks(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final inputAudioTracks = request.arguments!['inputAudioTracks'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().inputsSetAudioTracks(
+        inputName: inputName,
+        inputUuid: inputUuid,
+        inputAudioTracks: inputAudioTracks,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2611,40 +3364,62 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_get_properties_list_items(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final propertyName = request.arguments!['propertyName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsGetPropertiesListItems(inputName: inputName, inputUuid: inputUuid, propertyName: propertyName);
+  FutureOr<CallToolResult> _obs_inputs_get_properties_list_items(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final propertyName = request.arguments!['propertyName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .inputsGetPropertiesListItems(
+            inputName: inputName,
+            inputUuid: inputUuid,
+            propertyName: propertyName,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
     } catch (e, st) {
       if (_logErrors) {
-        io.stderr.writeln('[easy_api] obs_inputs_get_properties_list_items: $e');
+        io.stderr.writeln(
+          '[easy_api] obs_inputs_get_properties_list_items: $e',
+        );
         io.stderr.writeln(st);
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_inputs_press_properties_button(CallToolRequest request) async {
-    try {
-    final inputName = request.arguments?['inputName'] as String?;
-    final inputUuid = request.arguments?['inputUuid'] as String?;
-    final propertyName = request.arguments!['propertyName'] as String;
 
-      final result = await obs_mcp_server.ObsMcpServer().inputsPressPropertiesButton(inputName: inputName, inputUuid: inputUuid, propertyName: propertyName);
+  FutureOr<CallToolResult> _obs_inputs_press_properties_button(
+    CallToolRequest request,
+  ) async {
+    try {
+      final inputName = request.arguments?['inputName'] as String?;
+      final inputUuid = request.arguments?['inputUuid'] as String?;
+      final propertyName = request.arguments!['propertyName'] as String;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .inputsPressPropertiesButton(
+            inputName: inputName,
+            inputUuid: inputUuid,
+            propertyName: propertyName,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2655,18 +3430,27 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_get_source(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments?['sceneName'] as String?;
-    final sceneUuid = request.arguments?['sceneUuid'] as String?;
-    final sceneItemId = request.arguments!['sceneItemId'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetSource(sceneName: sceneName, sceneUuid: sceneUuid, sceneItemId: sceneItemId);
+  FutureOr<CallToolResult> _obs_scene_items_get_source(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments?['sceneName'] as String?;
+      final sceneUuid = request.arguments?['sceneUuid'] as String?;
+      final sceneItemId = request.arguments!['sceneItemId'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetSource(
+        sceneName: sceneName,
+        sceneUuid: sceneUuid,
+        sceneItemId: sceneItemId,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2677,60 +3461,89 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_get_private_settings(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments?['sceneName'] as String?;
-    final sceneUuid = request.arguments?['sceneUuid'] as String?;
-    final sceneItemId = request.arguments!['sceneItemId'] as int;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsGetPrivateSettings(sceneName: sceneName, sceneUuid: sceneUuid, sceneItemId: sceneItemId);
+  FutureOr<CallToolResult> _obs_scene_items_get_private_settings(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments?['sceneName'] as String?;
+      final sceneUuid = request.arguments?['sceneUuid'] as String?;
+      final sceneItemId = request.arguments!['sceneItemId'] as int;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .sceneItemsGetPrivateSettings(
+            sceneName: sceneName,
+            sceneUuid: sceneUuid,
+            sceneItemId: sceneItemId,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
     } catch (e, st) {
       if (_logErrors) {
-        io.stderr.writeln('[easy_api] obs_scene_items_get_private_settings: $e');
+        io.stderr.writeln(
+          '[easy_api] obs_scene_items_get_private_settings: $e',
+        );
         io.stderr.writeln(st);
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_set_private_settings(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments?['sceneName'] as String?;
-    final sceneUuid = request.arguments?['sceneUuid'] as String?;
-    final sceneItemId = request.arguments!['sceneItemId'] as int;
-    final sceneItemSettings = request.arguments!['sceneItemSettings'] as dynamic;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsSetPrivateSettings(sceneName: sceneName, sceneUuid: sceneUuid, sceneItemId: sceneItemId, sceneItemSettings: sceneItemSettings);
+  FutureOr<CallToolResult> _obs_scene_items_set_private_settings(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments?['sceneName'] as String?;
+      final sceneUuid = request.arguments?['sceneUuid'] as String?;
+      final sceneItemId = request.arguments!['sceneItemId'] as int;
+      final sceneItemSettings =
+          request.arguments!['sceneItemSettings'] as dynamic;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .sceneItemsSetPrivateSettings(
+            sceneName: sceneName,
+            sceneUuid: sceneUuid,
+            sceneItemId: sceneItemId,
+            sceneItemSettings: sceneItemSettings,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
     } catch (e, st) {
       if (_logErrors) {
-        io.stderr.writeln('[easy_api] obs_scene_items_set_private_settings: $e');
+        io.stderr.writeln(
+          '[easy_api] obs_scene_items_set_private_settings: $e',
+        );
         io.stderr.writeln(st);
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_connection_status(CallToolRequest request) async {
+
+  FutureOr<CallToolResult> _obs_connection_status(
+    CallToolRequest request,
+  ) async {
     try {
-
-
       final result = obs_mcp_server.ObsMcpServer().connectionStatus();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -2742,15 +3555,16 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_connection_ping(CallToolRequest request) async {
     try {
-
-
       final result = await obs_mcp_server.ObsMcpServer().connectionPing();
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
@@ -2762,17 +3576,26 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_events_subscribe(CallToolRequest request) async {
-    try {
-    final mask = request.arguments?['mask'] as int?;
-    final subscriptions = request.arguments?['subscriptions'] as List<String>?;
 
-      final result = await obs_mcp_server.ObsMcpServer().eventsSubscribe(mask: mask, subscriptions: subscriptions);
+  FutureOr<CallToolResult> _obs_events_subscribe(
+    CallToolRequest request,
+  ) async {
+    try {
+      final mask = request.arguments?['mask'] as int?;
+      final subscriptions =
+          request.arguments?['subscriptions'] as List<String>?;
+
+      final result = await obs_mcp_server.ObsMcpServer().eventsSubscribe(
+        mask: mask,
+        subscriptions: subscriptions,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2783,17 +3606,23 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_wait_for_event(CallToolRequest request) async {
     try {
-    final eventType = request.arguments!['eventType'] as String;
-    final timeoutMs = request.arguments?['timeoutMs'] as int?;
+      final eventType = request.arguments!['eventType'] as String;
+      final timeoutMs = request.arguments?['timeoutMs'] as int?;
 
-      final result = await obs_mcp_server.ObsMcpServer().waitForEvent(eventType: eventType, timeoutMs: timeoutMs);
+      final result = await obs_mcp_server.ObsMcpServer().waitForEvent(
+        eventType: eventType,
+        timeoutMs: timeoutMs,
+      );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2804,14 +3633,17 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   FutureOr<CallToolResult> _obs_client_sleep(CallToolRequest request) async {
     try {
-    final ms = request.arguments!['ms'] as int;
+      final ms = request.arguments!['ms'] as int;
 
       final result = await obs_mcp_server.ObsMcpServer().clientSleep(ms: ms);
       return CallToolResult(
@@ -2824,30 +3656,53 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  FutureOr<CallToolResult> _obs_scene_items_animate_transform(CallToolRequest request) async {
-    try {
-    final sceneName = request.arguments!['sceneName'] as String;
-    final sceneItemId = request.arguments!['sceneItemId'] as int;
-    final durationMs = request.arguments!['durationMs'] as int;
-    final targetPositionX = request.arguments?['targetPositionX'] as dynamic?;
-    final targetPositionY = request.arguments?['targetPositionY'] as dynamic?;
-    final targetScaleX = request.arguments?['targetScaleX'] as dynamic?;
-    final targetScaleY = request.arguments?['targetScaleY'] as dynamic?;
-    final targetRotation = request.arguments?['targetRotation'] as dynamic?;
-    final targetCropLeft = request.arguments?['targetCropLeft'] as int?;
-    final targetCropTop = request.arguments?['targetCropTop'] as int?;
-    final targetCropRight = request.arguments?['targetCropRight'] as int?;
-    final targetCropBottom = request.arguments?['targetCropBottom'] as int?;
-    final frameRate = request.arguments?['frameRate'] as int?;
-    final easing = request.arguments?['easing'] as String?;
-    final restoreOnComplete = request.arguments?['restoreOnComplete'] as bool?;
 
-      final result = await obs_mcp_server.ObsMcpServer().sceneItemsAnimateTransform(sceneName: sceneName, sceneItemId: sceneItemId, durationMs: durationMs, targetPositionX: targetPositionX, targetPositionY: targetPositionY, targetScaleX: targetScaleX, targetScaleY: targetScaleY, targetRotation: targetRotation, targetCropLeft: targetCropLeft, targetCropTop: targetCropTop, targetCropRight: targetCropRight, targetCropBottom: targetCropBottom, frameRate: frameRate, easing: easing, restoreOnComplete: restoreOnComplete);
+  FutureOr<CallToolResult> _obs_scene_items_animate_transform(
+    CallToolRequest request,
+  ) async {
+    try {
+      final sceneName = request.arguments!['sceneName'] as String;
+      final sceneItemId = request.arguments!['sceneItemId'] as int;
+      final durationMs = request.arguments!['durationMs'] as int;
+      final targetPositionX = request.arguments?['targetPositionX'] as dynamic?;
+      final targetPositionY = request.arguments?['targetPositionY'] as dynamic?;
+      final targetScaleX = request.arguments?['targetScaleX'] as dynamic?;
+      final targetScaleY = request.arguments?['targetScaleY'] as dynamic?;
+      final targetRotation = request.arguments?['targetRotation'] as dynamic?;
+      final targetCropLeft = request.arguments?['targetCropLeft'] as int?;
+      final targetCropTop = request.arguments?['targetCropTop'] as int?;
+      final targetCropRight = request.arguments?['targetCropRight'] as int?;
+      final targetCropBottom = request.arguments?['targetCropBottom'] as int?;
+      final frameRate = request.arguments?['frameRate'] as int?;
+      final easing = request.arguments?['easing'] as String?;
+      final restoreOnComplete =
+          request.arguments?['restoreOnComplete'] as bool?;
+
+      final result = await obs_mcp_server.ObsMcpServer()
+          .sceneItemsAnimateTransform(
+            sceneName: sceneName,
+            sceneItemId: sceneItemId,
+            durationMs: durationMs,
+            targetPositionX: targetPositionX,
+            targetPositionY: targetPositionY,
+            targetScaleX: targetScaleX,
+            targetScaleY: targetScaleY,
+            targetRotation: targetRotation,
+            targetCropLeft: targetCropLeft,
+            targetCropTop: targetCropTop,
+            targetCropRight: targetCropRight,
+            targetCropBottom: targetCropBottom,
+            frameRate: frameRate,
+            easing: easing,
+            restoreOnComplete: restoreOnComplete,
+          );
       return CallToolResult(
         content: [TextContent(text: _serializeResult(result))],
       );
@@ -2858,22 +3713,1973 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
-  static const _codeModeToolSpecs = <Map<String, dynamic>>[<String, dynamic>{'name': 'obs_connect', 'description': 'Connect to an OBS WebSocket server (ws:// or wss://) and authenticate. Required before any other tool can be invoked.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'url', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'password', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'timeoutSeconds', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'autoReconnect', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_disconnect', 'description': 'Close the active OBS WebSocket connection.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_is_connected', 'description': 'Return whether a live OBS WebSocket connection is held.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_send_raw', 'description': 'Send a raw OBS WebSocket request (requestType + optional data map) and return the response payload. Use this for requests that are not exposed directly as tools.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'requestType', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'requestData', 'type': 'object', 'required': false}]}, <String, dynamic>{'name': 'obs_general_version', 'description': 'Return OBS Studio + obs-websocket version information.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_general_stats', 'description': 'Return OBS runtime statistics (cpu, memory, frame rate).', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_general_hotkeys', 'description': 'Return the names of every registered hotkey in OBS.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_general_trigger_hotkey', 'description': 'Trigger a hotkey by its registered name.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'hotkeyName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_general_sleep', 'description': 'Sleep for a duration in milliseconds or frames (executed server-side).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sleepMillis', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'sleepFrames', 'type': 'number', 'required': false}]}, <String, dynamic>{'name': 'obs_general_broadcast_custom_event', 'description': 'Broadcast a custom JSON event to all connected clients.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'eventData', 'type': 'object', 'required': true}]}, <String, dynamic>{'name': 'obs_scenes_list', 'description': 'Return all scenes plus the current program and preview scene.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_scenes_group_list', 'description': 'Return the names of all groups in OBS.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_scenes_get_current_program', 'description': 'Return the name of the scene currently on the program bus.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_scenes_set_current_program', 'description': 'Set the program scene to the given sceneName.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scenes_get_current_preview', 'description': 'Return the name of the preview scene (studio mode only). Throws if studio mode is disabled.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_scenes_set_current_preview', 'description': 'Set the preview scene (studio mode only).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scenes_create', 'description': 'Create a new scene with the given name.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_list', 'description': 'List the scene items (sources) contained in a scene.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_group_list', 'description': 'List the scene items contained in a group.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_id', 'description': 'Return the numeric sceneItemId for a source placed in a given scene.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_enabled', 'description': 'Return whether a scene item is currently enabled (visible).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_set_enabled', 'description': 'Show or hide a scene item by id.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'sceneItemEnabled', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_locked', 'description': 'Return whether a scene item is locked (uneditable).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_set_locked', 'description': 'Lock or unlock a scene item by id.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'sceneItemLocked', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_set_transform', 'description': 'Set the transform properties (position, scale, rotation, crop, alignment, bounds) for a scene item. Only provide the fields you want to change. Returns the new transform as a flat object.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'positionX', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'positionY', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'scaleX', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'scaleY', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'rotation', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'cropLeft', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'cropTop', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'cropRight', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'cropBottom', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'alignment', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'boundsType', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'boundsAlignment', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'boundsWidth', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'boundsHeight', 'type': 'number', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_list', 'description': 'List all inputs in OBS. Provide inputKind to filter to a single kind.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputKind', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_kind_list', 'description': 'Return the list of available input kinds on this OBS.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'unversioned', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_special', 'description': 'Return the names of OBS special inputs (mic/aux/etc.).', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_inputs_get_mute', 'description': 'Return whether an input is currently muted.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_set_mute', 'description': 'Mute or unmute an input (by name or uuid).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputMuted', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_toggle_mute', 'description': 'Toggle mute on an input and return the new muted state.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_get_volume', 'description': 'Return the volume of an input as both multiplier and dB.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_get_settings', 'description': 'Return the current settings payload for an input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_settings', 'description': 'Overwrite or merge an input settings payload.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputSettings', 'type': 'object', 'required': true}, <String, dynamic>{'name': 'overlay', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_name', 'description': 'Rename an input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'newInputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_create', 'description': 'Create a new input as a scene item inside a scene.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'inputKind', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'inputSettings', 'type': 'object', 'required': false}, <String, dynamic>{'name': 'sceneItemEnabled', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_remove', 'description': 'Delete an input by name or uuid.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_stream_status', 'description': 'Return the current streaming status.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_stream_start', 'description': 'Start the active streaming output.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_stream_stop', 'description': 'Stop the active streaming output.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_stream_toggle', 'description': 'Toggle streaming. Returns the resulting active state.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_stream_send_caption', 'description': 'Send a caption line to the active stream.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'captionText', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_record_status', 'description': 'Return the current recording status.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_start', 'description': 'Start a new recording.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_stop', 'description': 'Stop the current recording and return the resulting file path.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_toggle', 'description': 'Toggle recording on/off.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_pause', 'description': 'Pause the active recording.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_resume', 'description': 'Resume a paused recording.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_record_toggle_pause', 'description': 'Toggle pause state of the active recording.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_virtual_cam_status', 'description': 'Return whether the virtual camera output is active.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_virtual_cam_toggle', 'description': 'Toggle the virtual camera output. Returns new state.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_virtual_cam_start', 'description': 'Start the virtual camera output.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_virtual_cam_stop', 'description': 'Stop the virtual camera output.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_status', 'description': 'Return whether the replay buffer is currently active.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_toggle', 'description': 'Toggle the replay buffer. Returns the new active state.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_start', 'description': 'Start the replay buffer.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_stop', 'description': 'Stop the replay buffer.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_outputs_replay_buffer_save', 'description': 'Flush the replay buffer contents to a replay file.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_outputs_toggle', 'description': 'Toggle a named OBS output. Returns the new active state.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_outputs_start', 'description': 'Start a named OBS output.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_outputs_stop', 'description': 'Stop a named OBS output.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_config_record_directory', 'description': 'Return the current recording directory.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_config_stream_service_settings', 'description': 'Return the active streaming service name + settings.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_ui_studio_mode_enabled', 'description': 'Return whether OBS studio mode is currently enabled.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_ui_set_studio_mode', 'description': 'Enable or disable OBS studio mode.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'enabled', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_ui_open_input_properties', 'description': 'Open the properties dialog window in the OBS UI for the given input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_ui_open_input_filters', 'description': 'Open the filters dialog in the OBS UI for the given input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_ui_open_input_interact', 'description': 'Open the interact dialog in the OBS UI for the given input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_ui_monitor_list', 'description': 'Return the list of connected monitors.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_trigger_studio', 'description': 'Trigger the studio-mode transition from the preview scene to program.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_kind_list', 'description': 'Return the list of all available transition kinds.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_scene_list', 'description': 'Return the list of all scene transitions configured in OBS.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_get_current', 'description': 'Return information about the current scene transition.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_set_current', 'description': 'Set the current scene transition by name.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'transitionName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_transitions_set_duration', 'description': 'Set the duration of the current scene transition in milliseconds (50-20000).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'duration', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_transitions_set_settings', 'description': 'Set the settings of the current scene transition.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'transitionSettings', 'type': 'object', 'required': true}, <String, dynamic>{'name': 'overlay', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_transitions_get_cursor', 'description': 'Return the cursor position (0.0-1.0) of the current scene transition.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_transitions_set_tbar', 'description': 'Set the T-Bar position (0.0-1.0). Requires Studio Mode to be enabled.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'position', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'release', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_sources_get_active', 'description': 'Return whether a source is active (shown in preview/program) and visible.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_sources_get_screenshot', 'description': 'Get a Base64-encoded screenshot of a source. Returns image data as Base64 string.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'imageFormat', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'imageWidth', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'imageHeight', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'compressionQuality', 'type': 'number', 'required': false}]}, <String, dynamic>{'name': 'obs_sources_save_screenshot', 'description': 'Save a screenshot of a source to a file path on the filesystem.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filePath', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'imageFormat', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'imageWidth', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'imageHeight', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'compressionQuality', 'type': 'number', 'required': false}]}, <String, dynamic>{'name': 'obs_sources_get_private_settings', 'description': 'Return the private settings of a source (e.g., global audio devices).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sourceUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_sources_set_private_settings', 'description': 'Set the private settings of a source (e.g., global audio devices).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sourceUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sourceSettings', 'type': 'object', 'required': true}]}, <String, dynamic>{'name': 'obs_media_inputs_get_status', 'description': 'Return the status of a media input (state, duration, cursor, etc.).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_media_inputs_set_cursor', 'description': 'Set the cursor position (in milliseconds) of a media input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'mediaCursor', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_media_inputs_offset_cursor', 'description': 'Offset the current cursor position of a media input by the specified value (in milliseconds).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'mediaCursorOffset', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_media_inputs_trigger_action', 'description': 'Trigger an action on a media input (play, pause, stop, restart, next, previous).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'mediaAction', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_deinterlace_mode', 'description': 'Return the deinterlace mode of an input (none, discard, retro, etc.).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_deinterlace_mode', 'description': 'Set the deinterlace mode of an input (none, discard, retro, etc.).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'deinterlaceMode', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_deinterlace_field_order', 'description': 'Return the deinterlace field order of an input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_deinterlace_field_order', 'description': 'Set the deinterlace field order of an input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'deinterlaceFieldOrder', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_set_volume', 'description': 'Set the volume of an input (0.0-1.0 multiplier).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputVolume', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_default_settings', 'description': 'Return the default settings for a given input kind (before customization).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputKind', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_general_call_vendor_request', 'description': 'Call a request registered to a third-party vendor/plugin (e.g., obs-browser).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'vendorName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'requestType', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'requestData', 'type': 'object', 'required': false}]}, <String, dynamic>{'name': 'obs_general_trigger_hotkey_by_key', 'description': 'Trigger a hotkey using a key sequence (e.g., Ctrl+Shift+A).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'keyId', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'keyModifiersShift', 'type': 'boolean', 'required': false}, <String, dynamic>{'name': 'keyModifiersCtrl', 'type': 'boolean', 'required': false}, <String, dynamic>{'name': 'keyModifiersAlt', 'type': 'boolean', 'required': false}, <String, dynamic>{'name': 'keyModifiersCmd', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_scene_items_create', 'description': 'Add an existing source as a new scene item in a scene.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemEnabled', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_scene_items_duplicate', 'description': 'Duplicate a scene item, copying it to the same or a different scene.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'destinationSceneName', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_scene_items_remove', 'description': 'Remove a scene item from a scene (does not delete the source).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_transform', 'description': 'Return the transform properties of a scene item as flat top-level fields (positionX, positionY, scaleX, scaleY, rotation, cropLeft, cropTop, cropRight, cropBottom, alignment, boundsType, boundsAlignment, boundsWidth, boundsHeight, sourceWidth, sourceHeight, width, height). Symmetric with set_transform.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_canvases_list', 'description': 'Return the list of all canvases configured in OBS (v5.7.0+).', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_filters_kind_list', 'description': 'Return the list of all available source filter kinds.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_filters_list', 'description': 'Return the list of filters applied to a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_filters_default_settings', 'description': 'Return the default settings for a given filter kind.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'filterKind', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_filters_create', 'description': 'Create a new filter and apply it to a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterKind', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterSettings', 'type': 'object', 'required': false}]}, <String, dynamic>{'name': 'obs_filters_remove', 'description': 'Remove a filter from a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_filters_rename', 'description': 'Rename a filter on a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'newFilterName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_filters_get', 'description': 'Return information about a specific filter on a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_filters_set_index', 'description': 'Set the index position (order) of a filter on a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterIndex', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_filters_set_settings', 'description': 'Set or merge the settings of a filter on a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterSettings', 'type': 'object', 'required': true}, <String, dynamic>{'name': 'overlay', 'type': 'boolean', 'required': false}]}, <String, dynamic>{'name': 'obs_filters_set_enabled', 'description': 'Enable or disable a filter on a source.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sourceName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'filterEnabled', 'type': 'boolean', 'required': true}]}, <String, dynamic>{'name': 'obs_outputs_list', 'description': 'Return the list of all available outputs in OBS.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_outputs_get_status', 'description': 'Return the status of a named output.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_outputs_get_settings', 'description': 'Return the settings of a named output.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_outputs_set_settings', 'description': 'Set the settings of a named output.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'outputName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'outputSettings', 'type': 'object', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_audio_balance', 'description': 'Return the audio balance (left-right) of an input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_audio_balance', 'description': 'Set the audio balance of an input (0.0 = left, 1.0 = right, 0.5 = center).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputAudioBalance', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_audio_sync_offset', 'description': 'Return the audio sync offset of an input in milliseconds.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_audio_sync_offset', 'description': 'Set the audio sync offset of an input in milliseconds.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputAudioSyncOffset', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_audio_monitor_type', 'description': 'Return the audio monitor type of an input (none, monitor only, monitor and output).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_audio_monitor_type', 'description': 'Set the audio monitor type of an input (0 = none, 1 = monitor only, 2 = monitor and output).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'monitorType', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_audio_tracks', 'description': 'Return the audio track bitmask of an input.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}]}, <String, dynamic>{'name': 'obs_inputs_set_audio_tracks', 'description': 'Set the audio tracks of an input (bitmask: 1=track1, 2=track2, 4=track3, etc.).', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputAudioTracks', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_get_properties_list_items', 'description': 'Return the items of a list property from an input\'s properties dialog.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'propertyName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_inputs_press_properties_button', 'description': 'Press a button property in an input\'s properties dialog.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'inputName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'inputUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'propertyName', 'type': 'string', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_source', 'description': 'Return the source name for a given scene item.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_get_private_settings', 'description': 'Return the private settings of a scene item.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_set_private_settings', 'description': 'Set the private settings of a scene item.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneUuid', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'sceneItemSettings', 'type': 'object', 'required': true}]}, <String, dynamic>{'name': 'obs_connection_status', 'description': 'Return the current OBS WebSocket connection state (disconnected | connecting | connected | reconnecting | failed) plus the negotiated RPC version when available.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_connection_ping', 'description': 'Round-trip a GetVersion request and return latency in ms. Use this as a cheap liveness probe before issuing batched commands.', 'parameters': <Map<String, dynamic>>[]}, <String, dynamic>{'name': 'obs_events_subscribe', 'description': 'Update the active OBS event subscription mask. Accepts either an integer bitmask or a list of subscription names (general, config, scenes, inputs, transitions, filters, outputs, sceneItems, mediaInputs, vendors, ui, canvases, all, inputVolumeMeters, inputActiveStateChanged, inputShowStateChanged, sceneItemTransformChanged). Required before wait_for_event for any event type that is not in the default subscription set.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'mask', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'subscriptions', 'type': 'array', 'required': false}]}, <String, dynamic>{'name': 'obs_wait_for_event', 'description': 'Wait for the next OBS event whose eventType matches the given name (e.g. RecordStateChanged, SceneItemTransformChanged). Times out after timeoutMs (default 30000). The caller MUST have subscribed to the relevant event group first via events_subscribe.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'eventType', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'timeoutMs', 'type': 'number', 'required': false}]}, <String, dynamic>{'name': 'obs_client_sleep', 'description': 'Pause server-side for the requested number of milliseconds. Prefer this over setTimeout/Promise inside execute() JS so the sandbox subprocess stays idle while the MCP host holds the wall clock. Maximum 25000ms per call to leave headroom under the sandbox timeout.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'ms', 'type': 'number', 'required': true}]}, <String, dynamic>{'name': 'obs_scene_items_animate_transform', 'description': 'Smoothly animate a scene item transform from its current state to the supplied target over durationMs. Runs server-side at frameRate fps (clamped 1-60). Fields omitted from the target hold steady. Easing options: linear, easeIn, easeOut, easeInOut, easeOutBounce.', 'parameters': <Map<String, dynamic>>[<String, dynamic>{'name': 'sceneName', 'type': 'string', 'required': true}, <String, dynamic>{'name': 'sceneItemId', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'durationMs', 'type': 'number', 'required': true}, <String, dynamic>{'name': 'targetPositionX', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'targetPositionY', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'targetScaleX', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'targetScaleY', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'targetRotation', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'targetCropLeft', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'targetCropTop', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'targetCropRight', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'targetCropBottom', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'frameRate', 'type': 'number', 'required': false}, <String, dynamic>{'name': 'easing', 'type': 'string', 'required': false}, <String, dynamic>{'name': 'restoreOnComplete', 'type': 'boolean', 'required': false}]}];
+
+  static const _codeModeToolSpecs = <Map<String, dynamic>>[
+    <String, dynamic>{
+      'name': 'obs_connect',
+      'description':
+          'Connect to an OBS WebSocket server (ws:// or wss://) and authenticate. Required before any other tool can be invoked.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{'name': 'url', 'type': 'string', 'required': true},
+        <String, dynamic>{
+          'name': 'password',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'timeoutSeconds',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'autoReconnect',
+          'type': 'boolean',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_disconnect',
+      'description': 'Close the active OBS WebSocket connection.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_is_connected',
+      'description': 'Return whether a live OBS WebSocket connection is held.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_send_raw',
+      'description':
+          'Send a raw OBS WebSocket request (requestType + optional data map) and return the response payload. Use this for requests that are not exposed directly as tools.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'requestType',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'requestData',
+          'type': 'object',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_general_version',
+      'description': 'Return OBS Studio + obs-websocket version information.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_general_stats',
+      'description': 'Return OBS runtime statistics (cpu, memory, frame rate).',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_general_hotkeys',
+      'description': 'Return the names of every registered hotkey in OBS.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_general_trigger_hotkey',
+      'description': 'Trigger a hotkey by its registered name.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'hotkeyName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_general_sleep',
+      'description':
+          'Sleep for a duration in milliseconds or frames (executed server-side).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sleepMillis',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'sleepFrames',
+          'type': 'number',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_general_broadcast_custom_event',
+      'description': 'Broadcast a custom JSON event to all connected clients.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'eventData',
+          'type': 'object',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scenes_list',
+      'description':
+          'Return all scenes plus the current program and preview scene.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_scenes_group_list',
+      'description': 'Return the names of all groups in OBS.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_scenes_get_current_program',
+      'description':
+          'Return the name of the scene currently on the program bus.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_scenes_set_current_program',
+      'description': 'Set the program scene to the given sceneName.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scenes_get_current_preview',
+      'description':
+          'Return the name of the preview scene (studio mode only). Throws if studio mode is disabled.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_scenes_set_current_preview',
+      'description': 'Set the preview scene (studio mode only).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scenes_create',
+      'description': 'Create a new scene with the given name.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_list',
+      'description': 'List the scene items (sources) contained in a scene.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_group_list',
+      'description': 'List the scene items contained in a group.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_get_id',
+      'description':
+          'Return the numeric sceneItemId for a source placed in a given scene.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_get_enabled',
+      'description':
+          'Return whether a scene item is currently enabled (visible).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemId',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_set_enabled',
+      'description': 'Show or hide a scene item by id.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemId',
+          'type': 'number',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemEnabled',
+          'type': 'boolean',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_get_locked',
+      'description': 'Return whether a scene item is locked (uneditable).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemId',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_set_locked',
+      'description': 'Lock or unlock a scene item by id.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemId',
+          'type': 'number',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemLocked',
+          'type': 'boolean',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_set_transform',
+      'description':
+          'Set the transform properties (position, scale, rotation, crop, alignment, bounds) for a scene item. Only provide the fields you want to change. Returns the new transform as a flat object.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemId',
+          'type': 'number',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'positionX',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'positionY',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'scaleX',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'scaleY',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'rotation',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'cropLeft',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'cropTop',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'cropRight',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'cropBottom',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'alignment',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'boundsType',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'boundsAlignment',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'boundsWidth',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'boundsHeight',
+          'type': 'number',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_list',
+      'description':
+          'List all inputs in OBS. Provide inputKind to filter to a single kind.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputKind',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_kind_list',
+      'description': 'Return the list of available input kinds on this OBS.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'unversioned',
+          'type': 'boolean',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_special',
+      'description': 'Return the names of OBS special inputs (mic/aux/etc.).',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_get_mute',
+      'description': 'Return whether an input is currently muted.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_set_mute',
+      'description': 'Mute or unmute an input (by name or uuid).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputMuted',
+          'type': 'boolean',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_toggle_mute',
+      'description': 'Toggle mute on an input and return the new muted state.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_get_volume',
+      'description': 'Return the volume of an input as both multiplier and dB.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_get_settings',
+      'description': 'Return the current settings payload for an input.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_set_settings',
+      'description': 'Overwrite or merge an input settings payload.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputSettings',
+          'type': 'object',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'overlay',
+          'type': 'boolean',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_set_name',
+      'description': 'Rename an input.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'newInputName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_create',
+      'description': 'Create a new input as a scene item inside a scene.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'sceneUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'inputKind',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'inputSettings',
+          'type': 'object',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemEnabled',
+          'type': 'boolean',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_remove',
+      'description': 'Delete an input by name or uuid.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_stream_status',
+      'description': 'Return the current streaming status.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_stream_start',
+      'description': 'Start the active streaming output.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_stream_stop',
+      'description': 'Stop the active streaming output.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_stream_toggle',
+      'description': 'Toggle streaming. Returns the resulting active state.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_stream_send_caption',
+      'description': 'Send a caption line to the active stream.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'captionText',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_record_status',
+      'description': 'Return the current recording status.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_record_start',
+      'description': 'Start a new recording.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_record_stop',
+      'description':
+          'Stop the current recording and return the resulting file path.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_record_toggle',
+      'description': 'Toggle recording on/off.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_record_pause',
+      'description': 'Pause the active recording.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_record_resume',
+      'description': 'Resume a paused recording.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_record_toggle_pause',
+      'description': 'Toggle pause state of the active recording.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_virtual_cam_status',
+      'description': 'Return whether the virtual camera output is active.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_virtual_cam_toggle',
+      'description': 'Toggle the virtual camera output. Returns new state.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_virtual_cam_start',
+      'description': 'Start the virtual camera output.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_virtual_cam_stop',
+      'description': 'Stop the virtual camera output.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_replay_buffer_status',
+      'description': 'Return whether the replay buffer is currently active.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_replay_buffer_toggle',
+      'description': 'Toggle the replay buffer. Returns the new active state.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_replay_buffer_start',
+      'description': 'Start the replay buffer.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'outputName',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_replay_buffer_stop',
+      'description': 'Stop the replay buffer.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'outputName',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_replay_buffer_save',
+      'description': 'Flush the replay buffer contents to a replay file.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'outputName',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_toggle',
+      'description': 'Toggle a named OBS output. Returns the new active state.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'outputName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_start',
+      'description': 'Start a named OBS output.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'outputName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_stop',
+      'description': 'Stop a named OBS output.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'outputName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_config_record_directory',
+      'description': 'Return the current recording directory.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_config_stream_service_settings',
+      'description': 'Return the active streaming service name + settings.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_ui_studio_mode_enabled',
+      'description': 'Return whether OBS studio mode is currently enabled.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_ui_set_studio_mode',
+      'description': 'Enable or disable OBS studio mode.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'enabled',
+          'type': 'boolean',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_ui_open_input_properties',
+      'description':
+          'Open the properties dialog window in the OBS UI for the given input.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_ui_open_input_filters',
+      'description':
+          'Open the filters dialog in the OBS UI for the given input.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_ui_open_input_interact',
+      'description':
+          'Open the interact dialog in the OBS UI for the given input.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_ui_monitor_list',
+      'description': 'Return the list of connected monitors.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_transitions_trigger_studio',
+      'description':
+          'Trigger the studio-mode transition from the preview scene to program.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_transitions_kind_list',
+      'description': 'Return the list of all available transition kinds.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_transitions_scene_list',
+      'description':
+          'Return the list of all scene transitions configured in OBS.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_transitions_get_current',
+      'description': 'Return information about the current scene transition.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_transitions_set_current',
+      'description': 'Set the current scene transition by name.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'transitionName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_transitions_set_duration',
+      'description':
+          'Set the duration of the current scene transition in milliseconds (50-20000).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'duration',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_transitions_set_settings',
+      'description': 'Set the settings of the current scene transition.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'transitionSettings',
+          'type': 'object',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'overlay',
+          'type': 'boolean',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_transitions_get_cursor',
+      'description':
+          'Return the cursor position (0.0-1.0) of the current scene transition.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_transitions_set_tbar',
+      'description':
+          'Set the T-Bar position (0.0-1.0). Requires Studio Mode to be enabled.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'position',
+          'type': 'number',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'release',
+          'type': 'boolean',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_sources_get_active',
+      'description':
+          'Return whether a source is active (shown in preview/program) and visible.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_sources_get_screenshot',
+      'description':
+          'Get a Base64-encoded screenshot of a source. Returns image data as Base64 string.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'imageFormat',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'imageWidth',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'imageHeight',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'compressionQuality',
+          'type': 'number',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_sources_save_screenshot',
+      'description':
+          'Save a screenshot of a source to a file path on the filesystem.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filePath',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'imageFormat',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'imageWidth',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'imageHeight',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'compressionQuality',
+          'type': 'number',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_sources_get_private_settings',
+      'description':
+          'Return the private settings of a source (e.g., global audio devices).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'sourceUuid',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_sources_set_private_settings',
+      'description':
+          'Set the private settings of a source (e.g., global audio devices).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'sourceUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'sourceSettings',
+          'type': 'object',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_media_inputs_get_status',
+      'description':
+          'Return the status of a media input (state, duration, cursor, etc.).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_media_inputs_set_cursor',
+      'description':
+          'Set the cursor position (in milliseconds) of a media input.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'mediaCursor',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_media_inputs_offset_cursor',
+      'description':
+          'Offset the current cursor position of a media input by the specified value (in milliseconds).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'mediaCursorOffset',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_media_inputs_trigger_action',
+      'description':
+          'Trigger an action on a media input (play, pause, stop, restart, next, previous).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'mediaAction',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_get_deinterlace_mode',
+      'description':
+          'Return the deinterlace mode of an input (none, discard, retro, etc.).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_set_deinterlace_mode',
+      'description':
+          'Set the deinterlace mode of an input (none, discard, retro, etc.).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'deinterlaceMode',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_get_deinterlace_field_order',
+      'description': 'Return the deinterlace field order of an input.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_set_deinterlace_field_order',
+      'description': 'Set the deinterlace field order of an input.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'deinterlaceFieldOrder',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_set_volume',
+      'description': 'Set the volume of an input (0.0-1.0 multiplier).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputVolume',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_get_default_settings',
+      'description':
+          'Return the default settings for a given input kind (before customization).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputKind',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_general_call_vendor_request',
+      'description':
+          'Call a request registered to a third-party vendor/plugin (e.g., obs-browser).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'vendorName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'requestType',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'requestData',
+          'type': 'object',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_general_trigger_hotkey_by_key',
+      'description':
+          'Trigger a hotkey using a key sequence (e.g., Ctrl+Shift+A).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{'name': 'keyId', 'type': 'string', 'required': true},
+        <String, dynamic>{
+          'name': 'keyModifiersShift',
+          'type': 'boolean',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'keyModifiersCtrl',
+          'type': 'boolean',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'keyModifiersAlt',
+          'type': 'boolean',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'keyModifiersCmd',
+          'type': 'boolean',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_create',
+      'description': 'Add an existing source as a new scene item in a scene.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemEnabled',
+          'type': 'boolean',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_duplicate',
+      'description':
+          'Duplicate a scene item, copying it to the same or a different scene.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemId',
+          'type': 'number',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'destinationSceneName',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_remove',
+      'description':
+          'Remove a scene item from a scene (does not delete the source).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemId',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_get_transform',
+      'description':
+          'Return the transform properties of a scene item as flat top-level fields (positionX, positionY, scaleX, scaleY, rotation, cropLeft, cropTop, cropRight, cropBottom, alignment, boundsType, boundsAlignment, boundsWidth, boundsHeight, sourceWidth, sourceHeight, width, height). Symmetric with set_transform.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemId',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_canvases_list',
+      'description':
+          'Return the list of all canvases configured in OBS (v5.7.0+).',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_filters_kind_list',
+      'description': 'Return the list of all available source filter kinds.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_filters_list',
+      'description': 'Return the list of filters applied to a source.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_filters_default_settings',
+      'description': 'Return the default settings for a given filter kind.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'filterKind',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_filters_create',
+      'description': 'Create a new filter and apply it to a source.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filterName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filterKind',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filterSettings',
+          'type': 'object',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_filters_remove',
+      'description': 'Remove a filter from a source.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filterName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_filters_rename',
+      'description': 'Rename a filter on a source.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filterName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'newFilterName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_filters_get',
+      'description': 'Return information about a specific filter on a source.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filterName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_filters_set_index',
+      'description': 'Set the index position (order) of a filter on a source.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filterName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filterIndex',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_filters_set_settings',
+      'description': 'Set or merge the settings of a filter on a source.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filterName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filterSettings',
+          'type': 'object',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'overlay',
+          'type': 'boolean',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_filters_set_enabled',
+      'description': 'Enable or disable a filter on a source.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sourceName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filterName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'filterEnabled',
+          'type': 'boolean',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_list',
+      'description': 'Return the list of all available outputs in OBS.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_get_status',
+      'description': 'Return the status of a named output.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'outputName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_get_settings',
+      'description': 'Return the settings of a named output.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'outputName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_outputs_set_settings',
+      'description': 'Set the settings of a named output.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'outputName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'outputSettings',
+          'type': 'object',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_get_audio_balance',
+      'description': 'Return the audio balance (left-right) of an input.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_set_audio_balance',
+      'description':
+          'Set the audio balance of an input (0.0 = left, 1.0 = right, 0.5 = center).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputAudioBalance',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_get_audio_sync_offset',
+      'description':
+          'Return the audio sync offset of an input in milliseconds.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_set_audio_sync_offset',
+      'description': 'Set the audio sync offset of an input in milliseconds.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputAudioSyncOffset',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_get_audio_monitor_type',
+      'description':
+          'Return the audio monitor type of an input (none, monitor only, monitor and output).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_set_audio_monitor_type',
+      'description':
+          'Set the audio monitor type of an input (0 = none, 1 = monitor only, 2 = monitor and output).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'monitorType',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_get_audio_tracks',
+      'description': 'Return the audio track bitmask of an input.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_set_audio_tracks',
+      'description':
+          'Set the audio tracks of an input (bitmask: 1=track1, 2=track2, 4=track3, etc.).',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputAudioTracks',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_get_properties_list_items',
+      'description':
+          'Return the items of a list property from an input\'s properties dialog.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'propertyName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_inputs_press_properties_button',
+      'description':
+          'Press a button property in an input\'s properties dialog.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'inputName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'inputUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'propertyName',
+          'type': 'string',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_get_source',
+      'description': 'Return the source name for a given scene item.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'sceneUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemId',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_get_private_settings',
+      'description': 'Return the private settings of a scene item.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'sceneUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemId',
+          'type': 'number',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_set_private_settings',
+      'description': 'Set the private settings of a scene item.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'sceneUuid',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemId',
+          'type': 'number',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemSettings',
+          'type': 'object',
+          'required': true,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_connection_status',
+      'description':
+          'Return the current OBS WebSocket connection state (disconnected | connecting | connected | reconnecting | failed) plus the negotiated RPC version when available.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_connection_ping',
+      'description':
+          'Round-trip a GetVersion request and return latency in ms. Use this as a cheap liveness probe before issuing batched commands.',
+      'parameters': <Map<String, dynamic>>[],
+    },
+    <String, dynamic>{
+      'name': 'obs_events_subscribe',
+      'description':
+          'Update the active OBS event subscription mask. Accepts either an integer bitmask or a list of subscription names (general, config, scenes, inputs, transitions, filters, outputs, sceneItems, mediaInputs, vendors, ui, canvases, all, inputVolumeMeters, inputActiveStateChanged, inputShowStateChanged, sceneItemTransformChanged). Required before wait_for_event for any event type that is not in the default subscription set.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{'name': 'mask', 'type': 'number', 'required': false},
+        <String, dynamic>{
+          'name': 'subscriptions',
+          'type': 'array',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_wait_for_event',
+      'description':
+          'Wait for the next OBS event whose eventType matches the given name (e.g. RecordStateChanged, SceneItemTransformChanged). Times out after timeoutMs (default 30000). The caller MUST have subscribed to the relevant event group first via events_subscribe.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'eventType',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'timeoutMs',
+          'type': 'number',
+          'required': false,
+        },
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_client_sleep',
+      'description':
+          'Pause server-side for the requested number of milliseconds. Prefer this over setTimeout/Promise inside execute() JS so the sandbox subprocess stays idle while the MCP host holds the wall clock. Maximum 25000ms per call to leave headroom under the sandbox timeout.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{'name': 'ms', 'type': 'number', 'required': true},
+      ],
+    },
+    <String, dynamic>{
+      'name': 'obs_scene_items_animate_transform',
+      'description':
+          'Smoothly animate a scene item transform from its current state to the supplied target over durationMs. Runs server-side at frameRate fps (clamped 1-60). Fields omitted from the target hold steady. Easing options: linear, easeIn, easeOut, easeInOut, easeOutBounce.',
+      'parameters': <Map<String, dynamic>>[
+        <String, dynamic>{
+          'name': 'sceneName',
+          'type': 'string',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'sceneItemId',
+          'type': 'number',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'durationMs',
+          'type': 'number',
+          'required': true,
+        },
+        <String, dynamic>{
+          'name': 'targetPositionX',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'targetPositionY',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'targetScaleX',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'targetScaleY',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'targetRotation',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'targetCropLeft',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'targetCropTop',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'targetCropRight',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'targetCropBottom',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'frameRate',
+          'type': 'number',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'easing',
+          'type': 'string',
+          'required': false,
+        },
+        <String, dynamic>{
+          'name': 'restoreOnComplete',
+          'type': 'boolean',
+          'required': false,
+        },
+      ],
+    },
+  ];
   FutureOr<CallToolResult> _search(CallToolRequest request) async {
     try {
       final query = (request.arguments?['query'] as String?) ?? '';
-      final detailLevel = (request.arguments?['detail_level'] as String?) ?? 'brief';
+      final detailLevel =
+          (request.arguments?['detail_level'] as String?) ?? 'brief';
 
-      final terms = query.toLowerCase().split(' ').where((t) => t.isNotEmpty).toList();
+      final terms = query
+          .toLowerCase()
+          .split(' ')
+          .where((t) => t.isNotEmpty)
+          .toList();
 
       if (terms.isEmpty) {
-        final results = _codeModeToolSpecs.map((tool) =>
-            _formatSearchResult(tool, detailLevel)).toList();
+        final results = _codeModeToolSpecs
+            .map((tool) => _formatSearchResult(tool, detailLevel))
+            .toList();
         return CallToolResult(
           content: [TextContent(text: jsonEncode(results))],
         );
@@ -2883,7 +5689,9 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
       final andMatches = _codeModeToolSpecs.where((tool) {
         final name = (tool['name'] as String).toLowerCase();
         final desc = (tool['description'] as String).toLowerCase();
-        return terms.every((term) => name.contains(term) || desc.contains(term));
+        return terms.every(
+          (term) => name.contains(term) || desc.contains(term),
+        );
       }).toList();
 
       List<Map<String, dynamic>> matches;
@@ -2891,26 +5699,28 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         matches = andMatches;
       } else {
         // Phase 2: ranked OR match — score each tool by how many terms it matches
-        final scored = _codeModeToolSpecs.map((tool) {
-          final name = (tool['name'] as String).toLowerCase();
-          final desc = (tool['description'] as String).toLowerCase();
-          int score = 0;
-          for (final term in terms) {
-            if (name.contains(term) || desc.contains(term)) score++;
-          }
-          return MapEntry(tool, score);
-        }).where((e) => e.value > 0).toList();
+        final scored = _codeModeToolSpecs
+            .map((tool) {
+              final name = (tool['name'] as String).toLowerCase();
+              final desc = (tool['description'] as String).toLowerCase();
+              int score = 0;
+              for (final term in terms) {
+                if (name.contains(term) || desc.contains(term)) score++;
+              }
+              return MapEntry(tool, score);
+            })
+            .where((e) => e.value > 0)
+            .toList();
 
         scored.sort((a, b) => b.value.compareTo(a.value));
         matches = scored.map((e) => e.key).toList();
       }
 
-      final results = matches.map((tool) =>
-          _formatSearchResult(tool, detailLevel)).toList();
+      final results = matches
+          .map((tool) => _formatSearchResult(tool, detailLevel))
+          .toList();
 
-      return CallToolResult(
-        content: [TextContent(text: jsonEncode(results))],
-      );
+      return CallToolResult(content: [TextContent(text: jsonEncode(results))]);
     } catch (e, st) {
       if (_logErrors) {
         io.stderr.writeln('[easy_api] _search: $e');
@@ -2918,7 +5728,9 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
@@ -2935,11 +5747,15 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
     if (detailLevel == 'brief') {
       return {'name': name, 'description': desc};
     } else if (detailLevel == 'detailed') {
-      final paramInfo = params.map((p) => {
-        'name': p['name'],
-        'type': p['type'],
-        'required': p['required'],
-      }).toList();
+      final paramInfo = params
+          .map(
+            (p) => {
+              'name': p['name'],
+              'type': p['type'],
+              'required': p['required'],
+            },
+          )
+          .toList();
       return {'name': name, 'description': desc, 'parameters': paramInfo};
     } else {
       final paramInfo = params.map((p) {
@@ -2954,14 +5770,12 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
     }
   }
   // ignore: prefer_adjacent_string_concatenation
-  
+
   FutureOr<CallToolResult> _execute(CallToolRequest request) async {
     try {
       final code = request.arguments!['code'] as String;
       final result = await _runCodeSandbox(code, 30);
-      return CallToolResult(
-        content: [TextContent(text: result ?? 'null')],
-      );
+      return CallToolResult(content: [TextContent(text: result ?? 'null')]);
     } catch (e, st) {
       if (_logErrors) {
         io.stderr.writeln('[easy_api] _execute: $e');
@@ -2969,11 +5783,14 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
         await io.stderr.flush();
       }
       return CallToolResult(
-        content: [TextContent(text: 'An error occurred while processing the request.')],
+        content: [
+          TextContent(text: 'An error occurred while processing the request.'),
+        ],
         isError: true,
       );
     }
   }
+
   Future<String?> _runCodeSandbox(String userCode, int timeoutSeconds) async {
     io.Process? process;
     io.Directory? tempDir;
@@ -2983,10 +5800,10 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
       final scriptFile = io.File('${tempDir.path}/sandbox.js');
       await scriptFile.writeAsString(wrapper);
 
-      process = await io.Process.start(
-        'node',
-        ['--max-old-space-size=64', scriptFile.path],
-      );
+      process = await io.Process.start('node', [
+        '--max-old-space-size=64',
+        scriptFile.path,
+      ]);
     } catch (e) {
       await tempDir?.delete(recursive: true);
       throw StateError('Code mode requires Node.js to be installed');
@@ -3000,62 +5817,80 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
           .transform(utf8.decoder)
           .transform(const LineSplitter())
           .listen((line) {
-        if (line.trim().isEmpty) return;
+            if (line.trim().isEmpty) return;
 
-        try {
-          final msg = jsonDecode(line) as Map<String, dynamic>;
-          final type = msg['type'] as String?;
+            try {
+              final msg = jsonDecode(line) as Map<String, dynamic>;
+              final type = msg['type'] as String?;
 
-          if (type == 'call') {
-            final callId = msg['callId'] as String;
-            final toolName = msg['tool'] as String;
-            final args = (msg['args'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+              if (type == 'call') {
+                final callId = msg['callId'] as String;
+                final toolName = msg['tool'] as String;
+                final args =
+                    (msg['args'] as Map<String, dynamic>?) ??
+                    <String, dynamic>{};
 
-            _dispatchCodeModeToolCall(toolName, args).then((resultJson) {
-              process?.stdin.writeln(jsonEncode({
-                'type': 'result',
-                'callId': callId,
-                'data': resultJson,
-              }));
-            }).catchError((e, st) {
-              if (_logErrors) {
-                io.stderr.writeln('[easy_api] _dispatchCodeModeToolCall($toolName): $e');
-                io.stderr.writeln(st);
-                io.stderr.flush();  // fire-and-forget; callback is not async
+                _dispatchCodeModeToolCall(toolName, args)
+                    .then((resultJson) {
+                      process?.stdin.writeln(
+                        jsonEncode({
+                          'type': 'result',
+                          'callId': callId,
+                          'data': resultJson,
+                        }),
+                      );
+                    })
+                    .catchError((e, st) {
+                      if (_logErrors) {
+                        io.stderr.writeln(
+                          '[easy_api] _dispatchCodeModeToolCall($toolName): $e',
+                        );
+                        io.stderr.writeln(st);
+                        io.stderr
+                            .flush(); // fire-and-forget; callback is not async
+                      }
+                      process?.stdin.writeln(
+                        jsonEncode({
+                          'type': 'result',
+                          'callId': callId,
+                          'data': null,
+                          'error':
+                              'An error occurred while processing the request.',
+                        }),
+                      );
+                    });
+              } else if (type == 'done') {
+                final result = msg['result'];
+                if (result == null) {
+                  resultCompleter.complete(null);
+                } else if (result is String) {
+                  resultCompleter.complete(result);
+                } else {
+                  resultCompleter.complete(jsonEncode(result));
+                }
+              } else if (type == 'error') {
+                errorCompleter.complete(
+                  msg['message'] as String? ?? 'Unknown error',
+                );
               }
-              process?.stdin.writeln(jsonEncode({
-                'type': 'result',
-                'callId': callId,
-                'data': null,
-                'error': 'An error occurred while processing the request.',
-              }));
-            });
-          } else if (type == 'done') {
-            final result = msg['result'];
-            if (result == null) {
-              resultCompleter.complete(null);
-            } else if (result is String) {
-              resultCompleter.complete(result);
-            } else {
-              resultCompleter.complete(jsonEncode(result));
+            } catch (_) {
+              // Ignore non-JSON lines
             }
-          } else if (type == 'error') {
-            errorCompleter.complete(msg['message'] as String? ?? 'Unknown error');
-          }
-        } catch (_) {
-          // Ignore non-JSON lines
-        }
-      });
+          });
 
       // Wait for result, error, or timeout
       final timeoutFuture = Future.delayed(
         Duration(seconds: timeoutSeconds),
-        () => throw StateError('Code execution timed out after $timeoutSeconds seconds'),
+        () => throw StateError(
+          'Code execution timed out after $timeoutSeconds seconds',
+        ),
       );
 
       final result = await Future.any<String?>([
         resultCompleter.future,
-        errorCompleter.future.then((e) => throw StateError('Code execution error: $e')),
+        errorCompleter.future.then(
+          (e) => throw StateError('Code execution error: $e'),
+        ),
         timeoutFuture,
       ]);
 
@@ -3065,6 +5900,7 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
       await tempDir.delete(recursive: true);
     }
   }
+
   String _buildJsWrapper(String userCode) {
     final sb = StringBuffer();
     sb.writeln('// Code Mode Sandbox - IPC Layer');
@@ -3108,139 +5944,405 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
     sb.writeln('}');
     sb.writeln();
     sb.writeln('// External Tool Functions (convenience wrappers)');
-    sb.writeln("async function external_obs_connect(args) { return call_tool('obs_connect', args); }");
-    sb.writeln("async function external_obs_disconnect(args) { return call_tool('obs_disconnect', args); }");
-    sb.writeln("async function external_obs_is_connected(args) { return call_tool('obs_is_connected', args); }");
-    sb.writeln("async function external_obs_send_raw(args) { return call_tool('obs_send_raw', args); }");
-    sb.writeln("async function external_obs_general_version(args) { return call_tool('obs_general_version', args); }");
-    sb.writeln("async function external_obs_general_stats(args) { return call_tool('obs_general_stats', args); }");
-    sb.writeln("async function external_obs_general_hotkeys(args) { return call_tool('obs_general_hotkeys', args); }");
-    sb.writeln("async function external_obs_general_trigger_hotkey(args) { return call_tool('obs_general_trigger_hotkey', args); }");
-    sb.writeln("async function external_obs_general_sleep(args) { return call_tool('obs_general_sleep', args); }");
-    sb.writeln("async function external_obs_general_broadcast_custom_event(args) { return call_tool('obs_general_broadcast_custom_event', args); }");
-    sb.writeln("async function external_obs_scenes_list(args) { return call_tool('obs_scenes_list', args); }");
-    sb.writeln("async function external_obs_scenes_group_list(args) { return call_tool('obs_scenes_group_list', args); }");
-    sb.writeln("async function external_obs_scenes_get_current_program(args) { return call_tool('obs_scenes_get_current_program', args); }");
-    sb.writeln("async function external_obs_scenes_set_current_program(args) { return call_tool('obs_scenes_set_current_program', args); }");
-    sb.writeln("async function external_obs_scenes_get_current_preview(args) { return call_tool('obs_scenes_get_current_preview', args); }");
-    sb.writeln("async function external_obs_scenes_set_current_preview(args) { return call_tool('obs_scenes_set_current_preview', args); }");
-    sb.writeln("async function external_obs_scenes_create(args) { return call_tool('obs_scenes_create', args); }");
-    sb.writeln("async function external_obs_scene_items_list(args) { return call_tool('obs_scene_items_list', args); }");
-    sb.writeln("async function external_obs_scene_items_group_list(args) { return call_tool('obs_scene_items_group_list', args); }");
-    sb.writeln("async function external_obs_scene_items_get_id(args) { return call_tool('obs_scene_items_get_id', args); }");
-    sb.writeln("async function external_obs_scene_items_get_enabled(args) { return call_tool('obs_scene_items_get_enabled', args); }");
-    sb.writeln("async function external_obs_scene_items_set_enabled(args) { return call_tool('obs_scene_items_set_enabled', args); }");
-    sb.writeln("async function external_obs_scene_items_get_locked(args) { return call_tool('obs_scene_items_get_locked', args); }");
-    sb.writeln("async function external_obs_scene_items_set_locked(args) { return call_tool('obs_scene_items_set_locked', args); }");
-    sb.writeln("async function external_obs_scene_items_set_transform(args) { return call_tool('obs_scene_items_set_transform', args); }");
-    sb.writeln("async function external_obs_inputs_list(args) { return call_tool('obs_inputs_list', args); }");
-    sb.writeln("async function external_obs_inputs_kind_list(args) { return call_tool('obs_inputs_kind_list', args); }");
-    sb.writeln("async function external_obs_inputs_special(args) { return call_tool('obs_inputs_special', args); }");
-    sb.writeln("async function external_obs_inputs_get_mute(args) { return call_tool('obs_inputs_get_mute', args); }");
-    sb.writeln("async function external_obs_inputs_set_mute(args) { return call_tool('obs_inputs_set_mute', args); }");
-    sb.writeln("async function external_obs_inputs_toggle_mute(args) { return call_tool('obs_inputs_toggle_mute', args); }");
-    sb.writeln("async function external_obs_inputs_get_volume(args) { return call_tool('obs_inputs_get_volume', args); }");
-    sb.writeln("async function external_obs_inputs_get_settings(args) { return call_tool('obs_inputs_get_settings', args); }");
-    sb.writeln("async function external_obs_inputs_set_settings(args) { return call_tool('obs_inputs_set_settings', args); }");
-    sb.writeln("async function external_obs_inputs_set_name(args) { return call_tool('obs_inputs_set_name', args); }");
-    sb.writeln("async function external_obs_inputs_create(args) { return call_tool('obs_inputs_create', args); }");
-    sb.writeln("async function external_obs_inputs_remove(args) { return call_tool('obs_inputs_remove', args); }");
-    sb.writeln("async function external_obs_stream_status(args) { return call_tool('obs_stream_status', args); }");
-    sb.writeln("async function external_obs_stream_start(args) { return call_tool('obs_stream_start', args); }");
-    sb.writeln("async function external_obs_stream_stop(args) { return call_tool('obs_stream_stop', args); }");
-    sb.writeln("async function external_obs_stream_toggle(args) { return call_tool('obs_stream_toggle', args); }");
-    sb.writeln("async function external_obs_stream_send_caption(args) { return call_tool('obs_stream_send_caption', args); }");
-    sb.writeln("async function external_obs_record_status(args) { return call_tool('obs_record_status', args); }");
-    sb.writeln("async function external_obs_record_start(args) { return call_tool('obs_record_start', args); }");
-    sb.writeln("async function external_obs_record_stop(args) { return call_tool('obs_record_stop', args); }");
-    sb.writeln("async function external_obs_record_toggle(args) { return call_tool('obs_record_toggle', args); }");
-    sb.writeln("async function external_obs_record_pause(args) { return call_tool('obs_record_pause', args); }");
-    sb.writeln("async function external_obs_record_resume(args) { return call_tool('obs_record_resume', args); }");
-    sb.writeln("async function external_obs_record_toggle_pause(args) { return call_tool('obs_record_toggle_pause', args); }");
-    sb.writeln("async function external_obs_outputs_virtual_cam_status(args) { return call_tool('obs_outputs_virtual_cam_status', args); }");
-    sb.writeln("async function external_obs_outputs_virtual_cam_toggle(args) { return call_tool('obs_outputs_virtual_cam_toggle', args); }");
-    sb.writeln("async function external_obs_outputs_virtual_cam_start(args) { return call_tool('obs_outputs_virtual_cam_start', args); }");
-    sb.writeln("async function external_obs_outputs_virtual_cam_stop(args) { return call_tool('obs_outputs_virtual_cam_stop', args); }");
-    sb.writeln("async function external_obs_outputs_replay_buffer_status(args) { return call_tool('obs_outputs_replay_buffer_status', args); }");
-    sb.writeln("async function external_obs_outputs_replay_buffer_toggle(args) { return call_tool('obs_outputs_replay_buffer_toggle', args); }");
-    sb.writeln("async function external_obs_outputs_replay_buffer_start(args) { return call_tool('obs_outputs_replay_buffer_start', args); }");
-    sb.writeln("async function external_obs_outputs_replay_buffer_stop(args) { return call_tool('obs_outputs_replay_buffer_stop', args); }");
-    sb.writeln("async function external_obs_outputs_replay_buffer_save(args) { return call_tool('obs_outputs_replay_buffer_save', args); }");
-    sb.writeln("async function external_obs_outputs_toggle(args) { return call_tool('obs_outputs_toggle', args); }");
-    sb.writeln("async function external_obs_outputs_start(args) { return call_tool('obs_outputs_start', args); }");
-    sb.writeln("async function external_obs_outputs_stop(args) { return call_tool('obs_outputs_stop', args); }");
-    sb.writeln("async function external_obs_config_record_directory(args) { return call_tool('obs_config_record_directory', args); }");
-    sb.writeln("async function external_obs_config_stream_service_settings(args) { return call_tool('obs_config_stream_service_settings', args); }");
-    sb.writeln("async function external_obs_ui_studio_mode_enabled(args) { return call_tool('obs_ui_studio_mode_enabled', args); }");
-    sb.writeln("async function external_obs_ui_set_studio_mode(args) { return call_tool('obs_ui_set_studio_mode', args); }");
-    sb.writeln("async function external_obs_ui_open_input_properties(args) { return call_tool('obs_ui_open_input_properties', args); }");
-    sb.writeln("async function external_obs_ui_open_input_filters(args) { return call_tool('obs_ui_open_input_filters', args); }");
-    sb.writeln("async function external_obs_ui_open_input_interact(args) { return call_tool('obs_ui_open_input_interact', args); }");
-    sb.writeln("async function external_obs_ui_monitor_list(args) { return call_tool('obs_ui_monitor_list', args); }");
-    sb.writeln("async function external_obs_transitions_trigger_studio(args) { return call_tool('obs_transitions_trigger_studio', args); }");
-    sb.writeln("async function external_obs_transitions_kind_list(args) { return call_tool('obs_transitions_kind_list', args); }");
-    sb.writeln("async function external_obs_transitions_scene_list(args) { return call_tool('obs_transitions_scene_list', args); }");
-    sb.writeln("async function external_obs_transitions_get_current(args) { return call_tool('obs_transitions_get_current', args); }");
-    sb.writeln("async function external_obs_transitions_set_current(args) { return call_tool('obs_transitions_set_current', args); }");
-    sb.writeln("async function external_obs_transitions_set_duration(args) { return call_tool('obs_transitions_set_duration', args); }");
-    sb.writeln("async function external_obs_transitions_set_settings(args) { return call_tool('obs_transitions_set_settings', args); }");
-    sb.writeln("async function external_obs_transitions_get_cursor(args) { return call_tool('obs_transitions_get_cursor', args); }");
-    sb.writeln("async function external_obs_transitions_set_tbar(args) { return call_tool('obs_transitions_set_tbar', args); }");
-    sb.writeln("async function external_obs_sources_get_active(args) { return call_tool('obs_sources_get_active', args); }");
-    sb.writeln("async function external_obs_sources_get_screenshot(args) { return call_tool('obs_sources_get_screenshot', args); }");
-    sb.writeln("async function external_obs_sources_save_screenshot(args) { return call_tool('obs_sources_save_screenshot', args); }");
-    sb.writeln("async function external_obs_sources_get_private_settings(args) { return call_tool('obs_sources_get_private_settings', args); }");
-    sb.writeln("async function external_obs_sources_set_private_settings(args) { return call_tool('obs_sources_set_private_settings', args); }");
-    sb.writeln("async function external_obs_media_inputs_get_status(args) { return call_tool('obs_media_inputs_get_status', args); }");
-    sb.writeln("async function external_obs_media_inputs_set_cursor(args) { return call_tool('obs_media_inputs_set_cursor', args); }");
-    sb.writeln("async function external_obs_media_inputs_offset_cursor(args) { return call_tool('obs_media_inputs_offset_cursor', args); }");
-    sb.writeln("async function external_obs_media_inputs_trigger_action(args) { return call_tool('obs_media_inputs_trigger_action', args); }");
-    sb.writeln("async function external_obs_inputs_get_deinterlace_mode(args) { return call_tool('obs_inputs_get_deinterlace_mode', args); }");
-    sb.writeln("async function external_obs_inputs_set_deinterlace_mode(args) { return call_tool('obs_inputs_set_deinterlace_mode', args); }");
-    sb.writeln("async function external_obs_inputs_get_deinterlace_field_order(args) { return call_tool('obs_inputs_get_deinterlace_field_order', args); }");
-    sb.writeln("async function external_obs_inputs_set_deinterlace_field_order(args) { return call_tool('obs_inputs_set_deinterlace_field_order', args); }");
-    sb.writeln("async function external_obs_inputs_set_volume(args) { return call_tool('obs_inputs_set_volume', args); }");
-    sb.writeln("async function external_obs_inputs_get_default_settings(args) { return call_tool('obs_inputs_get_default_settings', args); }");
-    sb.writeln("async function external_obs_general_call_vendor_request(args) { return call_tool('obs_general_call_vendor_request', args); }");
-    sb.writeln("async function external_obs_general_trigger_hotkey_by_key(args) { return call_tool('obs_general_trigger_hotkey_by_key', args); }");
-    sb.writeln("async function external_obs_scene_items_create(args) { return call_tool('obs_scene_items_create', args); }");
-    sb.writeln("async function external_obs_scene_items_duplicate(args) { return call_tool('obs_scene_items_duplicate', args); }");
-    sb.writeln("async function external_obs_scene_items_remove(args) { return call_tool('obs_scene_items_remove', args); }");
-    sb.writeln("async function external_obs_scene_items_get_transform(args) { return call_tool('obs_scene_items_get_transform', args); }");
-    sb.writeln("async function external_obs_canvases_list(args) { return call_tool('obs_canvases_list', args); }");
-    sb.writeln("async function external_obs_filters_kind_list(args) { return call_tool('obs_filters_kind_list', args); }");
-    sb.writeln("async function external_obs_filters_list(args) { return call_tool('obs_filters_list', args); }");
-    sb.writeln("async function external_obs_filters_default_settings(args) { return call_tool('obs_filters_default_settings', args); }");
-    sb.writeln("async function external_obs_filters_create(args) { return call_tool('obs_filters_create', args); }");
-    sb.writeln("async function external_obs_filters_remove(args) { return call_tool('obs_filters_remove', args); }");
-    sb.writeln("async function external_obs_filters_rename(args) { return call_tool('obs_filters_rename', args); }");
-    sb.writeln("async function external_obs_filters_get(args) { return call_tool('obs_filters_get', args); }");
-    sb.writeln("async function external_obs_filters_set_index(args) { return call_tool('obs_filters_set_index', args); }");
-    sb.writeln("async function external_obs_filters_set_settings(args) { return call_tool('obs_filters_set_settings', args); }");
-    sb.writeln("async function external_obs_filters_set_enabled(args) { return call_tool('obs_filters_set_enabled', args); }");
-    sb.writeln("async function external_obs_outputs_list(args) { return call_tool('obs_outputs_list', args); }");
-    sb.writeln("async function external_obs_outputs_get_status(args) { return call_tool('obs_outputs_get_status', args); }");
-    sb.writeln("async function external_obs_outputs_get_settings(args) { return call_tool('obs_outputs_get_settings', args); }");
-    sb.writeln("async function external_obs_outputs_set_settings(args) { return call_tool('obs_outputs_set_settings', args); }");
-    sb.writeln("async function external_obs_inputs_get_audio_balance(args) { return call_tool('obs_inputs_get_audio_balance', args); }");
-    sb.writeln("async function external_obs_inputs_set_audio_balance(args) { return call_tool('obs_inputs_set_audio_balance', args); }");
-    sb.writeln("async function external_obs_inputs_get_audio_sync_offset(args) { return call_tool('obs_inputs_get_audio_sync_offset', args); }");
-    sb.writeln("async function external_obs_inputs_set_audio_sync_offset(args) { return call_tool('obs_inputs_set_audio_sync_offset', args); }");
-    sb.writeln("async function external_obs_inputs_get_audio_monitor_type(args) { return call_tool('obs_inputs_get_audio_monitor_type', args); }");
-    sb.writeln("async function external_obs_inputs_set_audio_monitor_type(args) { return call_tool('obs_inputs_set_audio_monitor_type', args); }");
-    sb.writeln("async function external_obs_inputs_get_audio_tracks(args) { return call_tool('obs_inputs_get_audio_tracks', args); }");
-    sb.writeln("async function external_obs_inputs_set_audio_tracks(args) { return call_tool('obs_inputs_set_audio_tracks', args); }");
-    sb.writeln("async function external_obs_inputs_get_properties_list_items(args) { return call_tool('obs_inputs_get_properties_list_items', args); }");
-    sb.writeln("async function external_obs_inputs_press_properties_button(args) { return call_tool('obs_inputs_press_properties_button', args); }");
-    sb.writeln("async function external_obs_scene_items_get_source(args) { return call_tool('obs_scene_items_get_source', args); }");
-    sb.writeln("async function external_obs_scene_items_get_private_settings(args) { return call_tool('obs_scene_items_get_private_settings', args); }");
-    sb.writeln("async function external_obs_scene_items_set_private_settings(args) { return call_tool('obs_scene_items_set_private_settings', args); }");
-    sb.writeln("async function external_obs_connection_status(args) { return call_tool('obs_connection_status', args); }");
-    sb.writeln("async function external_obs_connection_ping(args) { return call_tool('obs_connection_ping', args); }");
-    sb.writeln("async function external_obs_events_subscribe(args) { return call_tool('obs_events_subscribe', args); }");
-    sb.writeln("async function external_obs_wait_for_event(args) { return call_tool('obs_wait_for_event', args); }");
-    sb.writeln("async function external_obs_client_sleep(args) { return call_tool('obs_client_sleep', args); }");
-    sb.writeln("async function external_obs_scene_items_animate_transform(args) { return call_tool('obs_scene_items_animate_transform', args); }");
+    sb.writeln(
+      "async function external_obs_connect(args) { return call_tool('obs_connect', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_disconnect(args) { return call_tool('obs_disconnect', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_is_connected(args) { return call_tool('obs_is_connected', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_send_raw(args) { return call_tool('obs_send_raw', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_general_version(args) { return call_tool('obs_general_version', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_general_stats(args) { return call_tool('obs_general_stats', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_general_hotkeys(args) { return call_tool('obs_general_hotkeys', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_general_trigger_hotkey(args) { return call_tool('obs_general_trigger_hotkey', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_general_sleep(args) { return call_tool('obs_general_sleep', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_general_broadcast_custom_event(args) { return call_tool('obs_general_broadcast_custom_event', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scenes_list(args) { return call_tool('obs_scenes_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scenes_group_list(args) { return call_tool('obs_scenes_group_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scenes_get_current_program(args) { return call_tool('obs_scenes_get_current_program', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scenes_set_current_program(args) { return call_tool('obs_scenes_set_current_program', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scenes_get_current_preview(args) { return call_tool('obs_scenes_get_current_preview', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scenes_set_current_preview(args) { return call_tool('obs_scenes_set_current_preview', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scenes_create(args) { return call_tool('obs_scenes_create', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_list(args) { return call_tool('obs_scene_items_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_group_list(args) { return call_tool('obs_scene_items_group_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_get_id(args) { return call_tool('obs_scene_items_get_id', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_get_enabled(args) { return call_tool('obs_scene_items_get_enabled', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_set_enabled(args) { return call_tool('obs_scene_items_set_enabled', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_get_locked(args) { return call_tool('obs_scene_items_get_locked', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_set_locked(args) { return call_tool('obs_scene_items_set_locked', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_set_transform(args) { return call_tool('obs_scene_items_set_transform', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_list(args) { return call_tool('obs_inputs_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_kind_list(args) { return call_tool('obs_inputs_kind_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_special(args) { return call_tool('obs_inputs_special', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_get_mute(args) { return call_tool('obs_inputs_get_mute', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_set_mute(args) { return call_tool('obs_inputs_set_mute', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_toggle_mute(args) { return call_tool('obs_inputs_toggle_mute', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_get_volume(args) { return call_tool('obs_inputs_get_volume', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_get_settings(args) { return call_tool('obs_inputs_get_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_set_settings(args) { return call_tool('obs_inputs_set_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_set_name(args) { return call_tool('obs_inputs_set_name', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_create(args) { return call_tool('obs_inputs_create', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_remove(args) { return call_tool('obs_inputs_remove', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_stream_status(args) { return call_tool('obs_stream_status', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_stream_start(args) { return call_tool('obs_stream_start', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_stream_stop(args) { return call_tool('obs_stream_stop', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_stream_toggle(args) { return call_tool('obs_stream_toggle', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_stream_send_caption(args) { return call_tool('obs_stream_send_caption', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_record_status(args) { return call_tool('obs_record_status', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_record_start(args) { return call_tool('obs_record_start', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_record_stop(args) { return call_tool('obs_record_stop', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_record_toggle(args) { return call_tool('obs_record_toggle', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_record_pause(args) { return call_tool('obs_record_pause', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_record_resume(args) { return call_tool('obs_record_resume', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_record_toggle_pause(args) { return call_tool('obs_record_toggle_pause', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_virtual_cam_status(args) { return call_tool('obs_outputs_virtual_cam_status', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_virtual_cam_toggle(args) { return call_tool('obs_outputs_virtual_cam_toggle', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_virtual_cam_start(args) { return call_tool('obs_outputs_virtual_cam_start', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_virtual_cam_stop(args) { return call_tool('obs_outputs_virtual_cam_stop', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_replay_buffer_status(args) { return call_tool('obs_outputs_replay_buffer_status', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_replay_buffer_toggle(args) { return call_tool('obs_outputs_replay_buffer_toggle', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_replay_buffer_start(args) { return call_tool('obs_outputs_replay_buffer_start', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_replay_buffer_stop(args) { return call_tool('obs_outputs_replay_buffer_stop', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_replay_buffer_save(args) { return call_tool('obs_outputs_replay_buffer_save', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_toggle(args) { return call_tool('obs_outputs_toggle', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_start(args) { return call_tool('obs_outputs_start', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_stop(args) { return call_tool('obs_outputs_stop', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_config_record_directory(args) { return call_tool('obs_config_record_directory', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_config_stream_service_settings(args) { return call_tool('obs_config_stream_service_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_ui_studio_mode_enabled(args) { return call_tool('obs_ui_studio_mode_enabled', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_ui_set_studio_mode(args) { return call_tool('obs_ui_set_studio_mode', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_ui_open_input_properties(args) { return call_tool('obs_ui_open_input_properties', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_ui_open_input_filters(args) { return call_tool('obs_ui_open_input_filters', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_ui_open_input_interact(args) { return call_tool('obs_ui_open_input_interact', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_ui_monitor_list(args) { return call_tool('obs_ui_monitor_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_transitions_trigger_studio(args) { return call_tool('obs_transitions_trigger_studio', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_transitions_kind_list(args) { return call_tool('obs_transitions_kind_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_transitions_scene_list(args) { return call_tool('obs_transitions_scene_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_transitions_get_current(args) { return call_tool('obs_transitions_get_current', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_transitions_set_current(args) { return call_tool('obs_transitions_set_current', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_transitions_set_duration(args) { return call_tool('obs_transitions_set_duration', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_transitions_set_settings(args) { return call_tool('obs_transitions_set_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_transitions_get_cursor(args) { return call_tool('obs_transitions_get_cursor', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_transitions_set_tbar(args) { return call_tool('obs_transitions_set_tbar', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_sources_get_active(args) { return call_tool('obs_sources_get_active', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_sources_get_screenshot(args) { return call_tool('obs_sources_get_screenshot', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_sources_save_screenshot(args) { return call_tool('obs_sources_save_screenshot', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_sources_get_private_settings(args) { return call_tool('obs_sources_get_private_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_sources_set_private_settings(args) { return call_tool('obs_sources_set_private_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_media_inputs_get_status(args) { return call_tool('obs_media_inputs_get_status', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_media_inputs_set_cursor(args) { return call_tool('obs_media_inputs_set_cursor', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_media_inputs_offset_cursor(args) { return call_tool('obs_media_inputs_offset_cursor', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_media_inputs_trigger_action(args) { return call_tool('obs_media_inputs_trigger_action', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_get_deinterlace_mode(args) { return call_tool('obs_inputs_get_deinterlace_mode', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_set_deinterlace_mode(args) { return call_tool('obs_inputs_set_deinterlace_mode', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_get_deinterlace_field_order(args) { return call_tool('obs_inputs_get_deinterlace_field_order', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_set_deinterlace_field_order(args) { return call_tool('obs_inputs_set_deinterlace_field_order', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_set_volume(args) { return call_tool('obs_inputs_set_volume', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_get_default_settings(args) { return call_tool('obs_inputs_get_default_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_general_call_vendor_request(args) { return call_tool('obs_general_call_vendor_request', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_general_trigger_hotkey_by_key(args) { return call_tool('obs_general_trigger_hotkey_by_key', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_create(args) { return call_tool('obs_scene_items_create', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_duplicate(args) { return call_tool('obs_scene_items_duplicate', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_remove(args) { return call_tool('obs_scene_items_remove', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_get_transform(args) { return call_tool('obs_scene_items_get_transform', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_canvases_list(args) { return call_tool('obs_canvases_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_filters_kind_list(args) { return call_tool('obs_filters_kind_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_filters_list(args) { return call_tool('obs_filters_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_filters_default_settings(args) { return call_tool('obs_filters_default_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_filters_create(args) { return call_tool('obs_filters_create', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_filters_remove(args) { return call_tool('obs_filters_remove', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_filters_rename(args) { return call_tool('obs_filters_rename', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_filters_get(args) { return call_tool('obs_filters_get', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_filters_set_index(args) { return call_tool('obs_filters_set_index', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_filters_set_settings(args) { return call_tool('obs_filters_set_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_filters_set_enabled(args) { return call_tool('obs_filters_set_enabled', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_list(args) { return call_tool('obs_outputs_list', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_get_status(args) { return call_tool('obs_outputs_get_status', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_get_settings(args) { return call_tool('obs_outputs_get_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_outputs_set_settings(args) { return call_tool('obs_outputs_set_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_get_audio_balance(args) { return call_tool('obs_inputs_get_audio_balance', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_set_audio_balance(args) { return call_tool('obs_inputs_set_audio_balance', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_get_audio_sync_offset(args) { return call_tool('obs_inputs_get_audio_sync_offset', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_set_audio_sync_offset(args) { return call_tool('obs_inputs_set_audio_sync_offset', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_get_audio_monitor_type(args) { return call_tool('obs_inputs_get_audio_monitor_type', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_set_audio_monitor_type(args) { return call_tool('obs_inputs_set_audio_monitor_type', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_get_audio_tracks(args) { return call_tool('obs_inputs_get_audio_tracks', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_set_audio_tracks(args) { return call_tool('obs_inputs_set_audio_tracks', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_get_properties_list_items(args) { return call_tool('obs_inputs_get_properties_list_items', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_inputs_press_properties_button(args) { return call_tool('obs_inputs_press_properties_button', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_get_source(args) { return call_tool('obs_scene_items_get_source', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_get_private_settings(args) { return call_tool('obs_scene_items_get_private_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_set_private_settings(args) { return call_tool('obs_scene_items_set_private_settings', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_connection_status(args) { return call_tool('obs_connection_status', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_connection_ping(args) { return call_tool('obs_connection_ping', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_events_subscribe(args) { return call_tool('obs_events_subscribe', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_wait_for_event(args) { return call_tool('obs_wait_for_event', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_client_sleep(args) { return call_tool('obs_client_sleep', args); }",
+    );
+    sb.writeln(
+      "async function external_obs_scene_items_animate_transform(args) { return call_tool('obs_scene_items_animate_transform', args); }",
+    );
     sb.writeln();
     sb.writeln('// Execute user code');
     sb.writeln('(async () => {');
@@ -3249,156 +6351,433 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
     // Auto-return expression-like code (IIFE or bare await) so the LLM
     // doesn't need to remember an explicit return for single-expression snippets.
     final trimmedCode = userCode.trim();
-    final isExpressionLike = trimmedCode.startsWith('(') || trimmedCode.startsWith('await ');
+    final isExpressionLike =
+        trimmedCode.startsWith('(') || trimmedCode.startsWith('await ');
     final alreadyHasReturn = trimmedCode.startsWith('return ');
-    final codeToRun = (isExpressionLike && !alreadyHasReturn) ? 'return ' + userCode : userCode;
+    final codeToRun = (isExpressionLike && !alreadyHasReturn)
+        ? 'return ' + userCode
+        : userCode;
     sb.writeln(codeToRun);
     sb.writeln('    })();');
     sb.writeln("    __send({ type: 'done', result: __result });");
     sb.writeln('  } catch (e) {');
-    sb.writeln("    __send({ type: 'error', message: e.message || String(e) });");
+    sb.writeln(
+      "    __send({ type: 'error', message: e.message || String(e) });",
+    );
     sb.writeln('  }');
     sb.writeln('})();');
     return sb.toString();
   }
-  dynamic _dispatchCodeModeToolCall(String toolName, Map<String, dynamic> args) async {
+
+  dynamic _dispatchCodeModeToolCall(
+    String toolName,
+    Map<String, dynamic> args,
+  ) async {
     final request = CallToolRequest(name: toolName, arguments: args);
     CallToolResult result;
     switch (toolName) {
-      case 'search': result = await _search(request); break;
-      case 'obs_connect': result = await _obs_connect(request); break;
-      case 'obs_disconnect': result = await _obs_disconnect(request); break;
-      case 'obs_is_connected': result = await _obs_is_connected(request); break;
-      case 'obs_send_raw': result = await _obs_send_raw(request); break;
-      case 'obs_general_version': result = await _obs_general_version(request); break;
-      case 'obs_general_stats': result = await _obs_general_stats(request); break;
-      case 'obs_general_hotkeys': result = await _obs_general_hotkeys(request); break;
-      case 'obs_general_trigger_hotkey': result = await _obs_general_trigger_hotkey(request); break;
-      case 'obs_general_sleep': result = await _obs_general_sleep(request); break;
-      case 'obs_general_broadcast_custom_event': result = await _obs_general_broadcast_custom_event(request); break;
-      case 'obs_scenes_list': result = await _obs_scenes_list(request); break;
-      case 'obs_scenes_group_list': result = await _obs_scenes_group_list(request); break;
-      case 'obs_scenes_get_current_program': result = await _obs_scenes_get_current_program(request); break;
-      case 'obs_scenes_set_current_program': result = await _obs_scenes_set_current_program(request); break;
-      case 'obs_scenes_get_current_preview': result = await _obs_scenes_get_current_preview(request); break;
-      case 'obs_scenes_set_current_preview': result = await _obs_scenes_set_current_preview(request); break;
-      case 'obs_scenes_create': result = await _obs_scenes_create(request); break;
-      case 'obs_scene_items_list': result = await _obs_scene_items_list(request); break;
-      case 'obs_scene_items_group_list': result = await _obs_scene_items_group_list(request); break;
-      case 'obs_scene_items_get_id': result = await _obs_scene_items_get_id(request); break;
-      case 'obs_scene_items_get_enabled': result = await _obs_scene_items_get_enabled(request); break;
-      case 'obs_scene_items_set_enabled': result = await _obs_scene_items_set_enabled(request); break;
-      case 'obs_scene_items_get_locked': result = await _obs_scene_items_get_locked(request); break;
-      case 'obs_scene_items_set_locked': result = await _obs_scene_items_set_locked(request); break;
-      case 'obs_scene_items_set_transform': result = await _obs_scene_items_set_transform(request); break;
-      case 'obs_inputs_list': result = await _obs_inputs_list(request); break;
-      case 'obs_inputs_kind_list': result = await _obs_inputs_kind_list(request); break;
-      case 'obs_inputs_special': result = await _obs_inputs_special(request); break;
-      case 'obs_inputs_get_mute': result = await _obs_inputs_get_mute(request); break;
-      case 'obs_inputs_set_mute': result = await _obs_inputs_set_mute(request); break;
-      case 'obs_inputs_toggle_mute': result = await _obs_inputs_toggle_mute(request); break;
-      case 'obs_inputs_get_volume': result = await _obs_inputs_get_volume(request); break;
-      case 'obs_inputs_get_settings': result = await _obs_inputs_get_settings(request); break;
-      case 'obs_inputs_set_settings': result = await _obs_inputs_set_settings(request); break;
-      case 'obs_inputs_set_name': result = await _obs_inputs_set_name(request); break;
-      case 'obs_inputs_create': result = await _obs_inputs_create(request); break;
-      case 'obs_inputs_remove': result = await _obs_inputs_remove(request); break;
-      case 'obs_stream_status': result = await _obs_stream_status(request); break;
-      case 'obs_stream_start': result = await _obs_stream_start(request); break;
-      case 'obs_stream_stop': result = await _obs_stream_stop(request); break;
-      case 'obs_stream_toggle': result = await _obs_stream_toggle(request); break;
-      case 'obs_stream_send_caption': result = await _obs_stream_send_caption(request); break;
-      case 'obs_record_status': result = await _obs_record_status(request); break;
-      case 'obs_record_start': result = await _obs_record_start(request); break;
-      case 'obs_record_stop': result = await _obs_record_stop(request); break;
-      case 'obs_record_toggle': result = await _obs_record_toggle(request); break;
-      case 'obs_record_pause': result = await _obs_record_pause(request); break;
-      case 'obs_record_resume': result = await _obs_record_resume(request); break;
-      case 'obs_record_toggle_pause': result = await _obs_record_toggle_pause(request); break;
-      case 'obs_outputs_virtual_cam_status': result = await _obs_outputs_virtual_cam_status(request); break;
-      case 'obs_outputs_virtual_cam_toggle': result = await _obs_outputs_virtual_cam_toggle(request); break;
-      case 'obs_outputs_virtual_cam_start': result = await _obs_outputs_virtual_cam_start(request); break;
-      case 'obs_outputs_virtual_cam_stop': result = await _obs_outputs_virtual_cam_stop(request); break;
-      case 'obs_outputs_replay_buffer_status': result = await _obs_outputs_replay_buffer_status(request); break;
-      case 'obs_outputs_replay_buffer_toggle': result = await _obs_outputs_replay_buffer_toggle(request); break;
-      case 'obs_outputs_replay_buffer_start': result = await _obs_outputs_replay_buffer_start(request); break;
-      case 'obs_outputs_replay_buffer_stop': result = await _obs_outputs_replay_buffer_stop(request); break;
-      case 'obs_outputs_replay_buffer_save': result = await _obs_outputs_replay_buffer_save(request); break;
-      case 'obs_outputs_toggle': result = await _obs_outputs_toggle(request); break;
-      case 'obs_outputs_start': result = await _obs_outputs_start(request); break;
-      case 'obs_outputs_stop': result = await _obs_outputs_stop(request); break;
-      case 'obs_config_record_directory': result = await _obs_config_record_directory(request); break;
-      case 'obs_config_stream_service_settings': result = await _obs_config_stream_service_settings(request); break;
-      case 'obs_ui_studio_mode_enabled': result = await _obs_ui_studio_mode_enabled(request); break;
-      case 'obs_ui_set_studio_mode': result = await _obs_ui_set_studio_mode(request); break;
-      case 'obs_ui_open_input_properties': result = await _obs_ui_open_input_properties(request); break;
-      case 'obs_ui_open_input_filters': result = await _obs_ui_open_input_filters(request); break;
-      case 'obs_ui_open_input_interact': result = await _obs_ui_open_input_interact(request); break;
-      case 'obs_ui_monitor_list': result = await _obs_ui_monitor_list(request); break;
-      case 'obs_transitions_trigger_studio': result = await _obs_transitions_trigger_studio(request); break;
-      case 'obs_transitions_kind_list': result = await _obs_transitions_kind_list(request); break;
-      case 'obs_transitions_scene_list': result = await _obs_transitions_scene_list(request); break;
-      case 'obs_transitions_get_current': result = await _obs_transitions_get_current(request); break;
-      case 'obs_transitions_set_current': result = await _obs_transitions_set_current(request); break;
-      case 'obs_transitions_set_duration': result = await _obs_transitions_set_duration(request); break;
-      case 'obs_transitions_set_settings': result = await _obs_transitions_set_settings(request); break;
-      case 'obs_transitions_get_cursor': result = await _obs_transitions_get_cursor(request); break;
-      case 'obs_transitions_set_tbar': result = await _obs_transitions_set_tbar(request); break;
-      case 'obs_sources_get_active': result = await _obs_sources_get_active(request); break;
-      case 'obs_sources_get_screenshot': result = await _obs_sources_get_screenshot(request); break;
-      case 'obs_sources_save_screenshot': result = await _obs_sources_save_screenshot(request); break;
-      case 'obs_sources_get_private_settings': result = await _obs_sources_get_private_settings(request); break;
-      case 'obs_sources_set_private_settings': result = await _obs_sources_set_private_settings(request); break;
-      case 'obs_media_inputs_get_status': result = await _obs_media_inputs_get_status(request); break;
-      case 'obs_media_inputs_set_cursor': result = await _obs_media_inputs_set_cursor(request); break;
-      case 'obs_media_inputs_offset_cursor': result = await _obs_media_inputs_offset_cursor(request); break;
-      case 'obs_media_inputs_trigger_action': result = await _obs_media_inputs_trigger_action(request); break;
-      case 'obs_inputs_get_deinterlace_mode': result = await _obs_inputs_get_deinterlace_mode(request); break;
-      case 'obs_inputs_set_deinterlace_mode': result = await _obs_inputs_set_deinterlace_mode(request); break;
-      case 'obs_inputs_get_deinterlace_field_order': result = await _obs_inputs_get_deinterlace_field_order(request); break;
-      case 'obs_inputs_set_deinterlace_field_order': result = await _obs_inputs_set_deinterlace_field_order(request); break;
-      case 'obs_inputs_set_volume': result = await _obs_inputs_set_volume(request); break;
-      case 'obs_inputs_get_default_settings': result = await _obs_inputs_get_default_settings(request); break;
-      case 'obs_general_call_vendor_request': result = await _obs_general_call_vendor_request(request); break;
-      case 'obs_general_trigger_hotkey_by_key': result = await _obs_general_trigger_hotkey_by_key(request); break;
-      case 'obs_scene_items_create': result = await _obs_scene_items_create(request); break;
-      case 'obs_scene_items_duplicate': result = await _obs_scene_items_duplicate(request); break;
-      case 'obs_scene_items_remove': result = await _obs_scene_items_remove(request); break;
-      case 'obs_scene_items_get_transform': result = await _obs_scene_items_get_transform(request); break;
-      case 'obs_canvases_list': result = await _obs_canvases_list(request); break;
-      case 'obs_filters_kind_list': result = await _obs_filters_kind_list(request); break;
-      case 'obs_filters_list': result = await _obs_filters_list(request); break;
-      case 'obs_filters_default_settings': result = await _obs_filters_default_settings(request); break;
-      case 'obs_filters_create': result = await _obs_filters_create(request); break;
-      case 'obs_filters_remove': result = await _obs_filters_remove(request); break;
-      case 'obs_filters_rename': result = await _obs_filters_rename(request); break;
-      case 'obs_filters_get': result = await _obs_filters_get(request); break;
-      case 'obs_filters_set_index': result = await _obs_filters_set_index(request); break;
-      case 'obs_filters_set_settings': result = await _obs_filters_set_settings(request); break;
-      case 'obs_filters_set_enabled': result = await _obs_filters_set_enabled(request); break;
-      case 'obs_outputs_list': result = await _obs_outputs_list(request); break;
-      case 'obs_outputs_get_status': result = await _obs_outputs_get_status(request); break;
-      case 'obs_outputs_get_settings': result = await _obs_outputs_get_settings(request); break;
-      case 'obs_outputs_set_settings': result = await _obs_outputs_set_settings(request); break;
-      case 'obs_inputs_get_audio_balance': result = await _obs_inputs_get_audio_balance(request); break;
-      case 'obs_inputs_set_audio_balance': result = await _obs_inputs_set_audio_balance(request); break;
-      case 'obs_inputs_get_audio_sync_offset': result = await _obs_inputs_get_audio_sync_offset(request); break;
-      case 'obs_inputs_set_audio_sync_offset': result = await _obs_inputs_set_audio_sync_offset(request); break;
-      case 'obs_inputs_get_audio_monitor_type': result = await _obs_inputs_get_audio_monitor_type(request); break;
-      case 'obs_inputs_set_audio_monitor_type': result = await _obs_inputs_set_audio_monitor_type(request); break;
-      case 'obs_inputs_get_audio_tracks': result = await _obs_inputs_get_audio_tracks(request); break;
-      case 'obs_inputs_set_audio_tracks': result = await _obs_inputs_set_audio_tracks(request); break;
-      case 'obs_inputs_get_properties_list_items': result = await _obs_inputs_get_properties_list_items(request); break;
-      case 'obs_inputs_press_properties_button': result = await _obs_inputs_press_properties_button(request); break;
-      case 'obs_scene_items_get_source': result = await _obs_scene_items_get_source(request); break;
-      case 'obs_scene_items_get_private_settings': result = await _obs_scene_items_get_private_settings(request); break;
-      case 'obs_scene_items_set_private_settings': result = await _obs_scene_items_set_private_settings(request); break;
-      case 'obs_connection_status': result = await _obs_connection_status(request); break;
-      case 'obs_connection_ping': result = await _obs_connection_ping(request); break;
-      case 'obs_events_subscribe': result = await _obs_events_subscribe(request); break;
-      case 'obs_wait_for_event': result = await _obs_wait_for_event(request); break;
-      case 'obs_client_sleep': result = await _obs_client_sleep(request); break;
-      case 'obs_scene_items_animate_transform': result = await _obs_scene_items_animate_transform(request); break;
+      case 'search':
+        result = await _search(request);
+        break;
+      case 'obs_connect':
+        result = await _obs_connect(request);
+        break;
+      case 'obs_disconnect':
+        result = await _obs_disconnect(request);
+        break;
+      case 'obs_is_connected':
+        result = await _obs_is_connected(request);
+        break;
+      case 'obs_send_raw':
+        result = await _obs_send_raw(request);
+        break;
+      case 'obs_general_version':
+        result = await _obs_general_version(request);
+        break;
+      case 'obs_general_stats':
+        result = await _obs_general_stats(request);
+        break;
+      case 'obs_general_hotkeys':
+        result = await _obs_general_hotkeys(request);
+        break;
+      case 'obs_general_trigger_hotkey':
+        result = await _obs_general_trigger_hotkey(request);
+        break;
+      case 'obs_general_sleep':
+        result = await _obs_general_sleep(request);
+        break;
+      case 'obs_general_broadcast_custom_event':
+        result = await _obs_general_broadcast_custom_event(request);
+        break;
+      case 'obs_scenes_list':
+        result = await _obs_scenes_list(request);
+        break;
+      case 'obs_scenes_group_list':
+        result = await _obs_scenes_group_list(request);
+        break;
+      case 'obs_scenes_get_current_program':
+        result = await _obs_scenes_get_current_program(request);
+        break;
+      case 'obs_scenes_set_current_program':
+        result = await _obs_scenes_set_current_program(request);
+        break;
+      case 'obs_scenes_get_current_preview':
+        result = await _obs_scenes_get_current_preview(request);
+        break;
+      case 'obs_scenes_set_current_preview':
+        result = await _obs_scenes_set_current_preview(request);
+        break;
+      case 'obs_scenes_create':
+        result = await _obs_scenes_create(request);
+        break;
+      case 'obs_scene_items_list':
+        result = await _obs_scene_items_list(request);
+        break;
+      case 'obs_scene_items_group_list':
+        result = await _obs_scene_items_group_list(request);
+        break;
+      case 'obs_scene_items_get_id':
+        result = await _obs_scene_items_get_id(request);
+        break;
+      case 'obs_scene_items_get_enabled':
+        result = await _obs_scene_items_get_enabled(request);
+        break;
+      case 'obs_scene_items_set_enabled':
+        result = await _obs_scene_items_set_enabled(request);
+        break;
+      case 'obs_scene_items_get_locked':
+        result = await _obs_scene_items_get_locked(request);
+        break;
+      case 'obs_scene_items_set_locked':
+        result = await _obs_scene_items_set_locked(request);
+        break;
+      case 'obs_scene_items_set_transform':
+        result = await _obs_scene_items_set_transform(request);
+        break;
+      case 'obs_inputs_list':
+        result = await _obs_inputs_list(request);
+        break;
+      case 'obs_inputs_kind_list':
+        result = await _obs_inputs_kind_list(request);
+        break;
+      case 'obs_inputs_special':
+        result = await _obs_inputs_special(request);
+        break;
+      case 'obs_inputs_get_mute':
+        result = await _obs_inputs_get_mute(request);
+        break;
+      case 'obs_inputs_set_mute':
+        result = await _obs_inputs_set_mute(request);
+        break;
+      case 'obs_inputs_toggle_mute':
+        result = await _obs_inputs_toggle_mute(request);
+        break;
+      case 'obs_inputs_get_volume':
+        result = await _obs_inputs_get_volume(request);
+        break;
+      case 'obs_inputs_get_settings':
+        result = await _obs_inputs_get_settings(request);
+        break;
+      case 'obs_inputs_set_settings':
+        result = await _obs_inputs_set_settings(request);
+        break;
+      case 'obs_inputs_set_name':
+        result = await _obs_inputs_set_name(request);
+        break;
+      case 'obs_inputs_create':
+        result = await _obs_inputs_create(request);
+        break;
+      case 'obs_inputs_remove':
+        result = await _obs_inputs_remove(request);
+        break;
+      case 'obs_stream_status':
+        result = await _obs_stream_status(request);
+        break;
+      case 'obs_stream_start':
+        result = await _obs_stream_start(request);
+        break;
+      case 'obs_stream_stop':
+        result = await _obs_stream_stop(request);
+        break;
+      case 'obs_stream_toggle':
+        result = await _obs_stream_toggle(request);
+        break;
+      case 'obs_stream_send_caption':
+        result = await _obs_stream_send_caption(request);
+        break;
+      case 'obs_record_status':
+        result = await _obs_record_status(request);
+        break;
+      case 'obs_record_start':
+        result = await _obs_record_start(request);
+        break;
+      case 'obs_record_stop':
+        result = await _obs_record_stop(request);
+        break;
+      case 'obs_record_toggle':
+        result = await _obs_record_toggle(request);
+        break;
+      case 'obs_record_pause':
+        result = await _obs_record_pause(request);
+        break;
+      case 'obs_record_resume':
+        result = await _obs_record_resume(request);
+        break;
+      case 'obs_record_toggle_pause':
+        result = await _obs_record_toggle_pause(request);
+        break;
+      case 'obs_outputs_virtual_cam_status':
+        result = await _obs_outputs_virtual_cam_status(request);
+        break;
+      case 'obs_outputs_virtual_cam_toggle':
+        result = await _obs_outputs_virtual_cam_toggle(request);
+        break;
+      case 'obs_outputs_virtual_cam_start':
+        result = await _obs_outputs_virtual_cam_start(request);
+        break;
+      case 'obs_outputs_virtual_cam_stop':
+        result = await _obs_outputs_virtual_cam_stop(request);
+        break;
+      case 'obs_outputs_replay_buffer_status':
+        result = await _obs_outputs_replay_buffer_status(request);
+        break;
+      case 'obs_outputs_replay_buffer_toggle':
+        result = await _obs_outputs_replay_buffer_toggle(request);
+        break;
+      case 'obs_outputs_replay_buffer_start':
+        result = await _obs_outputs_replay_buffer_start(request);
+        break;
+      case 'obs_outputs_replay_buffer_stop':
+        result = await _obs_outputs_replay_buffer_stop(request);
+        break;
+      case 'obs_outputs_replay_buffer_save':
+        result = await _obs_outputs_replay_buffer_save(request);
+        break;
+      case 'obs_outputs_toggle':
+        result = await _obs_outputs_toggle(request);
+        break;
+      case 'obs_outputs_start':
+        result = await _obs_outputs_start(request);
+        break;
+      case 'obs_outputs_stop':
+        result = await _obs_outputs_stop(request);
+        break;
+      case 'obs_config_record_directory':
+        result = await _obs_config_record_directory(request);
+        break;
+      case 'obs_config_stream_service_settings':
+        result = await _obs_config_stream_service_settings(request);
+        break;
+      case 'obs_ui_studio_mode_enabled':
+        result = await _obs_ui_studio_mode_enabled(request);
+        break;
+      case 'obs_ui_set_studio_mode':
+        result = await _obs_ui_set_studio_mode(request);
+        break;
+      case 'obs_ui_open_input_properties':
+        result = await _obs_ui_open_input_properties(request);
+        break;
+      case 'obs_ui_open_input_filters':
+        result = await _obs_ui_open_input_filters(request);
+        break;
+      case 'obs_ui_open_input_interact':
+        result = await _obs_ui_open_input_interact(request);
+        break;
+      case 'obs_ui_monitor_list':
+        result = await _obs_ui_monitor_list(request);
+        break;
+      case 'obs_transitions_trigger_studio':
+        result = await _obs_transitions_trigger_studio(request);
+        break;
+      case 'obs_transitions_kind_list':
+        result = await _obs_transitions_kind_list(request);
+        break;
+      case 'obs_transitions_scene_list':
+        result = await _obs_transitions_scene_list(request);
+        break;
+      case 'obs_transitions_get_current':
+        result = await _obs_transitions_get_current(request);
+        break;
+      case 'obs_transitions_set_current':
+        result = await _obs_transitions_set_current(request);
+        break;
+      case 'obs_transitions_set_duration':
+        result = await _obs_transitions_set_duration(request);
+        break;
+      case 'obs_transitions_set_settings':
+        result = await _obs_transitions_set_settings(request);
+        break;
+      case 'obs_transitions_get_cursor':
+        result = await _obs_transitions_get_cursor(request);
+        break;
+      case 'obs_transitions_set_tbar':
+        result = await _obs_transitions_set_tbar(request);
+        break;
+      case 'obs_sources_get_active':
+        result = await _obs_sources_get_active(request);
+        break;
+      case 'obs_sources_get_screenshot':
+        result = await _obs_sources_get_screenshot(request);
+        break;
+      case 'obs_sources_save_screenshot':
+        result = await _obs_sources_save_screenshot(request);
+        break;
+      case 'obs_sources_get_private_settings':
+        result = await _obs_sources_get_private_settings(request);
+        break;
+      case 'obs_sources_set_private_settings':
+        result = await _obs_sources_set_private_settings(request);
+        break;
+      case 'obs_media_inputs_get_status':
+        result = await _obs_media_inputs_get_status(request);
+        break;
+      case 'obs_media_inputs_set_cursor':
+        result = await _obs_media_inputs_set_cursor(request);
+        break;
+      case 'obs_media_inputs_offset_cursor':
+        result = await _obs_media_inputs_offset_cursor(request);
+        break;
+      case 'obs_media_inputs_trigger_action':
+        result = await _obs_media_inputs_trigger_action(request);
+        break;
+      case 'obs_inputs_get_deinterlace_mode':
+        result = await _obs_inputs_get_deinterlace_mode(request);
+        break;
+      case 'obs_inputs_set_deinterlace_mode':
+        result = await _obs_inputs_set_deinterlace_mode(request);
+        break;
+      case 'obs_inputs_get_deinterlace_field_order':
+        result = await _obs_inputs_get_deinterlace_field_order(request);
+        break;
+      case 'obs_inputs_set_deinterlace_field_order':
+        result = await _obs_inputs_set_deinterlace_field_order(request);
+        break;
+      case 'obs_inputs_set_volume':
+        result = await _obs_inputs_set_volume(request);
+        break;
+      case 'obs_inputs_get_default_settings':
+        result = await _obs_inputs_get_default_settings(request);
+        break;
+      case 'obs_general_call_vendor_request':
+        result = await _obs_general_call_vendor_request(request);
+        break;
+      case 'obs_general_trigger_hotkey_by_key':
+        result = await _obs_general_trigger_hotkey_by_key(request);
+        break;
+      case 'obs_scene_items_create':
+        result = await _obs_scene_items_create(request);
+        break;
+      case 'obs_scene_items_duplicate':
+        result = await _obs_scene_items_duplicate(request);
+        break;
+      case 'obs_scene_items_remove':
+        result = await _obs_scene_items_remove(request);
+        break;
+      case 'obs_scene_items_get_transform':
+        result = await _obs_scene_items_get_transform(request);
+        break;
+      case 'obs_canvases_list':
+        result = await _obs_canvases_list(request);
+        break;
+      case 'obs_filters_kind_list':
+        result = await _obs_filters_kind_list(request);
+        break;
+      case 'obs_filters_list':
+        result = await _obs_filters_list(request);
+        break;
+      case 'obs_filters_default_settings':
+        result = await _obs_filters_default_settings(request);
+        break;
+      case 'obs_filters_create':
+        result = await _obs_filters_create(request);
+        break;
+      case 'obs_filters_remove':
+        result = await _obs_filters_remove(request);
+        break;
+      case 'obs_filters_rename':
+        result = await _obs_filters_rename(request);
+        break;
+      case 'obs_filters_get':
+        result = await _obs_filters_get(request);
+        break;
+      case 'obs_filters_set_index':
+        result = await _obs_filters_set_index(request);
+        break;
+      case 'obs_filters_set_settings':
+        result = await _obs_filters_set_settings(request);
+        break;
+      case 'obs_filters_set_enabled':
+        result = await _obs_filters_set_enabled(request);
+        break;
+      case 'obs_outputs_list':
+        result = await _obs_outputs_list(request);
+        break;
+      case 'obs_outputs_get_status':
+        result = await _obs_outputs_get_status(request);
+        break;
+      case 'obs_outputs_get_settings':
+        result = await _obs_outputs_get_settings(request);
+        break;
+      case 'obs_outputs_set_settings':
+        result = await _obs_outputs_set_settings(request);
+        break;
+      case 'obs_inputs_get_audio_balance':
+        result = await _obs_inputs_get_audio_balance(request);
+        break;
+      case 'obs_inputs_set_audio_balance':
+        result = await _obs_inputs_set_audio_balance(request);
+        break;
+      case 'obs_inputs_get_audio_sync_offset':
+        result = await _obs_inputs_get_audio_sync_offset(request);
+        break;
+      case 'obs_inputs_set_audio_sync_offset':
+        result = await _obs_inputs_set_audio_sync_offset(request);
+        break;
+      case 'obs_inputs_get_audio_monitor_type':
+        result = await _obs_inputs_get_audio_monitor_type(request);
+        break;
+      case 'obs_inputs_set_audio_monitor_type':
+        result = await _obs_inputs_set_audio_monitor_type(request);
+        break;
+      case 'obs_inputs_get_audio_tracks':
+        result = await _obs_inputs_get_audio_tracks(request);
+        break;
+      case 'obs_inputs_set_audio_tracks':
+        result = await _obs_inputs_set_audio_tracks(request);
+        break;
+      case 'obs_inputs_get_properties_list_items':
+        result = await _obs_inputs_get_properties_list_items(request);
+        break;
+      case 'obs_inputs_press_properties_button':
+        result = await _obs_inputs_press_properties_button(request);
+        break;
+      case 'obs_scene_items_get_source':
+        result = await _obs_scene_items_get_source(request);
+        break;
+      case 'obs_scene_items_get_private_settings':
+        result = await _obs_scene_items_get_private_settings(request);
+        break;
+      case 'obs_scene_items_set_private_settings':
+        result = await _obs_scene_items_set_private_settings(request);
+        break;
+      case 'obs_connection_status':
+        result = await _obs_connection_status(request);
+        break;
+      case 'obs_connection_ping':
+        result = await _obs_connection_ping(request);
+        break;
+      case 'obs_events_subscribe':
+        result = await _obs_events_subscribe(request);
+        break;
+      case 'obs_wait_for_event':
+        result = await _obs_wait_for_event(request);
+        break;
+      case 'obs_client_sleep':
+        result = await _obs_client_sleep(request);
+        break;
+      case 'obs_scene_items_animate_transform':
+        result = await _obs_scene_items_animate_transform(request);
+        break;
       default:
         throw StateError('Unknown tool: $toolName');
     }
@@ -3419,12 +6798,15 @@ base class MCPServerWithTools extends MCPServer with ToolsSupport {
     if (result == null) return 'null';
     try {
       if (result is List) {
-        final items = result.map((e) {
-          if (e == null) return null;
-          final toJson = e.toJson;
-          if (toJson != null && toJson is Function) return toJson();
-          return e.toString();
-        }).where((e) => e != null).toList();
+        final items = result
+            .map((e) {
+              if (e == null) return null;
+              final toJson = e.toJson;
+              if (toJson != null && toJson is Function) return toJson();
+              return e.toString();
+            })
+            .where((e) => e != null)
+            .toList();
         return jsonEncode(items);
       }
       final toJson = result.toJson;

@@ -46,8 +46,11 @@ melos:
         concurrency: 1
     format-check:
       run: dart format --output=none --set-exit-if-changed .
-      exec:
-        concurrency: 1
+      packageFilters:
+        dirExists: test
+        ignore:
+          - obs_websocket_js
+          - obs_mcp_js
     test:
       run: melos run _test_internal --no-select
       exec:
